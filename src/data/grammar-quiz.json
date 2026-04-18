@@ -60,5 +60,20 @@
   { "q": "'Πώς πάω στο νοσοκομείο;' means...?", "a": "How do I get to the hospital?", "wrong": ["Where is the hospital?", "Is the hospital far?", "I'm going to the hospital"], "topic": 28 },
   { "q": "'Στρίψε δεξιά' means...?", "a": "Turn right", "wrong": ["Turn left", "Go straight", "Go back"], "topic": 28 },
   { "q": "'Θα ήθελα ένα καφέ' is an example of...?", "a": "A polite request (conditional)", "wrong": ["A command", "A past action", "A future plan"], "topic": 29 },
-  { "q": "'Αν βρέξει, θα μείνω σπίτι' is what type of sentence?", "a": "Real conditional", "wrong": ["Unreal conditional", "Command", "Wish"], "topic": 29 }
+  { "q": "'Αν βρέξει, θα μείνω σπίτι' is what type of sentence?", "a": "Real conditional", "wrong": ["Unreal conditional", "Command", "Wish"], "topic": 29 },
+  { "q": "What is the plural of 'το παιδί' (the child)?", "a": "τα παιδιά", "wrong": ["τα παιδές", "οι παιδοί", "τα παιδάκια"], "topic": 3 },
+  { "q": "What is the accusative plural of masculine nouns (e.g. 'οι φίλοι')?", "a": "τους φίλους", "wrong": ["τους φίλοι", "τις φίλους", "τα φίλους"], "topic": 2 },
+  { "q": "Which verb group uses the endings -άω, -άς, -ά, -άμε, -άτε, -άνε?", "a": "B1", "wrong": ["A", "B2", "Passive"], "topic": 7 },
+  { "q": "What is the past tense of 'γράφω' (to write)?", "a": "έγραψα", "wrong": ["έγραφα", "γράφησα", "γράψα"], "topic": 8 },
+  { "q": "'Μου αρέσουν τα φρούτα' means...?", "a": "I like fruits", "wrong": ["Fruits are mine", "My fruits", "I eat fruits"], "topic": 14 },
+  { "q": "What is 'σε + την' contracted to?", "a": "στην", "wrong": ["στη", "στον", "σ'την"], "topic": 12 },
+  { "q": "What is the irregular comparative of 'κακός' (bad)?", "a": "χειρότερος", "wrong": ["πιο κακός", "κακότερος", "κακίστερος"], "topic": 13 },
+  { "q": "'Δεν θέλω τίποτα' means...?", "a": "I don't want anything", "wrong": ["I don't want nothing", "I want everything", "I never want"], "topic": 10 },
+  { "q": "What does 'Πόσο κοστίζει;' mean?", "a": "How much does it cost?", "wrong": ["How many are there?", "How is it?", "Where is it?"], "topic": 11 },
+  { "q": "'Ελάτε!' is the formal/plural command form of...?", "a": "έρχομαι (to come)", "wrong": ["πάω (to go)", "λέω (to say)", "τρώω (to eat)"], "topic": 18 },
+  { "q": "How do you say 'at 5 o'clock' in Greek?", "a": "Στις πέντε", "wrong": ["Σε πέντε", "Τις πέντε", "Οι πέντε"], "topic": 19 },
+  { "q": "'εκείνο το βιβλίο' means...?", "a": "That book", "wrong": ["This book", "My book", "The book"], "topic": 21 },
+  { "q": "Which word means 'therefore/so'?", "a": "γι' αυτό", "wrong": ["γιατί", "αλλά", "επειδή"], "topic": 17 },
+  { "q": "In 'Θέλω να φάω', what follows 'να'?", "a": "Subjunctive form of the verb", "wrong": ["Infinitive", "Past tense", "Imperative"], "topic": 15 },
+  { "q": "How do you express 'I hope to...' in Greek?", "a": "Ελπίζω να...", "wrong": ["Θα ήθελα...", "Μακάρι...", "Πρέπει να..."], "topic": 29 }
 ]

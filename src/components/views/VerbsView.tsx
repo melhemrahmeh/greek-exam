@@ -1,5 +1,9 @@
+import { useState } from "react";
 import { tenseGreek, tenseLabels, typeDescriptions } from "../../features/study/constants";
 import { persons, verbs } from "../../features/study/data";
+
+const verbTypes = ["All", "A", "B1", "B2", "passive", "irregular"] as const;
+type VerbTypeFilter = (typeof verbTypes)[number];
 
 type VerbsViewProps = {
   selectedVerb: number | null;
@@ -38,11 +42,20 @@ export function VerbsView({
   onOpenMatch,
   onOpenTyping,
 }: VerbsViewProps) {
+  const [typeFilter, setTypeFilter] = useState<VerbTypeFilter>("All");
+
   const filteredVerbs = verbs.filter((verb) => {
+    if (typeFilter !== "All" && verb.type.toLowerCase() !== typeFilter.toLowerCase()) return false;
     const query = verbSearch.trim().toLowerCase();
     if (!query) return true;
     return verb.inf.toLowerCase().includes(query) || verb.en.toLowerCase().includes(query) || verb.type.toLowerCase().includes(query);
   });
+
+  const typeCounts = verbs.reduce<Record<string, number>>((acc, v) => {
+    const key = v.type.toLowerCase();
+    acc[key] = (acc[key] ?? 0) + 1;
+    return acc;
+  }, {});
 
   const selectedVerbData = selectedVerb !== null ? verbs[selectedVerb] : null;
 
@@ -126,6 +139,22 @@ export function VerbsView({
         </div>
 
         <input className="search-input" value={verbSearch} onChange={(event) => onVerbSearchChange(event.target.value)} placeholder="Search verbs" />
+
+        <div className="filter-bar">
+          {verbTypes.map((t) => {
+            const count = t === "All" ? verbs.length : (typeCounts[t.toLowerCase()] ?? 0);
+            return (
+              <button
+                key={t}
+                className={typeFilter === t ? "filter-chip active" : "filter-chip"}
+                onClick={() => setTypeFilter(t)}
+              >
+                {t === "All" ? "All" : t}
+                <span className="chip-count">{count}</span>
+              </button>
+            );
+          })}
+        </div>
 
         <div className="verb-results-head">
           <span className="verb-results-count">{filteredVerbs.length} result(s)</span>

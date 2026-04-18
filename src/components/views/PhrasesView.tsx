@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { phraseSections } from "../../features/study/data";
 
 type PhrasesViewProps = {
@@ -19,6 +20,24 @@ export function PhrasesView({
   onTogglePhrase,
   onBuildPhraseQuiz,
 }: PhrasesViewProps) {
+  const [search, setSearch] = useState("");
+
+  const normalizedSearch = search.trim().toLowerCase();
+  const filteredSections = normalizedSearch
+    ? phraseSections
+        .map((section) => ({
+          ...section,
+          items: section.items.filter(
+            (item) =>
+              item.gr.toLowerCase().includes(normalizedSearch) ||
+              item.en.toLowerCase().includes(normalizedSearch)
+          ),
+        }))
+        .filter((section) => section.items.length > 0 || section.title.toLowerCase().includes(normalizedSearch))
+    : phraseSections;
+
+  const totalPhrases = phraseSections.reduce((sum, s) => sum + s.items.length, 0);
+
   return (
     <>
       <section className="panel">
@@ -53,32 +72,52 @@ export function PhrasesView({
       </section>
 
       <section className="panel">
+        <input
+          className="search-input"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search phrases in Greek or English"
+        />
+        <div style={{ display: "flex", gap: 12, marginTop: 10, color: "var(--text-muted)", fontSize: "0.86rem", fontWeight: 700 }}>
+          <span>{phraseSections.length} sections</span>
+          <span>{totalPhrases} phrases</span>
+          {normalizedSearch && <span>{filteredSections.reduce((s, sec) => s + sec.items.length, 0)} matches</span>}
+        </div>
+
         <div className="accordion-list">
-          {phraseSections.map((section) => {
-            const isOpen = openPhrase === section.title;
+          {filteredSections.map((section) => {
+            const isOpen = openPhrase === section.title || !!normalizedSearch;
             const bestScore = phraseSectionBestScores[section.title];
 
             return (
               <article key={section.title} className="accordion-card">
                 <button className="accordion-toggle" onClick={() => onTogglePhrase(section.title)}>
-                  <span>{section.title}</span>
-                  <span>{bestScore !== null ? `best ${bestScore}%` : isOpen ? "Hide" : "Show"}</span>
+                  <span>
+                    {section.icon} {section.title}
+                    <span className="word-count-badge" style={{ marginLeft: 8 }}>{section.items.length}</span>
+                  </span>
+                  <span>{bestScore !== null ? `best ${bestScore}%` : isOpen && !normalizedSearch ? "Hide" : "Show"}</span>
                 </button>
                 {isOpen && (
                   <div className="phrase-list">
-                    <div className="phrase-actions">
-                      <button className="primary-button" onClick={() => onBuildPhraseQuiz("gr-en", section.title)}>
-                        Greek to English
-                      </button>
-                      <button className="secondary-button" onClick={() => onBuildPhraseQuiz("en-gr", section.title)}>
-                        English to Greek
-                      </button>
-                    </div>
-                    {section.items.map((item) => (
+                    {!normalizedSearch && (
+                      <div className="phrase-actions">
+                        <button className="primary-button" onClick={() => onBuildPhraseQuiz("gr-en", section.title)}>
+                          Greek to English
+                        </button>
+                        <button className="secondary-button" onClick={() => onBuildPhraseQuiz("en-gr", section.title)}>
+                          English to Greek
+                        </button>
+                      </div>
+                    )}
+                    {section.items.map((item, i) => (
                       <div key={`${section.title}-${item.gr}`} className="phrase-row">
-                        <div>
-                          <strong>{item.gr}</strong>
-                          <small>{item.note ?? section.title}</small>
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                          <span className="phrase-row-index">{i + 1}</span>
+                          <div>
+                            <strong>{item.gr}</strong>
+                            <small>{item.note ?? section.title}</small>
+                          </div>
                         </div>
                         <span>{item.en}</span>
                       </div>
@@ -88,6 +127,7 @@ export function PhrasesView({
               </article>
             );
           })}
+          {!filteredSections.length && <div className="empty-state">No phrases match your search.</div>}
         </div>
       </section>
     </>
