@@ -1169,21 +1169,25 @@ export default function App() {
                   <span className="mini-label">Mixed</span>
                   <strong>Grammar pressure test</strong>
                   <span>Run a broad rule check with exam-style wording.</span>
+                  <span className="card-cta">Start quiz</span>
                 </button>
                 <button className="dashboard-mode dashboard-mode-amber" onClick={buildVerbConjugationQuiz}>
                   <span className="mini-label">Verbs</span>
                   <strong>Conjugation sprint</strong>
                   <span>Train tense and person recognition with longer sessions.</span>
+                  <span className="card-cta">Start quiz</span>
                 </button>
                 <button className="dashboard-mode dashboard-mode-green" onClick={() => setSession({ kind: "match" })}>
                   <span className="mini-label">Game</span>
                   <strong>Pronoun matcher</strong>
                   <span>Quick, interactive practice pulled from the original build.</span>
+                  <span className="card-cta">Play now</span>
                 </button>
                 <button className="dashboard-mode dashboard-mode-rose" onClick={() => setSession({ kind: "typing" })}>
                   <span className="mini-label">Recall</span>
                   <strong>Typing drill</strong>
                   <span>Force active memory instead of passive recognition.</span>
+                  <span className="card-cta">Start drill</span>
                 </button>
               </div>
             </section>
@@ -1326,21 +1330,25 @@ export default function App() {
                   <span className="mini-label">Recognition</span>
                   <strong>Meanings</strong>
                   <span>Recognize core verbs fast</span>
+                  <span className="card-cta subtle">Start quiz</span>
                 </button>
                 <button className="verb-action-card action-conjugation" onClick={buildVerbConjugationQuiz}>
                   <span className="mini-label">Accuracy</span>
                   <strong>Conjugation</strong>
                   <span>Spot the right tense and person</span>
+                  <span className="card-cta subtle">Start quiz</span>
                 </button>
                 <button className="verb-action-card action-match" onClick={() => setSession({ kind: "match" })}>
                   <span className="mini-label">Interactive</span>
                   <strong>Match game</strong>
                   <span>Pronouns and endings</span>
+                  <span className="card-cta subtle">Play now</span>
                 </button>
                 <button className="verb-action-card action-typing" onClick={() => setSession({ kind: "typing" })}>
                   <span className="mini-label">Recall</span>
                   <strong>Typing drill</strong>
                   <span>Recall forms from memory</span>
+                  <span className="card-cta subtle">Start drill</span>
                 </button>
               </div>
             </div>

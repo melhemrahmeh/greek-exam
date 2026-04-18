@@ -71,6 +71,10 @@ input {
   font: inherit;
 }
 
+button {
+  color: inherit;
+}
+
 .app-shell {
   width: min(1120px, calc(100% - 28px));
   margin: 0 auto;
@@ -215,7 +219,10 @@ input {
 .accordion-toggle,
 .match-chip,
 .choice-card,
-.list-button {
+.list-button,
+.dashboard-mode,
+.verb-action-card,
+.verb-browser-card {
   color: var(--text);
   background: var(--surface);
 }
@@ -390,7 +397,7 @@ input {
   font-size: 1.18rem;
 }
 
-.dashboard-mode span:last-child {
+.dashboard-mode span:nth-of-type(2) {
   display: block;
   margin-top: 8px;
   color: inherit;
@@ -433,6 +440,28 @@ input {
 
 .utility-card strong {
   font-size: 2rem;
+}
+
+.card-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-top: 16px;
+  padding: 0.52rem 0.88rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.12);
+  color: inherit;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.card-cta.subtle {
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--text);
 }
 
 .stats-grid {
@@ -559,6 +588,7 @@ input {
 .verb-action-card {
   padding: 18px;
   text-align: left;
+  color: var(--text);
 }
 
 .verb-action-card strong {
@@ -567,7 +597,7 @@ input {
   font-size: 1.15rem;
 }
 
-.verb-action-card span:last-child {
+.verb-action-card span:nth-of-type(2) {
   display: block;
   margin-top: 8px;
   color: var(--text-muted);
@@ -587,6 +617,22 @@ input {
 
 .action-typing {
   background: linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--danger) 10%, var(--surface)));
+}
+
+[data-theme="dark"] .action-meaning {
+  background: linear-gradient(160deg, rgba(20, 59, 88, 0.92), rgba(29, 72, 112, 0.96));
+}
+
+[data-theme="dark"] .action-conjugation {
+  background: linear-gradient(160deg, rgba(77, 56, 34, 0.94), rgba(107, 76, 42, 0.98));
+}
+
+[data-theme="dark"] .action-match {
+  background: linear-gradient(160deg, rgba(24, 67, 58, 0.94), rgba(34, 90, 74, 0.98));
+}
+
+[data-theme="dark"] .action-typing {
+  background: linear-gradient(160deg, rgba(76, 40, 56, 0.94), rgba(96, 51, 71, 0.98));
 }
 
 .verb-results-head {
@@ -688,6 +734,131 @@ input {
 .type-impersonal {
   background: rgba(181, 77, 66, 0.14);
   color: #8a4138;
+}
+
+[data-theme="dark"] .mini-label,
+[data-theme="dark"] .pill,
+[data-theme="dark"] .verb-browser-link,
+[data-theme="dark"] .verb-browser-preview span,
+[data-theme="dark"] .verb-studio-pill,
+[data-theme="dark"] .verb-glance-card,
+[data-theme="dark"] .conjugation-card,
+[data-theme="dark"] .card-cta.subtle {
+  color: var(--text);
+}
+
+[data-theme="dark"] .type-a {
+  background: rgba(103, 205, 232, 0.18);
+  color: #b7f3ff;
+}
+
+[data-theme="dark"] .type-b1,
+[data-theme="dark"] .type-b2 {
+  background: rgba(240, 178, 106, 0.18);
+  color: #ffe0b7;
+}
+
+[data-theme="dark"] .type-passive {
+  background: rgba(84, 190, 147, 0.18);
+  color: #c8ffe7;
+}
+
+[data-theme="dark"] .type-irregular,
+[data-theme="dark"] .type-impersonal {
+  background: rgba(239, 138, 129, 0.18);
+  color: #ffd2cd;
+}
+
+[data-theme="dark"] .verb-studio,
+[data-theme="dark"] .verb-action-card,
+[data-theme="dark"] .verb-browser-card,
+[data-theme="dark"] .verb-detail-copy,
+[data-theme="dark"] .verb-detail-note,
+[data-theme="dark"] .verb-glance-card,
+[data-theme="dark"] .conjugation-card {
+  color: var(--text);
+}
+
+[data-theme="dark"] .verb-studio-head h3,
+[data-theme="dark"] .verb-action-card strong,
+[data-theme="dark"] .verb-browser-card strong,
+[data-theme="dark"] .verb-detail-copy h3,
+[data-theme="dark"] .verb-glance-card strong,
+[data-theme="dark"] .conjugation-card strong,
+[data-theme="dark"] .verb-studio-pill strong {
+  color: #f5f9ff;
+}
+
+[data-theme="dark"] .verb-studio-head p,
+[data-theme="dark"] .verb-action-card span:nth-of-type(2),
+[data-theme="dark"] .verb-browser-card small,
+[data-theme="dark"] .verb-studio-pill span,
+[data-theme="dark"] .verb-results-count,
+[data-theme="dark"] .verb-detail-copy p,
+[data-theme="dark"] .verb-detail-note p,
+[data-theme="dark"] .verb-glance-card small,
+[data-theme="dark"] .conjugation-card small,
+[data-theme="dark"] .conjugation-card span,
+[data-theme="dark"] .section-label,
+[data-theme="dark"] .search-input::placeholder {
+  color: #c6d2e4;
+}
+
+[data-theme="dark"] .verb-browser-link,
+[data-theme="dark"] .card-cta.subtle {
+  background: #22314d;
+  border-color: #32486b;
+  color: #dce8fa;
+}
+
+[data-theme="dark"] .verb-browser-preview span {
+  background: #1d2940;
+  border-color: #314668;
+  color: #d0dbeb;
+}
+
+[data-theme="dark"] .verb-studio-pill,
+[data-theme="dark"] .verb-glance-card,
+[data-theme="dark"] .conjugation-card {
+  background: #172239;
+  border-color: #2c3d5c;
+}
+
+[data-theme="dark"] .verb-studio {
+  background:
+    radial-gradient(circle at top right, rgba(103, 205, 232, 0.18), transparent 26%),
+    linear-gradient(180deg, #152138, #101a2d);
+  border-color: #314668;
+}
+
+[data-theme="dark"] .verb-action-card {
+  border-color: #385172;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .verb-browser-card {
+  background: linear-gradient(180deg, #152137, #10192b);
+  border-color: #31476b;
+}
+
+[data-theme="dark"] .verb-detail-copy,
+[data-theme="dark"] .verb-detail-note {
+  background: linear-gradient(180deg, #16233a, #101a2d);
+  border-color: #32486c;
+}
+
+[data-theme="light"] .dashboard-mode,
+[data-theme="light"] .dashboard-mode .card-cta {
+  color: #fff;
+}
+
+[data-theme="light"] .verb-action-card,
+[data-theme="light"] .verb-browser-card,
+[data-theme="light"] .verb-detail-copy,
+[data-theme="light"] .verb-detail-note,
+[data-theme="light"] .dashboard-lead,
+[data-theme="light"] .verb-studio {
+  color: var(--text);
 }
 
 .verb-detail-hero {
@@ -824,6 +995,12 @@ input {
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
+.search-input::placeholder,
+.field input::placeholder {
+  color: var(--text-soft);
+  opacity: 1;
+}
+
 .search-input:focus,
 .field input:focus {
   border-color: var(--brand);
@@ -910,6 +1087,11 @@ input {
   padding: 16px;
 }
 
+[data-theme="dark"] .quiz-panel {
+  background: linear-gradient(180deg, #10192b, #0d1626);
+  border-color: #30466a;
+}
+
 .quiz-toolbar {
   display: grid;
   gap: 10px;
@@ -937,6 +1119,16 @@ input {
 .quiz-stat strong {
   color: var(--text);
   font-size: 1rem;
+}
+
+[data-theme="dark"] .quiz-stat {
+  background: #1a2640;
+  border-color: #32486b;
+  color: #c5d3e8;
+}
+
+[data-theme="dark"] .quiz-stat strong {
+  color: #f6fbff;
 }
 
 .progress-track {
@@ -1146,6 +1338,30 @@ input {
 .match-chip.resolved {
   background: rgba(31, 122, 88, 0.14);
   border-color: var(--success);
+}
+
+[data-theme="dark"] .match-chip {
+  background: linear-gradient(180deg, #152137, #111a2c);
+  border-color: #32486b;
+  color: #eef5ff;
+}
+
+[data-theme="dark"] .match-chip.selected {
+  background: linear-gradient(135deg, rgba(48, 150, 182, 0.34), rgba(27, 78, 108, 0.72));
+  border-color: #74d7f1;
+  color: #f3fbff;
+}
+
+[data-theme="dark"] .match-chip.resolved {
+  background: linear-gradient(135deg, rgba(78, 182, 136, 0.34), rgba(27, 90, 70, 0.72));
+  border-color: #7ce2b6;
+  color: #f2fff9;
+}
+
+[data-theme="dark"] .feedback-box {
+  background: linear-gradient(180deg, #17233b, #111a2d);
+  border-color: #32496d;
+  color: #d7e3f5;
 }
 
 .form-grid {
