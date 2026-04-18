@@ -1,0 +1,11 @@
+html {
+  color-scheme: light;
+}
+
+body {
+  min-width: 320px;
+}
+
+a {
+  color: inherit;
+}

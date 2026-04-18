@@ -1,0 +1,1543 @@
+
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Ελληνικά A2 Trainer PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f6ff;--surface:#ffffff;--surface2:#e8f0fb;--border:#c5d5ef;
+  --accent:#2563eb;--accent2:#3b82f6;--gold:#d97706;--green:#059669;
+  --red:#dc2626;--text:#1e293b;--muted:#64748b;--white:#ffffff;
+  --shadow:0 2px 12px rgba(37,99,235,0.09);--shadow-lg:0 6px 24px rgba(37,99,235,0.14);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 40% at 10% 0%,rgba(37,99,235,0.06) 0%,transparent 55%),radial-gradient(ellipse 50% 30% at 90% 100%,rgba(217,119,6,0.05) 0%,transparent 55%);pointer-events:none;z-index:0;}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.96);backdrop-filter:blur(18px);border-bottom:1.5px solid var(--border);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 8px rgba(37,99,235,0.07);}
+.hdr-left{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.flag{font-size:22px;}
+.hdr-left h1{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;background:linear-gradient(120deg,#2563eb,#d97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.btn-reset{background:#fef2f2;border:1.5px solid #fecaca;color:#b91c1c;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+/* VIEWS */
+.view{display:none;position:relative;z-index:1;}
+#view-menu{padding:14px 14px 100px;}
+
+/* MENU */
+.menu-hero{text-align:center;padding:18px 10px 16px;margin-bottom:14px;}
+.menu-hero h2{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:var(--text);margin-bottom:4px;}
+.menu-hero h2 em{font-style:normal;color:var(--gold);}
+.menu-hero p{color:var(--muted);font-size:12px;}
+.overall-box{background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:13px 15px;margin-bottom:16px;box-shadow:var(--shadow);}
+.overall-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.overall-hdr span:first-child{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.overall-pct{font-size:19px;font-weight:700;color:var(--accent);}
+.bar-track{height:6px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--gold));transition:width .5s;}
+.overall-detail{font-size:10px;color:var(--muted);margin-top:4px;text-align:right;}
+.sec-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:7px;padding-left:2px;}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.cat-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:12px 11px;cursor:pointer;transition:transform .12s,border-color .12s;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.cat-card:hover{border-color:var(--accent2);transform:translateY(-1px);box-shadow:var(--shadow-lg);}
+.cat-card:active{transform:scale(.97);}
+.cat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--gold));opacity:0;transition:opacity .2s;}
+.cat-card:hover::after{opacity:1;}
+.cc-emoji{font-size:20px;display:block;margin-bottom:5px;}
+.cc-name{font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px;line-height:1.3;}
+.cc-count{font-size:10px;color:var(--muted);margin-bottom:6px;}
+.cc-bar{height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;}
+.cc-bar-fill{height:100%;border-radius:2px;background:var(--green);}
+.cc-pct{font-size:11px;font-weight:700;color:var(--accent);margin-top:3px;}
+.fav-dot{position:absolute;top:7px;right:8px;font-size:13px;}
+
+/* QUIZ VIEW */
+#view-quiz{padding:12px 14px 80px;}
+.q-top{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.btn-back{background:var(--white);border:1.5px solid var(--border);color:var(--text);padding:7px 12px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:var(--shadow);}
+.q-cat-lbl{font-size:11px;font-weight:700;color:var(--accent);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.score-pill{background:var(--surface2);border:1px solid var(--border);border-radius:18px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap;}
+.score-pill .cn{color:var(--green);}
+.q-prog-bar{height:4px;background:var(--surface2);border-radius:3px;margin-bottom:5px;overflow:hidden;}
+.q-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:3px;transition:width .4s;}
+.q-rem{text-align:center;font-size:10px;color:var(--muted);margin-bottom:11px;}
+.q-card{background:var(--white);border:1.5px solid var(--border);border-radius:15px;padding:20px 16px;margin-bottom:11px;text-align:center;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:var(--shadow);position:relative;}
+.lang-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gold);background:#fef3c7;border:1px solid #fde68a;padding:2px 8px;border-radius:14px;margin-bottom:8px;}
+.q-text{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:var(--text);line-height:1.3;}
+.star-btn{position:absolute;top:9px;right:11px;background:none;border:none;font-size:22px;cursor:pointer;line-height:1;padding:3px;transition:transform .18s;}
+.star-btn:active{transform:scale(1.35);}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px;}
+.opt{background:var(--white);border:1.5px solid var(--border);color:var(--text);padding:12px 7px;border-radius:11px;font-size:13px;font-weight:600;cursor:pointer;transition:all .12s;font-family:'DM Sans',sans-serif;text-align:center;box-shadow:var(--shadow);}
+.opt:active:not(:disabled){background:#eff6ff;border-color:var(--accent);}
+.opt.ok{background:#ecfdf5;border-color:var(--green);color:#065f46;animation:cpop .3s ease;}
+.opt.bad{background:#fef2f2;border-color:var(--red);color:#991b1b;animation:cshk .3s ease;}
+.opt:disabled{cursor:default;}
+@keyframes cpop{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+@keyframes cshk{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+#fb-bar{min-height:48px;border-radius:11px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;opacity:0;transition:opacity .2s;}
+#fb-bar.show{opacity:1;}
+#fb-bar.fb-c{background:#ecfdf5;border:1px solid #6ee7b7;color:#065f46;}
+#fb-bar.fb-w{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;}
+.fb-ans{font-size:10px;color:var(--muted);text-align:right;}
+.fb-ans strong{color:var(--text);display:block;font-size:12px;}
+.sess-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:11px;}
+.sbox{background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:9px 5px;text-align:center;box-shadow:var(--shadow);}
+.sbox .sv{font-size:19px;font-weight:700;display:block;}
+.sbox .sl{font-size:8px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-top:1px;display:block;}
+.vg{color:var(--green);}.vr{color:var(--red);}.vb{color:var(--accent);}
+
+/* SUMMARY VIEW */
+#view-summary{padding:20px 14px 90px;text-align:center;}
+.trophy{font-size:58px;display:block;margin-bottom:12px;animation:tb .45s ease;}
+@keyframes tb{0%{transform:scale(0)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+.sum-title{font-family:'Playfair Display',serif;font-size:23px;font-weight:900;color:var(--text);margin-bottom:5px;}
+.sum-sub{color:var(--muted);font-size:12px;margin-bottom:18px;}
+.sum-score-box{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow);}
+.sum-pct-big{font-size:50px;font-weight:900;font-family:'Playfair Display',serif;}
+.sum-pct-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+.sum-3grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.sum-3box{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:12px 7px;box-shadow:var(--shadow);}
+.sum-3box .sv{font-size:24px;font-weight:700;display:block;}
+.sum-3box .sl{font-size:8px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-top:2px;display:block;}
+.wrong-section{text-align:left;margin-bottom:18px;}
+.wrong-ttl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:7px;}
+.wrong-item{background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:8px 11px;margin-bottom:4px;}
+.wi-q{font-weight:700;color:var(--text);font-size:12px;}
+.wi-a{color:var(--green);font-size:11px;margin-top:1px;}
+.btn-pri{background:linear-gradient(135deg,var(--accent),#1d4ed8);border:none;color:#fff;padding:13px 24px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:8px;box-shadow:0 4px 14px rgba(37,99,235,0.28);}
+.btn-sec{background:var(--white);border:1.5px solid var(--border);color:var(--text);padding:11px 24px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:8px;box-shadow:var(--shadow);}
+
+/* STATS VIEW */
+#view-stats{padding:16px 14px 90px;}
+.stats-hero{text-align:center;padding:14px 0 18px;}
+.stats-hero h2{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;margin-bottom:3px;color:var(--text);}
+.stats-hero p{color:var(--muted);font-size:11px;}
+.stats-3grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px;}
+.stat-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;box-shadow:var(--shadow);}
+.stat-card .big{font-size:22px;font-weight:700;display:block;}
+.stat-card .tiny{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-top:2px;display:block;}
+.stats-sec-ttl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.1px;color:var(--muted);margin-bottom:9px;padding-left:2px;}
+.stat-row{background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:6px;display:flex;align-items:center;gap:9px;cursor:pointer;box-shadow:var(--shadow);}
+.sr-em{font-size:17px;}
+.sr-info{flex:1;}
+.sr-name{font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.sr-bar{height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;}
+.sr-bar-fill{height:100%;border-radius:2px;}
+.sr-right{text-align:right;}
+.sr-pct{font-size:16px;font-weight:700;display:block;}
+.sr-frac{font-size:9px;color:var(--muted);}
+
+/* MATCH VIEW */
+#view-match{padding:12px 14px 80px;}
+.m-instruction{background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:11px;padding:11px 13px;font-size:12px;font-weight:700;color:var(--accent);text-align:center;margin-bottom:12px;}
+.m-verb-info{text-align:center;font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.m-tense-info{text-align:center;font-size:10px;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px;}
+.m-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.m-col-hdr{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);text-align:center;margin-bottom:6px;}
+.m-col{display:flex;flex-direction:column;gap:7px;}
+.m-item{background:var(--white);border:2px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer;font-size:13px;font-weight:700;color:var(--text);transition:all .12s;box-shadow:var(--shadow);}
+.m-item.sel{border-color:var(--accent);background:#eff6ff;color:var(--accent);}
+.m-item.ok{border-color:var(--green);background:#ecfdf5;color:#065f46;cursor:default;}
+.m-item.bad{border-color:var(--red);background:#fef2f2;color:#991b1b;}
+.m-item.done{cursor:default;opacity:.55;}
+.m-fb{min-height:42px;border-radius:10px;padding:9px 13px;text-align:center;font-size:13px;font-weight:700;margin-bottom:9px;opacity:0;transition:opacity .2s;}
+.m-fb.show{opacity:1;}
+.m-fb.fb-c{background:#ecfdf5;border:1px solid #6ee7b7;color:#065f46;}
+.m-fb.fb-w{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;}
+.m-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+
+/* ALL FORMS VIEW */
+#view-allforms{padding:12px 14px 80px;}
+.af-q-card{background:var(--white);border:1.5px solid var(--border);border-radius:15px;padding:18px 14px;margin-bottom:12px;text-align:center;box-shadow:var(--shadow);}
+.af-q-lbl{font-size:10px;color:var(--muted);margin-bottom:5px;}
+.af-q-word{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--text);}
+.af-inputs{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px;}
+.af-box{background:var(--white);border:1.5px solid var(--border);border-radius:11px;padding:11px 10px;box-shadow:var(--shadow);}
+.af-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:5px;display:block;}
+.af-inp{width:100%;border:none;background:var(--surface2);border-radius:7px;padding:8px 9px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;}
+.af-inp:focus{background:#eff6ff;outline:2px solid var(--accent2);}
+.af-inp.ok{background:#ecfdf5;color:#065f46;outline:2px solid var(--green);}
+.af-inp.bad{background:#fef2f2;color:#991b1b;outline:2px solid var(--red);}
+.af-check-btn{background:linear-gradient(135deg,var(--accent),#1d4ed8);border:none;color:#fff;padding:13px;border-radius:11px;font-size:13px;font-weight:700;cursor:pointer;width:100%;font-family:'DM Sans',sans-serif;margin-bottom:9px;box-shadow:0 3px 12px rgba(37,99,235,0.28);}
+.af-fb{border-radius:10px;padding:11px 13px;font-size:12px;font-weight:700;margin-bottom:9px;opacity:0;transition:opacity .22s;line-height:1.6;}
+.af-fb.show{opacity:1;}
+.af-fb.fb-c{background:#ecfdf5;border:1px solid #6ee7b7;color:#065f46;}
+.af-fb.fb-w{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;}
+/* correct answer reveal box */
+.af-answer-box{background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:10px 13px;margin-bottom:9px;font-size:12px;color:var(--text);display:none;}
+.af-answer-box.show{display:block;}
+.af-answer-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #dbeafe;}
+.af-answer-row:last-child{border-bottom:none;}
+.af-answer-lbl{font-weight:700;color:var(--muted);font-size:10px;text-transform:uppercase;}
+.af-answer-val{font-weight:700;color:var(--accent);}
+.af-prog{text-align:center;font-size:10px;color:var(--muted);margin-bottom:9px;}
+.af-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:9px;}
+
+/* PHRASES VIEW */
+#view-phrases{padding:14px 14px 90px;}
+.phrases-hero{text-align:center;padding:14px 0 14px;}
+.phrases-hero h2{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.phrases-hero p{color:var(--muted);font-size:11px;}
+.ph-section{background:var(--white);border:1.5px solid var(--border);border-radius:13px;margin-bottom:11px;overflow:hidden;box-shadow:var(--shadow);}
+.ph-hdr{background:linear-gradient(120deg,var(--accent),#1d4ed8);color:#fff;padding:11px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;}
+.ph-hdr-icon{font-size:17px;}
+.ph-hdr-title{font-size:13px;font-weight:700;flex:1;}
+.ph-toggle{font-size:14px;transition:transform .2s;}
+.ph-body{padding:11px 13px;display:none;}
+.ph-item{padding:9px 0;border-bottom:1px solid var(--surface2);display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.ph-item:last-child{border-bottom:none;}
+.ph-gr{font-size:13px;font-weight:700;color:var(--text);flex:1.2;}
+.ph-en{font-size:11px;color:var(--muted);flex:1;text-align:right;}
+.ph-note{font-size:10px;color:var(--gold);font-style:italic;margin-top:2px;}
+
+/* NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(18px);border-top:1.5px solid var(--border);display:flex;z-index:200;box-shadow:0 -2px 10px rgba(37,99,235,0.06);}
+.nav-btn{flex:1;background:none;border:none;color:var(--muted);padding:10px 6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:'DM Sans',sans-serif;}
+.nav-btn .ni{font-size:18px;}
+.nav-btn.active{color:var(--accent);}
+
+/* Shared score pill in match/allforms */
+.score-pill-sm{background:var(--surface2);border:1px solid var(--border);border-radius:18px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap;}
+.score-pill-sm .cn{color:var(--green);}
+</style>
+</head>
+<body>
+<header>
+  <div class="hdr-left" onclick="showMenu()">
+    <span class="flag">🇬🇷</span>
+    <h1>Ελληνικά A2 PRO</h1>
+  </div>
+  <button class="btn-reset" onclick="confirmReset()">↺ Reset</button>
+</header>
+
+<!-- MENU -->
+<div id="view-menu" class="view">
+  <div class="menu-hero">
+    <h2>Μάθε <em>Ελληνικά</em></h2>
+    <p>Tap a category to start practicing</p>
+  </div>
+  <div class="overall-box">
+    <div class="overall-hdr"><span>Overall Progress</span><span class="overall-pct" id="overall-pct">0%</span></div>
+    <div class="bar-track"><div class="bar-fill" id="overall-bar" style="width:0%"></div></div>
+    <div class="overall-detail" id="overall-detail">0 correct out of 0 questions</div>
+  </div>
+  <div id="menu-sections"></div>
+</div>
+
+<!-- QUIZ -->
+<div id="view-quiz" class="view">
+  <div class="q-top">
+    <button class="btn-back" onclick="showMenu()">← Back</button>
+    <span class="q-cat-lbl" id="q-cat-lbl"></span>
+    <div class="score-pill"><span class="cn" id="sc-done">0</span>/<span id="sc-total">0</span></div>
+  </div>
+  <div class="q-prog-bar"><div class="q-prog-fill" id="qpf" style="width:0%"></div></div>
+  <div class="q-rem" id="q-rem">0 / 0 mastered</div>
+  <div class="q-card">
+    <div class="lang-tag" id="lang-tag">Greek → English</div>
+    <div class="q-text" id="q-text">...</div>
+    <button class="star-btn" id="star-btn" onclick="toggleFav()">☆</button>
+  </div>
+  <div class="opts-grid" id="opts-grid"></div>
+  <div id="fb-bar">
+    <span id="fb-msg"></span>
+    <div class="fb-ans" id="fb-ans"></div>
+  </div>
+  <div class="sess-stats">
+    <div class="sbox"><span class="sv vg" id="ss-c">0</span><span class="sl">Correct</span></div>
+    <div class="sbox"><span class="sv vr" id="ss-w">0</span><span class="sl">Wrong</span></div>
+    <div class="sbox"><span class="sv vb" id="ss-p">—</span><span class="sl">Score</span></div>
+  </div>
+</div>
+
+<!-- SUMMARY -->
+<div id="view-summary" class="view">
+  <span class="trophy" id="sum-trophy">🏆</span>
+  <div class="sum-title" id="sum-title">Complete!</div>
+  <div class="sum-sub" id="sum-sub">Session finished</div>
+  <div class="sum-score-box">
+    <div class="sum-pct-big" id="sum-pct">0%</div>
+    <div class="sum-pct-lbl">Accuracy this session</div>
+  </div>
+  <div class="sum-3grid">
+    <div class="sum-3box"><span class="sv vg" id="sm-c">0</span><span class="sl">Correct</span></div>
+    <div class="sum-3box"><span class="sv vr" id="sm-w">0</span><span class="sl">Wrong</span></div>
+    <div class="sum-3box"><span class="sv vb" id="sm-t">0</span><span class="sl">Total Qs</span></div>
+  </div>
+  <div class="wrong-section" id="wrong-section"></div>
+  <button class="btn-sec" onclick="retrySession()">🔁 Retry this category</button>
+  <button class="btn-pri" onclick="showMenu()">🏠 Back to Home</button>
+</div>
+
+<!-- STATS -->
+<div id="view-stats" class="view">
+  <div class="stats-hero"><h2>📊 Progress</h2><p>Your learning journey</p></div>
+  <div class="stats-3grid">
+    <div class="stat-card"><span class="big vg" id="st-c">0</span><span class="tiny">Correct</span></div>
+    <div class="stat-card"><span class="big vb" id="st-a">0</span><span class="tiny">Answered</span></div>
+    <div class="stat-card"><span class="big vb" id="st-p">0%</span><span class="tiny">Accuracy</span></div>
+  </div>
+  <div class="stats-sec-ttl">By Category</div>
+  <div id="stats-rows"></div>
+</div>
+
+<!-- MATCH (pronoun-verb linking) -->
+<div id="view-match" class="view">
+  <div class="q-top">
+    <button class="btn-back" onclick="showMenu()">← Back</button>
+    <span class="q-cat-lbl" id="m-cat-lbl">Verb Endings</span>
+    <div class="score-pill-sm"><span class="cn" id="m-done">0</span>/<span id="m-total">0</span></div>
+  </div>
+  <div class="q-prog-bar"><div class="q-prog-fill" id="m-pf" style="width:0%"></div></div>
+  <div class="q-rem" id="m-rem">Round 1</div>
+  <div class="m-verb-info" id="m-verb-info"></div>
+  <div class="m-tense-info" id="m-tense-info"></div>
+  <div class="m-instruction" id="m-instr">Tap a pronoun, then tap its matching verb form</div>
+  <div class="m-cols">
+    <div><div class="m-col-hdr">Pronoun</div><div class="m-col" id="m-left"></div></div>
+    <div><div class="m-col-hdr">Verb Form</div><div class="m-col" id="m-right"></div></div>
+  </div>
+  <div class="m-fb" id="m-fb"></div>
+  <div class="m-stats">
+    <div class="sbox"><span class="sv vg" id="m-sc">0</span><span class="sl">Correct</span></div>
+    <div class="sbox"><span class="sv vr" id="m-sw">0</span><span class="sl">Wrong</span></div>
+    <div class="sbox"><span class="sv vb" id="m-sp">—</span><span class="sl">Score</span></div>
+  </div>
+</div>
+
+<!-- ALL FORMS (typing test) -->
+<div id="view-allforms" class="view">
+  <div class="q-top">
+    <button class="btn-back" onclick="showMenu()">← Back</button>
+    <span class="q-cat-lbl">✍️ Writing - All verbs types</span>
+    <div class="score-pill-sm"><span class="cn" id="af-done">0</span>/<span id="af-total">?</span></div>
+  </div>
+  <div class="q-prog-bar"><div class="q-prog-fill" id="af-pf" style="width:0%"></div></div>
+  <div class="af-prog" id="af-prog">Question 1 of ?</div>
+
+  <!-- Question card: always shows English verb -->
+  <div class="af-q-card">
+    <div class="af-q-lbl" id="af-q-lbl">What is the present tense in Greek?</div>
+    <div class="af-q-word" id="af-word">...</div>
+  </div>
+
+  <!-- STEP 1: Present only -->
+  <div id="af-step1">
+    <div class="af-box" style="margin-bottom:11px;">
+      <span class="af-lbl">⚡ Present tense</span>
+      <input class="af-inp" id="af-pres" placeholder="e.g. μιλάω" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <button class="af-check-btn" id="af-check-btn" onclick="checkAFPresent()">✓ Check Present</button>
+  </div>
+
+  <!-- Present feedback (shown after step 1 check) -->
+  <div class="af-fb" id="af-fb-pres"></div>
+
+  <!-- STEP 2: Past / Future / Imperative (revealed after present checked) -->
+  <div id="af-step2" style="display:none;">
+    <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;padding-left:2px;">Now complete the remaining forms:</div>
+    <div class="af-inputs">
+      <div class="af-box"><span class="af-lbl">⏪ Past</span><input class="af-inp" id="af-past" placeholder="e.g. μίλησα" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+      <div class="af-box"><span class="af-lbl">⏩ Future</span><input class="af-inp" id="af-fut" placeholder="e.g. θα μιλήσω" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+      <div class="af-box" style="grid-column:1/-1;"><span class="af-lbl">👉 Imperative</span><input class="af-inp" id="af-imp" placeholder="e.g. μίλα" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+    </div>
+    <button class="af-check-btn" id="af-check-btn2" onclick="checkAFRest()">✓ Check Remaining</button>
+    <div class="af-fb" id="af-fb-rest"></div>
+    <!-- Full correct answer reveal -->
+    <div class="af-answer-box" id="af-answer-box">
+      <div style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:6px;text-transform:uppercase;letter-spacing:.7px;">✅ All Correct Answers</div>
+      <div class="af-answer-row"><span class="af-answer-lbl">⚡ Present</span><span class="af-answer-val" id="af-ans-pres">—</span></div>
+      <div class="af-answer-row"><span class="af-answer-lbl">⏪ Past</span><span class="af-answer-val" id="af-ans-past">—</span></div>
+      <div class="af-answer-row"><span class="af-answer-lbl">⏩ Future</span><span class="af-answer-val" id="af-ans-fut">—</span></div>
+      <div class="af-answer-row"><span class="af-answer-lbl">👉 Imperative</span><span class="af-answer-val" id="af-ans-imp">—</span></div>
+    </div>
+    <button class="btn-sec" id="af-next-btn" onclick="nextAF()" style="display:none">Next Verb →</button>
+  </div>
+
+  <div class="af-stats">
+    <div class="sbox"><span class="sv vg" id="af-sc">0</span><span class="sl">Perfect</span></div>
+    <div class="sbox"><span class="sv vr" id="af-sw">0</span><span class="sl">Partial</span></div>
+    <div class="sbox"><span class="sv vb" id="af-sp">—</span><span class="sl">Score</span></div>
+  </div>
+</div>
+
+<!-- PHRASES -->
+<div id="view-phrases" class="view">
+  <div class="phrases-hero"><h2>💬 Real-Life Phrases</h2><p>Tap any section to expand</p></div>
+  <div id="phrases-body"></div>
+</div>
+
+<!-- NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-home" onclick="switchTab('menu')"><span class="ni">🏠</span>Home</button>
+  <button class="nav-btn" id="nav-phrases" onclick="switchTab('phrases')"><span class="ni">💬</span>Phrases</button>
+  <button class="nav-btn" id="nav-stats" onclick="switchTab('stats')"><span class="ni">📊</span>Stats</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════
+const rnd=n=>Math.floor(Math.random()*n);
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=rnd(i+1);[r[i],r[j]]=[r[j],r[i]];}return r;}
+function buildQ(q,correct,wrongs,lang){
+  const opts=[...wrongs.slice(0,3)];
+  const p=rnd(4);opts.splice(p,0,correct);
+  return{q,opts,a:p,lang};
+}
+function buildVocabQs(pairs){
+  const qs=[];const gs=pairs.map(p=>p[0]);const es=pairs.map(p=>p[1]);
+  pairs.forEach(([g,e],i)=>{
+    const we=shuffle(es.filter((_,j)=>j!==i));
+    if(we.length>=3)qs.push(buildQ(g,e,we.slice(0,3),'gr'));
+    const wg=shuffle(gs.filter((_,j)=>j!==i));
+    if(wg.length>=3)qs.push(buildQ(e,g,wg.slice(0,3),'en'));
+  });
+  return qs;
+}
+function norm(s){return(s||'').trim().toLowerCase().replace(/\s+/g,' ');}
+
+// ═══════════════════════════════════════════════
+// VOCAB DATA
+// ═══════════════════════════════════════════════
+const VOCAB={
+  clothing:[["το παντελόνι","trousers"],["η μπλούζα","blouse / top"],["το πουκάμισο","shirt"],["το σακάκι","jacket"],["η γραβάτα","tie"],["το κοστούμι","suit"],["το πουλόβερ","pullover / jumper"],["το φανελάκι","vest / tank top"],["τα εσώρουχα","underwear"],["το φόρεμα","dress"],["η φούστα","skirt"],["τα παπούτσια","shoes"],["οι μπότες","boots"],["οι παντόφλες","slippers"],["τα πέδιλα","sandals"],["οι κάλτσες","socks"],["τα γάντια","gloves"],["το καπέλο","hat"],["ο σκούφος","beanie / woolly hat"],["το σορτς","shorts"],["το μπουφάν","puffer jacket"],["το παλτό","coat"],["το κασκόλ","scarf"],["το καλσόν","tights"],["η ζώνη","belt"]],
+  colors:[["κόκκινο","red"],["μπλε","blue"],["κίτρινο","yellow"],["πράσινο","green"],["μαύρο","black"],["άσπρο","white"],["γαλάζιο","light blue"],["γκρι","grey"],["μοβ","purple"],["ροζ","pink"],["μπεζ","beige"],["καφέ","brown"],["πορτοκαλί","orange"],["χρυσό","gold"],["ασημί","silver"]],
+  house:[["κουζίνα","kitchen"],["μπάνιο","bathroom"],["υπνοδωμάτιο","bedroom"],["τραπεζαρία","dining room"],["αποθήκη","storage room"],["καθιστικό / σαλόνι","living room"],["διάδρομος","corridor / hallway"],["πόρτα","door"],["παράθυρο","window"],["ντουλάπι","wardrobe / cupboard"],["συρτάρι","drawer"],["ψυγείο","fridge"],["νεροχύτης","sink"],["βρύση","tap / faucet"],["κρεβάτι","bed"],["κομοδίνο","bedside table"],["καθρέφτης","mirror"],["τραπέζι","table"],["καρέκλα","chair"],["γραφείο","desk"],["βιβλιοθήκη","bookcase"],["καναπές","sofa"],["πολυθρόνα","armchair"],["χαλί","rug / carpet"],["φωτιστικό","lamp"],["κουρτίνες","curtains"],["μπανιέρα","bathtub"],["πλυντήριο ρούχων","washing machine"],["νιπτήρας","washbasin"],["λεκάνη τουαλέτας","toilet"]],
+  work:[["η θέση εργασίας","job / position"],["μόνιμη εργασία","permanent job"],["προσωρινή εργασία","temporary job"],["μερική απασχόληση","part-time work"],["η σύμβαση εργασίας","employment contract"],["ο εργοδότης","employer"],["ο/η υπάλληλος","employee"],["ο εργαζόμενος","worker"],["ο/η συνάδελφος","colleague"],["το ωράριο","working hours"],["η υπερωρία","overtime"],["η άδεια","leave / holiday"],["η αργία","public holiday"],["το μεροκάματο","daily wage"],["ο μισθός","salary"],["η καριέρα","career"],["τα μεικτά","gross pay"],["τα καθαρά","net pay"],["η ανεργία","unemployment"],["η σύνταξη","pension"],["οι κρατήσεις","deductions"],["η απεργία","strike"],["η αύξηση","pay rise"],["τα ένσημα","social insurance stamps"]],
+  directions:[["αριστερά","left"],["δεξιά","right"],["ευθεία","straight ahead"],["πίσω","behind / back"],["μπροστά","in front"],["πάνω","up / above"],["κάτω","down / below"],["μέσα","inside"],["έξω","outside"],["δίπλα","next to / beside"],["απέναντι","opposite"],["κοντά","near / close"],["μακριά","far / away"],["στη γωνία","at the corner"],["στο τέλος","at the end"],["ανάμεσα","between"],["γύρω","around"],["στρίψε δεξιά","turn right"],["στρίψε αριστερά","turn left"],["ευθεία μπροστά","go straight ahead"]],
+  // COMMON WORDS — enriched with new entries from image (items 9-25) + existing
+  common_words:[
+    ["συνήθως","usually"],["σπάνια","rarely"],["συχνά","often"],["πάντα","always"],
+    ["ποτέ","never"],["μερικές φορές","sometimes"],["μαζί","together"],["χωρίς","without"],
+    ["με","with"],["πώς","how"],["πότε","when"],["τι","what"],["ποιος / ποια","who"],
+    ["ποιανού","whose"],["πού","where"],["γιατί","why / because"],["πόσο","how much"],
+    ["πόσοι","how many"],["ήδη","already"],["ακόμα","still / yet"],["μόνο","only"],
+    ["επίσης","also / too"],["ίσως","maybe / perhaps"],["σχεδόν","almost"],["πολύ","very / a lot"],
+    ["λίγο","a little"],["αρκετά","enough / quite"],["καθόλου","not at all"],["μάλλον","probably"],
+    ["αμέσως","immediately"],["τώρα","now"],["μετά","after / later"],["πριν","before"],
+    ["εδώ","here"],["εκεί","there"],["κάθε","every / each"],
+    // NEW from image items 9-25
+    ["ακόμα και","even"],["γενικά","generally"],["γι' αυτό","that's why"],
+    ["δυστυχώς","unfortunately"],["επειδή","because"],["λοιπόν","so / then"],
+    ["μάλιστα","indeed / certainly"],["όμως","however"],["πάλι","again"],
+    ["πάντως","anyway"],["παρακάτω","below / further down"],["σιγά","slowly / quietly"],
+    ["σίγουρα","surely / certainly"],["συνέχεια","continuously / all the time"],
+    ["τόσος / τόση / τόσο","so much / so many"]
+  ],
+  body_parts:[["το κεφάλι","head"],["το πρόσωπο","face"],["τα μαλλιά","hair"],["τα μάτια","eyes"],["η μύτη","nose"],["το στόμα","mouth"],["τα αυτιά","ears"],["τα δόντια","teeth"],["η γλώσσα","tongue"],["ο λαιμός","neck / throat"],["οι ώμοι","shoulders"],["η πλάτη","back"],["το στήθος","chest"],["η κοιλιά","stomach / belly"],["η μέση","waist"],["τα χέρια","hands / arms"],["ο αγκώνας","elbow"],["ο καρπός","wrist"],["τα δάκτυλα","fingers"],["τα πόδια","feet / legs"],["το γόνατο","knee"],["ο αστράγαλος","ankle"],["η φτέρνα","heel"],["ο αντίχειρας","thumb"],["το νύχι","nail"],["η καρδιά","heart"],["οι πνεύμονες","lungs"],["το δέρμα","skin"],["τα χείλη","lips"],["τα φρύδια","eyebrows"]],
+  supermarket_food:[["το ψωμί","bread"],["το γάλα","milk"],["τα αυγά","eggs"],["το τυρί","cheese"],["το βούτυρο","butter"],["το γιαούρτι","yoghurt"],["το κρέας","meat"],["το κοτόπουλο","chicken"],["το ψάρι","fish"],["τα λαχανικά","vegetables"],["τα φρούτα","fruit"],["οι πατάτες","potatoes"],["η ντομάτα","tomato"],["το αγγούρι","cucumber"],["το κρεμμύδι","onion"],["το σκόρδο","garlic"],["τα καρότα","carrots"],["η μαρούλα","lettuce"],["το λεμόνι","lemon"],["τα μήλα","apples"],["οι μπανάνες","bananas"],["τα σταφύλια","grapes"],["οι φράουλες","strawberries"],["το ρύζι","rice"],["τα ζυμαρικά","pasta"],["η ζάχαρη","sugar"],["το αλάτι","salt"],["το πιπέρι","pepper"],["το λάδι","oil"],["ο χυμός","juice"],["το νερό","water"],["ο καφές","coffee"],["το τσάι","tea"],["το κρασί","wine"],["η μπύρα","beer"],["τα μπισκότα","biscuits"],["η σοκολάτα","chocolate"],["το παγωτό","ice cream"],["η μαρμελάδα","jam"],["το μέλι","honey"]],
+  supermarket_other:[["η οδοντόκρεμα","toothpaste"],["η οδοντόβουρτσα","toothbrush"],["το σαμπουάν","shampoo"],["το σαπούνι","soap"],["το αποσμητικό","deodorant"],["η κρέμα προσώπου","face cream"],["το χαρτί υγείας","toilet paper"],["οι χαρτοπετσέτες","paper serviettes"],["το απορρυπαντικό","detergent"],["η σκούπα","broom"],["η σφουγγαρίστρα","mop"],["ο κάδος","rubbish bin"],["οι σακούλες","bags"],["το αλουμινόχαρτο","aluminium foil"],["η μεμβράνη","cling film"],["τα σπίρτα","matches"],["ο αναπτήρας","lighter"],["η μπαταρία","battery"],["η λάμπα","light bulb"],["το κερί","candle"],["ο φακός","torch / flashlight"],["το σφουγγάρι","sponge"],["η βούρτσα","brush"]],
+  days_time:[["Δευτέρα","Monday"],["Τρίτη","Tuesday"],["Τετάρτη","Wednesday"],["Πέμπτη","Thursday"],["Παρασκευή","Friday"],["Σάββατο","Saturday"],["Κυριακή","Sunday"],["σήμερα","today"],["αύριο","tomorrow"],["χθες","yesterday"],["πρωί","morning"],["μεσημέρι","noon"],["απόγευμα","afternoon"],["βράδυ","evening"],["νύχτα","night"],["εβδομάδα","week"],["μήνας","month"],["χρόνος","year"],["ώρα","hour"],["λεπτό","minute"],["μεθαύριο","the day after tomorrow"],["προχθές","the day before yesterday"]],
+  numbers:[["ένα","1"],["δύο","2"],["τρία","3"],["τέσσερα","4"],["πέντε","5"],["έξι","6"],["επτά","7"],["οκτώ","8"],["εννέα","9"],["δέκα","10"],["έντεκα","11"],["δώδεκα","12"],["δεκαπέντε","15"],["είκοσι","20"],["τριάντα","30"],["σαράντα","40"],["πενήντα","50"],["εξήντα","60"],["εβδομήντα","70"],["ογδόντα","80"],["ενενήντα","90"],["εκατό","100"],["χίλια","1000"]]
+};
+
+// ═══════════════════════════════════════════════
+// VERBS  [greek, english, present, past, future, imperative]
+// De-duped at source — one unique Greek form per entry
+// ═══════════════════════════════════════════════
+const VERBS=[
+  ["πηγαίνω","go","πηγαίνω","πήγα","θα πάω","πήγαινε"],
+  ["έρχομαι","come","έρχομαι","ήρθα","θα έρθω","έλα"],
+  ["μένω","stay / live","μένω","έμεινα","θα μείνω","μείνε"],
+  ["φεύγω","leave","φεύγω","έφυγα","θα φύγω","φύγε"],
+  ["τρώω","eat","τρώω","έφαγα","θα φάω","φάε"],
+  ["πίνω","drink","πίνω","ήπια","θα πιω","πιες"],
+  ["κοιμάμαι","sleep","κοιμάμαι","κοιμήθηκα","θα κοιμηθώ","κοιμήσου"],
+  ["ξυπνάω","wake up","ξυπνάω","ξύπνησα","θα ξυπνήσω","ξύπνα"],
+  ["δουλεύω","work","δουλεύω","δούλεψα","θα δουλέψω","δούλεψε"],
+  ["σπουδάζω","study","σπουδάζω","σπούδασα","θα σπουδάσω","σπούδασε"],
+  ["μαθαίνω","learn","μαθαίνω","έμαθα","θα μάθω","μάθε"],
+  ["ξέρω","know","ξέρω","ήξερα","θα ξέρω","ξέρε"],
+  ["καταλαβαίνω","understand","καταλαβαίνω","κατάλαβα","θα καταλάβω","κατάλαβε"],
+  ["μιλάω","speak","μιλάω","μίλησα","θα μιλήσω","μίλα"],
+  ["λέω","say / tell","λέω","είπα","θα πω","πες"],
+  ["ακούω","listen / hear","ακούω","άκουσα","θα ακούσω","άκουσε"],
+  ["βλέπω","see","βλέπω","είδα","θα δω","δες"],
+  ["διαβάζω","read","διαβάζω","διάβασα","θα διαβάσω","διάβασε"],
+  ["γράφω","write","γράφω","έγραψα","θα γράψω","γράψε"],
+  ["αγοράζω","buy","αγοράζω","αγόρασα","θα αγοράσω","αγόρασε"],
+  ["πληρώνω","pay","πληρώνω","πλήρωσα","θα πληρώσω","πλήρωσε"],
+  ["δίνω","give","δίνω","έδωσα","θα δώσω","δώσε"],
+  ["παίρνω","take / get","παίρνω","πήρα","θα πάρω","πάρε"],
+  ["βάζω","put / place","βάζω","έβαλα","θα βάλω","βάλε"],
+  ["βγάζω","take out","βγάζω","έβγαλα","θα βγάλω","βγάλε"],
+  ["βρίσκω","find","βρίσκω","βρήκα","θα βρω","βρες"],
+  ["ψάχνω","search / look for","ψάχνω","έψαξα","θα ψάξω","ψάξε"],
+  ["φτιάχνω","make / fix","φτιάχνω","έφτιαξα","θα φτιάξω","φτιάξε"],
+  ["κάνω","do / make","κάνω","έκανα","θα κάνω","κάνε"],
+  ["έχω","have","έχω","είχα","θα έχω","έχε"],
+  ["είμαι","be","είμαι","ήμουν","θα είμαι","—"],
+  ["θέλω","want","θέλω","ήθελα","θα θέλω","θέλε"],
+  ["μπορώ","can / be able to","μπορώ","μπόρεσα","θα μπορέσω","μπόρεσε"],
+  ["προτιμώ","prefer","προτιμώ","προτίμησα","θα προτιμήσω","προτίμησε"],
+  ["περιμένω","wait","περιμένω","περίμεινα","θα περιμένω","περίμενε"],
+  ["σταματάω","stop","σταματάω","σταμάτησα","θα σταματήσω","σταμάτα"],
+  ["αρχίζω","start","αρχίζω","άρχισα","θα αρχίσω","άρχισε"],
+  ["περνάω","pass by","περνάω","πέρασα","θα περάσω","πέρνα"],
+  ["περπατάω","walk","περπατάω","περπάτησα","θα περπατήσω","περπάτα"],
+  ["τρέχω","run","τρέχω","έτρεξα","θα τρέξω","τρέξε"],
+  ["κολυμπάω","swim","κολυμπάω","κολύμπησα","θα κολυμπήσω","κολύμπα"],
+  ["μαγειρεύω","cook","μαγειρεύω","μαγείρεψα","θα μαγειρέψω","μαγείρεψε"],
+  ["καθαρίζω","clean","καθαρίζω","καθάρισα","θα καθαρίσω","καθάρισε"],
+  ["πλένω","wash","πλένω","έπλυνα","θα πλύνω","πλύνε"],
+  ["ταξιδεύω","travel","ταξιδεύω","ταξίδεψα","θα ταξιδέψω","ταξίδεψε"],
+  ["οδηγώ","drive","οδηγώ","οδήγησα","θα οδηγήσω","οδήγησε"],
+  ["ανοίγω","open","ανοίγω","άνοιξα","θα ανοίξω","άνοιξε"],
+  ["κλείνω","close","κλείνω","έκλεισα","θα κλείσω","κλείσε"],
+  ["αλλάζω","change","αλλάζω","άλλαξα","θα αλλάξω","άλλαξε"],
+  ["στέλνω","send","στέλνω","έστειλα","θα στείλω","στείλε"],
+  ["φέρνω","bring","φέρνω","έφερα","θα φέρω","φέρε"],
+  ["βοηθάω","help","βοηθάω","βοήθησα","θα βοηθήσω","βοήθησε"],
+  ["ρωτάω","ask","ρωτάω","ρώτησα","θα ρωτήσω","ρώτησε"],
+  ["απαντάω","answer","απαντάω","απάντησα","θα απαντήσω","απάντησε"],
+  ["αγαπάω","love","αγαπάω","αγάπησα","θα αγαπήσω","αγάπησε"],
+  ["φοράω","wear","φοράω","φόρεσα","θα φορέσω","φόρεσε"],
+  ["γελάω","laugh","γελάω","γέλασα","θα γελάσω","γέλα"],
+  ["κλαίω","cry","κλαίω","έκλαψα","θα κλάψω","κλάψε"],
+  ["χορεύω","dance","χορεύω","χόρεψα","θα χορέψω","χόρεψε"],
+  ["τραγουδάω","sing","τραγουδάω","τραγούδησα","θα τραγουδήσω","τραγούδησε"],
+  ["παίζω","play","παίζω","έπαιξα","θα παίξω","παίξε"],
+  ["φτάνω","arrive","φτάνω","έφτασα","θα φτάσω","φτάσε"],
+  ["χρησιμοποιώ","use","χρησιμοποιώ","χρησιμοποίησα","θα χρησιμοποιήσω","χρησιμοποίησε"],
+  ["χάνω","lose","χάνω","έχασα","θα χάσω","χάσε"],
+  ["πονάω","hurt / be in pain","πονάω","πόνεσα","θα πονέσω","—"],
+  ["επιστρέφω","return","επιστρέφω","επέστρεψα","θα επιστρέψω","επίστρεψε"],
+  ["ζητάω","ask for / request","ζητάω","ζήτησα","θα ζητήσω","ζήτησε"],
+  ["σκέφτομαι","think","σκέφτομαι","σκέφτηκα","θα σκεφτώ","σκέψου"],
+  ["ξεχνάω","forget","ξεχνάω","ξέχασα","θα ξεχάσω","ξέχνα"],
+  ["κάθομαι","sit","κάθομαι","κάθισα","θα καθίσω","κάθισε"],
+  ["πέφτω","fall","πέφτω","έπεσα","θα πέσω","πέσε"],
+  ["παραγγέλνω","order","παραγγέλνω","παρήγγειλα","θα παραγγείλω","παράγγειλε"],
+  ["ζω","live","ζω","έζησα","θα ζήσω","ζήσε"],
+  ["γίνομαι","become","γίνομαι","έγινα","θα γίνω","γίνε"],
+  ["μπαίνω","enter","μπαίνω","μπήκα","θα μπω","μπες"],
+  ["βγαίνω","exit","βγαίνω","βγήκα","θα βγω","βγες"],
+  ["ανεβαίνω","go up","ανεβαίνω","ανέβηκα","θα ανεβώ","ανέβα"],
+  ["κατεβαίνω","go down","κατεβαίνω","κατέβηκα","θα κατεβώ","κατέβα"],
+  ["διψάω","be thirsty","διψάω","δίψασα","θα διψάσω","—"],
+  ["πεινάω","be hungry","πεινάω","πείνασα","θα πεινάσω","—"],
+  ["ανάβω","turn on","ανάβω","άναψα","θα ανάψω","άναψε"],
+  ["σβήνω","turn off","σβήνω","έσβησα","θα σβήσω","σβήσε"],
+  ["χαλάω","ruin / break","χαλάω","χάλασα","θα χαλάσω","χάλασε"],
+  ["εξηγώ","explain","εξηγώ","εξήγησα","θα εξηγήσω","εξήγησε"],
+  ["καλωσορίζω","welcome","καλωσορίζω","καλωσόρισα","θα καλωσορίσω","καλωσόρισε"]
+];
+
+// De-duplicate VERBS: one entry per unique Greek form AND one per unique English meaning
+const VB=(()=>{
+  const sg=new Set(), se=new Set();
+  return VERBS.filter(v=>{
+    if(sg.has(v[0])||se.has(v[1]))return false;
+    sg.add(v[0]); se.add(v[1]); return true;
+  });
+})();
+
+// ═══════════════════════════════════════════════
+// CONJUGATION DATA (for match game)
+// ═══════════════════════════════════════════════
+const CONJ=[
+  {label:"Type A — δουλεύω (work)",tenses:{
+    present:["δουλεύω","δουλεύεις","δουλεύει","δουλεύουμε","δουλεύετε","δουλεύουν"],
+    past:["δούλεψα","δούλεψες","δούλεψε","δουλέψαμε","δουλέψατε","δούλεψαν"],
+    future:["θα δουλέψω","θα δουλέψεις","θα δουλέψει","θα δουλέψουμε","θα δουλέψετε","θα δουλέψουν"],
+    imperative:["—","δούλεψε","—","—","δουλέψτε","—"]}},
+  {label:"Type B1 — μιλάω (speak)",tenses:{
+    present:["μιλάω","μιλάς","μιλάει","μιλάμε","μιλάτε","μιλάνε"],
+    past:["μίλησα","μίλησες","μίλησε","μιλήσαμε","μιλήσατε","μίλησαν"],
+    future:["θα μιλήσω","θα μιλήσεις","θα μιλήσει","θα μιλήσουμε","θα μιλήσετε","θα μιλήσουν"],
+    imperative:["—","μίλα","—","—","μιλήστε","—"]}},
+  {label:"Type B2 — οδηγώ (drive)",tenses:{
+    present:["οδηγώ","οδηγείς","οδηγεί","οδηγούμε","οδηγείτε","οδηγούν"],
+    past:["οδήγησα","οδήγησες","οδήγησε","οδηγήσαμε","οδηγήσατε","οδήγησαν"],
+    future:["θα οδηγήσω","θα οδηγήσεις","θα οδηγήσει","θα οδηγήσουμε","θα οδηγήσετε","θα οδηγήσουν"],
+    imperative:["—","οδήγησε","—","—","οδηγήστε","—"]}},
+  {label:"Irregular — πηγαίνω (go)",tenses:{
+    present:["πηγαίνω","πηγαίνεις","πηγαίνει","πηγαίνουμε","πηγαίνετε","πηγαίνουν"],
+    past:["πήγα","πήγες","πήγε","πήγαμε","πήγατε","πήγαν"],
+    future:["θα πάω","θα πας","θα πάει","θα πάμε","θα πάτε","θα πάνε"],
+    imperative:["—","πήγαινε","—","—","πηγαίνετε","—"]}},
+  {label:"Irregular — τρώω (eat)",tenses:{
+    present:["τρώω","τρως","τρώει","τρώμε","τρώτε","τρώνε"],
+    past:["έφαγα","έφαγες","έφαγε","φάγαμε","φάγατε","έφαγαν"],
+    future:["θα φάω","θα φας","θα φάει","θα φάμε","θα φάτε","θα φάνε"],
+    imperative:["—","φάε","—","—","φάτε","—"]}},
+  {label:"Irregular — είμαι (be)",tenses:{
+    present:["είμαι","είσαι","είναι","είμαστε","είστε","είναι"],
+    past:["ήμουν","ήσουν","ήταν","ήμαστε","ήσαστε","ήταν"],
+    future:["θα είμαι","θα είσαι","θα είναι","θα είμαστε","θα είστε","θα είναι"],
+    imperative:["—","να είσαι","—","—","να είστε","—"]}},
+  {label:"Irregular — έχω (have)",tenses:{
+    present:["έχω","έχεις","έχει","έχουμε","έχετε","έχουν"],
+    past:["είχα","είχες","είχε","είχαμε","είχατε","είχαν"],
+    future:["θα έχω","θα έχεις","θα έχει","θα έχουμε","θα έχετε","θα έχουν"],
+    imperative:["—","έχε","—","—","έχετε","—"]}},
+  {label:"Irregular — λέω (say)",tenses:{
+    present:["λέω","λες","λέει","λέμε","λέτε","λένε"],
+    past:["είπα","είπες","είπε","είπαμε","είπατε","είπαν"],
+    future:["θα πω","θα πεις","θα πει","θα πούμε","θα πείτε","θα πουν"],
+    imperative:["—","πες","—","—","πείτε","—"]}}
+];
+const PRONOUNS=["εγώ","εσύ","αυτός/αυτή/αυτό","εμείς","εσείς","αυτοί/αυτές"];
+const PRON_EN=["I","you (sing.)","he / she / it","we","you (plur.)","they"];
+
+// ═══════════════════════════════════════════════
+// REAL-LIFE PHRASES (including new Medical & Everyday phrases from image)
+// ═══════════════════════════════════════════════
+const PHRASES=[
+  {icon:"🍽️",title:"Restaurant — Booking a Table",items:[
+    {gr:"Θέλω να κλείσω ένα τραπέζι.",en:"I'd like to book a table."},
+    {gr:"Για πόσα άτομα;",en:"For how many people?",note:"staff asks"},
+    {gr:"Για δύο άτομα, παρακαλώ.",en:"For two people, please."},
+    {gr:"Για απόψε / αύριο στις οκτώ.",en:"For tonight / tomorrow at eight."},
+    {gr:"Έχετε ελεύθερο τραπέζι;",en:"Do you have a free table?"},
+    {gr:"Στο όνομα...",en:"Under the name of..."},
+    {gr:"Θέλω τραπέζι στη βεράντα.",en:"I'd like a table on the terrace."}
+  ]},
+  {icon:"🍴",title:"Restaurant — Ordering Food",items:[
+    {gr:"Τον κατάλογο, παρακαλώ.",en:"The menu, please."},
+    {gr:"Τι έχετε σήμερα;",en:"What do you have today?"},
+    {gr:"Θα πάρω...",en:"I'll have...",note:"ordering"},
+    {gr:"Μπορώ να παραγγείλω;",en:"Can I order?"},
+    {gr:"Τι μου προτείνετε;",en:"What do you recommend?"},
+    {gr:"Χωρίς κρεμμύδι, παρακαλώ.",en:"Without onion, please."},
+    {gr:"Είμαι χορτοφάγος/χορτοφάγα.",en:"I am vegetarian."},
+    {gr:"Τον λογαριασμό, παρακαλώ.",en:"The bill, please."},
+    {gr:"Μαζί ή χωριστά;",en:"Together or separately?",note:"staff asks"},
+    {gr:"Πληρώνω με κάρτα.",en:"I'm paying by card."},
+    {gr:"Ήταν πολύ νόστιμο!",en:"It was very tasty!"}
+  ]},
+  {icon:"✈️",title:"Travelling — Transport",items:[
+    {gr:"Πού είναι η στάση του λεωφορείου;",en:"Where is the bus stop?"},
+    {gr:"Πού είναι το μετρό;",en:"Where is the metro?"},
+    {gr:"Ένα εισιτήριο, παρακαλώ.",en:"One ticket, please."},
+    {gr:"Πότε φεύγει το λεωφορείο / τρένο;",en:"When does the bus / train leave?"},
+    {gr:"Θέλω να πάω στο / στην...",en:"I want to go to..."},
+    {gr:"Πόσο κάνει;",en:"How much does it cost?"},
+    {gr:"Αλλάζω εδώ;",en:"Do I change here?"},
+    {gr:"Σε ποια στάση κατεβαίνω;",en:"At which stop do I get off?"},
+    {gr:"Πότε φτάνει;",en:"When does it arrive?"}
+  ]},
+  {icon:"🏨",title:"Being a Tourist — Hotel & Sightseeing",items:[
+    {gr:"Έχετε δωμάτια ελεύθερα;",en:"Do you have free rooms?"},
+    {gr:"Θέλω ένα δωμάτιο για δύο.",en:"I'd like a room for two."},
+    {gr:"Πόσο κάνει τη βραδιά;",en:"How much per night?"},
+    {gr:"Τι ώρα είναι το check-in / check-out;",en:"What time is check-in / check-out?"},
+    {gr:"Πού είναι το κέντρο;",en:"Where is the town centre?"},
+    {gr:"Είναι ελεύθερη η είσοδος;",en:"Is entry free?"},
+    {gr:"Τι ώρα ανοίγει / κλείνει;",en:"What time does it open / close?"},
+    {gr:"Χάθηκα. Μπορείτε να με βοηθήσετε;",en:"I'm lost. Can you help me?"},
+    {gr:"Μπορώ να βγάλω φωτογραφία εδώ;",en:"Can I take a photo here?"}
+  ]},
+  {icon:"🏥",title:"At the Doctor — Feeling Ill",items:[
+    {gr:"Δεν αισθάνομαι καλά.",en:"I don't feel well."},
+    {gr:"Έχω πυρετό.",en:"I have a fever."},
+    {gr:"Έχω πονοκέφαλο.",en:"I have a headache."},
+    {gr:"Πονάει ο λαιμός μου.",en:"My throat hurts."},
+    {gr:"Έχω κρυολόγημα.",en:"I have a cold."},
+    {gr:"Κάνω εμετό.",en:"I am vomiting."},
+    {gr:"Με πονάει εδώ.",en:"It hurts here.",note:"pointing"},
+    {gr:"Παίρνω φάρμακα.",en:"I am taking medication."},
+    {gr:"Χρειάζομαι γιατρό.",en:"I need a doctor."},
+    {gr:"Θέλω να κλείσω ραντεβού.",en:"I want to make an appointment."},
+    {gr:"Είμαι αλλεργικός/ή σε...",en:"I am allergic to..."},
+    {gr:"Από πότε έχετε πυρετό;",en:"How long have you had a fever?",note:"doctor asks"},
+    {gr:"Πρέπει να πάρετε αντιβίωση.",en:"You need to take antibiotics.",note:"doctor says"},
+    {gr:"Πού είναι το νοσοκομείο / φαρμακείο;",en:"Where is the hospital / pharmacy?"},
+    {gr:"Αν δεν κατεβεί ο πυρετός, θα με πάρετε τηλέφωνο.",en:"If the fever doesn't go down, you will call me."},
+    {gr:"Βήξτε λίγο.",en:"Cough a bit."},
+    {gr:"Για να δω και τον λαιμό σας.",en:"Let me also check your throat."},
+    {gr:"Διανυκτερεύοντα / εφημερεύοντα φαρμακεία",en:"Pharmacies open overnight / on call"},
+    {gr:"Είμαι κατά / υπέρ της ομοιοπαθητικής.",en:"I am against / in favour of homeopathy."},
+    {gr:"Είναι για το καλό σου!",en:"It's for your own good!"},
+    {gr:"Κάνω γενικές εξετάσεις αίματος και ούρων.",en:"I am having general blood and urine tests."},
+    {gr:"Να 'στε καλά!",en:"Be well!"},
+    {gr:"Ορίστε.",en:"Here you go."},
+    {gr:"Πάρτε μια βαθιά αναπνοή, να σας ακούσω...",en:"Take a deep breath so I can listen to you..."},
+    {gr:"Περαστικά (σου/σας)!",en:"Get well soon!"},
+    {gr:"Περιμένω παιδί.",en:"I'm expecting a child."},
+    {gr:"Πόσα θέλετε, γιατρέ, για να μου βγάλετε το χαλασμένο δόντι;",en:"How much do you want, doctor, to remove my broken/decayed tooth?"},
+    {gr:"Προτιμώ μια φυσική θεραπεία.",en:"I prefer a natural treatment."},
+    {gr:"Τον τελευταίο καιρό αισθάνομαι πολύ κουρασμένη / κουρασμένος.",en:"Lately, I have been feeling very tired."},
+    {gr:"Τρέχει η μύτη μου.",en:"My nose is running."}
+  ]},
+  {icon:"💬",title:"Everyday Expressions",items:[
+    {gr:"από ό,τι συνήθως",en:"than usual"},
+    {gr:"Αυτό όλοι το ξέρουν.",en:"Everyone knows that."},
+    {gr:"Γύρισε, λοιπόν, εκείνο το πρωί από το νοσοκομείο ο Δημήτρης όλο χαρά.",en:"So, Dimitris came back from the hospital that morning full of joy."},
+    {gr:"η κουταλιά της σούπας — οι κουταλιές της σούπας",en:"tablespoon (singular / plural)"},
+    {gr:"κ.ά. = και άλλα",en:"etc. = and others"},
+    {gr:"Έχω πολύ καιρό να σου γράψω...",en:"I haven't written to you for a long time..."},
+    {gr:"Τι να σου πω;",en:"What can I tell you?"},
+    {gr:"Τι σας οφείλω;",en:"What do I owe you?"},
+    {gr:"Πάντως εγώ τον καφέ δεν τον κόβω με τίποτα.",en:"Anyway, I can't give up coffee for anything."},
+    {gr:"Χαιρετισμούς / Χαιρετίσματα στον Γεράσιμο!",en:"Greetings to Gerasimos!"}
+  ]}
+];
+
+// ═══════════════════════════════════════════════
+// BUILD VERB QUESTION SETS
+// Exactly 2 questions per verb: GR→EN and EN→GR
+// Question shows only the bare verb (no suffix labels)
+// Total = 2 × number of unique verbs (e.g. 172 for 86 verbs)
+// ═══════════════════════════════════════════════
+function buildVerbMainQs(){
+  const qs=[];
+  const seenQA=new Set();
+  const gs=VB.map(v=>v[0]);
+  const es=VB.map(v=>v[1]);
+  VB.forEach((v)=>{
+    const g=v[0], e=v[1];
+    // GR → EN  (show Greek verb, pick correct English)
+    const k1='gr|'+g;
+    if(!seenQA.has(k1)){
+      seenQA.add(k1);
+      const w=shuffle(es.filter(x=>x!==e)).slice(0,3);
+      if(w.length>=3) qs.push(buildQ(g,e,w,'gr'));
+    }
+    // EN → GR  (show English verb, pick correct Greek)
+    const k2='en|'+e;
+    if(!seenQA.has(k2)){
+      seenQA.add(k2);
+      const w=shuffle(gs.filter(x=>x!==g)).slice(0,3);
+      if(w.length>=3) qs.push(buildQ(e,g,w,'en'));
+    }
+  });
+  return qs;
+}
+
+function buildVerbTenseQs(ti,tl){
+  const qs=[];
+  const seenQA=new Set();
+  const es=VB.map(v=>v[1]);
+  const fs=VB.map(v=>v[ti]).filter(f=>f!=='—');
+  VB.forEach(v=>{
+    const e=v[1]; const f=v[ti]; if(f==='—')return;
+    // English → tense form
+    const k1='en|'+e+'|||'+f;
+    if(!seenQA.has(k1)){
+      seenQA.add(k1);
+      const wf=shuffle(fs.filter(x=>x!==f)).slice(0,3);
+      if(wf.length===3) qs.push(buildQ(e+' ('+tl+')',f,wf,'en'));
+    }
+    // tense form → English
+    const k2='gr|'+f+'|||'+e;
+    if(!seenQA.has(k2)){
+      seenQA.add(k2);
+      const wm=shuffle(es.filter(x=>x!==e)).slice(0,3);
+      if(wm.length===3) qs.push(buildQ(f+' ('+tl+')',e,wm,'gr'));
+    }
+  });
+  return qs;
+}
+
+// ═══════════════════════════════════════════════
+// CATEGORIES
+// ═══════════════════════════════════════════════
+const CATEGORIES=[];
+function initCats(){
+  CATEGORIES.length=0;
+  // dedup vocab pairs — unique greek AND unique english
+  function dd(p){
+    const sg=new Set(),se=new Set();
+    return p.filter(([g,e])=>{
+      if(sg.has(g)||se.has(e))return false;
+      sg.add(g);se.add(e);return true;
+    });
+  }
+  const push=(id,name,emoji,section,questions,special)=>{
+    CATEGORIES.push({id,name,emoji,section,questions:questions||[],special:special||null});
+  };
+  push('clothing','Clothing','👗','Vocabulary',buildVocabQs(dd(VOCAB.clothing)));
+  push('colors','Colors','🎨','Vocabulary',buildVocabQs(dd(VOCAB.colors)));
+  push('house','House & Rooms','🏠','Vocabulary',buildVocabQs(dd(VOCAB.house)));
+  push('work','Work & Jobs','💼','Vocabulary',buildVocabQs(dd(VOCAB.work)));
+  push('directions','Directions','🗺️','Vocabulary',buildVocabQs(dd(VOCAB.directions)));
+  push('common_words','Common Words','💬','Vocabulary',buildVocabQs(dd(VOCAB.common_words)));
+  push('body_parts','Body Parts','🫀','Vocabulary',buildVocabQs(dd(VOCAB.body_parts)));
+  push('supermarket_food','Supermarket: Food','🛒','Vocabulary',buildVocabQs(dd(VOCAB.supermarket_food)));
+  push('supermarket_other','Supermarket: Household','🧴','Vocabulary',buildVocabQs(dd(VOCAB.supermarket_other)));
+  push('days_time','Days & Time','📅','Time & Numbers',buildVocabQs(dd(VOCAB.days_time)));
+  push('numbers','Numbers','🔢','Time & Numbers',buildVocabQs(dd(VOCAB.numbers)));
+  push('verbs','Verbs (Meaning & Present)','📖','Verbs',buildVerbMainQs());
+  push('verb_past','Verbs — Past','⏪','Verbs',buildVerbTenseQs(3,'past'));
+  push('verb_future','Verbs — Future','⏩','Verbs',buildVerbTenseQs(4,'future'));
+  push('verb_imperative','Verbs — Imperative','👉','Verbs',buildVerbTenseQs(5,'imperative'));
+  push('verb_match','Verb Endings (Match)','🔗','Verbs',[],'match');
+  push('all_forms','Writing - All verbs types','✍️','Verbs',[],'allforms');
+  push('favorites','⭐ Favorites','⭐','Special',[],'favorites');
+  push('mistakes','❌ Mistakes','❌','Special',[],'mistakes');
+}
+function totalQs(){return CATEGORIES.filter(c=>!c.special).reduce((s,c)=>s+c.questions.length,0);}
+
+// ═══════════════════════════════════════════════
+// STATE + STORAGE
+// lastSessionPct[catId] = % from the last FULLY completed session (null = never finished)
+// ═══════════════════════════════════════════════
+const SK = 'greek_v11';
+let stats = {}, favs = new Set(), mistakeKeys = new Set();
+let lastSessionPct = {};   // { catId: number|null }
+let currentCatId = '', curView = 'menu';
+
+// Session state
+let sessionQs = [];
+let sessionIdx = 0;
+let curQ = null;
+let sC = 0, sW = 0;
+let blocked = false;
+let wrongItems = [];
+
+function loadState() {
+  try {
+    const d = JSON.parse(localStorage.getItem(SK)) || {};
+    stats = d.stats || {};
+    favs = new Set(d.favs || []);
+    mistakeKeys = new Set(d.mistakeKeys || []);
+    lastSessionPct = d.lastSessionPct || {};
+  } catch(e) {
+    stats = {}; favs = new Set(); mistakeKeys = new Set(); lastSessionPct = {};
+  }
+  for (const c of CATEGORIES) {
+    if (!stats[c.id]) stats[c.id] = { correct: 0, answered: 0 };
+  }
+}
+
+function saveState() {
+  localStorage.setItem(SK, JSON.stringify({
+    stats,
+    favs: [...favs],
+    mistakeKeys: [...mistakeKeys],
+    lastSessionPct
+  }));
+}
+
+// ═══════════════════════════════════════════════
+// FAVORITES helpers
+// ═══════════════════════════════════════════════
+function favKey(catId, qi) { return catId + '|' + qi; }
+
+function toggleFav() {
+  if (!curQ) return;
+  const realCatId = curQ._origCat || currentCatId;
+  const realIdx   = (curQ._origIdx !== undefined) ? curQ._origIdx : 0;
+  const k = favKey(realCatId, realIdx);
+  if (currentCatId === 'favorites') {
+    favs.delete(k);
+  } else {
+    if (favs.has(k)) favs.delete(k); else favs.add(k);
+  }
+  saveState();
+  updateStarBtn();
+}
+
+function updateStarBtn() {
+  const b = document.getElementById('star-btn');
+  if (!b) return;
+  b.style.display = 'block';
+  const realCatId = curQ ? (curQ._origCat || currentCatId) : currentCatId;
+  const realIdx   = curQ ? ((curQ._origIdx !== undefined) ? curQ._origIdx : 0) : 0;
+  const on = curQ && favs.has(favKey(realCatId, realIdx));
+  b.textContent = on ? '★' : '☆';
+  b.style.color  = on ? '#d97706' : '#94a3b8';
+}
+
+function getFavQs() {
+  const qs = [];
+  for (const k of favs) {
+    const [cid, qi] = k.split('|');
+    const cat = CATEGORIES.find(c => c.id === cid);
+    if (!cat) continue;
+    const q = cat.questions[+qi];
+    if (q) qs.push({ ...q, _origCat: cid, _origIdx: +qi, _favKey: k });
+  }
+  return qs;
+}
+
+function getMistakeQs() {
+  const qs = [];
+  for (const k of mistakeKeys) {
+    const [cid, qi] = k.split('|');
+    const cat = CATEGORIES.find(c => c.id === cid);
+    if (!cat) continue;
+    const q = cat.questions[+qi];
+    if (q) qs.push({ ...q, _origCat: cid, _origIdx: +qi, _mistakeKey: k });
+  }
+  return qs;
+}
+
+// ═══════════════════════════════════════════════
+// MENU
+// ═══════════════════════════════════════════════
+function renderMenu() {
+  const el = document.getElementById('menu-sections');
+  el.innerHTML = '';
+
+  const secs = {};
+  for (const c of CATEGORIES) {
+    if (!secs[c.section]) secs[c.section] = [];
+    secs[c.section].push(c);
+  }
+
+  for (const [sec, cats] of Object.entries(secs)) {
+    const lbl = document.createElement('div');
+    lbl.className = 'sec-lbl';
+    lbl.textContent = sec;
+    el.appendChild(lbl);
+
+    const grid = document.createElement('div');
+    grid.className = 'cat-grid';
+
+    for (const cat of cats) {
+      const s = stats[cat.id] || { correct: 0, answered: 0 };
+      let qCnt = cat.questions.length, barPct = 0, accLbl = '—';
+
+      if (cat.special === 'favorites') {
+        qCnt = getFavQs().length;
+        accLbl = qCnt > 0 ? qCnt + ' saved' : 'No favorites yet';
+      } else if (cat.special === 'mistakes') {
+        qCnt = getMistakeQs().length;
+        accLbl = qCnt > 0 ? qCnt + ' to fix' : 'No mistakes!';
+      } else if (!cat.special) {
+        // Show LAST COMPLETED SESSION percentage only
+        const lsp = lastSessionPct[cat.id];
+        if (lsp !== undefined && lsp !== null) {
+          barPct = lsp;
+          accLbl = lsp + '% last run';
+        } else {
+          barPct = 0;
+          accLbl = '—';
+        }
+      }
+
+      const card = document.createElement('div');
+      card.className = 'cat-card';
+      card.innerHTML = `
+        <span class="cc-emoji">${cat.emoji}</span>
+        <div class="cc-name">${cat.name}</div>
+        <div class="cc-count">${cat.special ? '' : qCnt + ' questions'}</div>
+        <div class="cc-bar"><div class="cc-bar-fill" style="width:${barPct}%"></div></div>
+        <div class="cc-pct">${accLbl}</div>`;
+
+      if (cat.id === 'favorites') {
+        const dot = document.createElement('span');
+        dot.className = 'fav-dot';
+        dot.textContent = getFavQs().length > 0 ? '⭐' : '';
+        card.appendChild(dot);
+      }
+
+      card.onclick = () => launchCat(cat.id);
+      grid.appendChild(card);
+    }
+    el.appendChild(grid);
+  }
+
+  updateOverall();
+}
+
+function updateOverall() {
+  const tq = totalQs(); let tc = 0, ta = 0;
+  for (const c of CATEGORIES) {
+    if (c.special) continue;
+    tc += (stats[c.id] || {correct:0}).correct;
+    ta += (stats[c.id] || {answered:0}).answered;
+  }
+  const pct = tq > 0 ? Math.round((tc / tq) * 100) : 0;
+  document.getElementById('overall-pct').textContent = pct + '%';
+  document.getElementById('overall-bar').style.width = Math.min(100, pct) + '%';
+  document.getElementById('overall-detail').textContent = tc + ' correct out of ' + tq + ' questions';
+}
+
+function launchCat(id) {
+  if (id === 'verb_match') { startMatch(); return; }
+  if (id === 'all_forms')  { startAF();    return; }
+  if (id === 'favorites') {
+    const fqs = getFavQs();
+    if (!fqs.length) { alert('No favorites yet! Star ☆ questions during practice.'); return; }
+    startQuiz('favorites', fqs); return;
+  }
+  if (id === 'mistakes') {
+    const mqs = getMistakeQs();
+    if (!mqs.length) { alert('No mistakes yet! Keep practicing.'); return; }
+    startQuiz('mistakes', mqs); return;
+  }
+  startQuiz(id);
+}
+
+// ═══════════════════════════════════════════════
+// QUIZ ENGINE
+// ═══════════════════════════════════════════════
+function startQuiz(catId, overrideQs) {
+  currentCatId = catId;
+  const cat = CATEGORIES.find(c => c.id === catId);
+
+  let rawQs = overrideQs || cat.questions;
+
+  if (catId !== 'favorites' && catId !== 'mistakes') {
+    rawQs = rawQs.map((q, i) => ({ ...q, _origCat: catId, _origIdx: i }));
+    cat.questions = rawQs;
+  } else {
+    cat.questions = [...rawQs];
+  }
+
+  sessionQs = shuffle([...Array(rawQs.length).keys()]);
+  sessionIdx = 0;
+  sC = 0; sW = 0; blocked = false; wrongItems = []; curQ = null;
+
+  const lbl = catId === 'favorites' ? '⭐ Favorites'
+             : catId === 'mistakes'  ? '❌ Mistakes'
+             : cat.emoji + ' ' + cat.name;
+  document.getElementById('q-cat-lbl').textContent = lbl;
+  document.getElementById('sc-total').textContent = rawQs.length;
+  document.getElementById('sc-done').textContent  = '0';
+  document.getElementById('qpf').style.width = '0%';
+  document.getElementById('q-rem').textContent = '0 / ' + rawQs.length + ' answered';
+  document.getElementById('ss-c').textContent = '0';
+  document.getElementById('ss-w').textContent = '0';
+  document.getElementById('ss-p').textContent = '—';
+
+  showView('quiz');
+  loadQ();
+}
+
+function retrySession() { launchCat(currentCatId); }
+
+function loadQ() {
+  blocked = false;
+
+  const fb = document.getElementById('fb-bar');
+  if (fb) { fb.className = ''; fb.style.opacity = '0'; }
+
+  if (sessionIdx >= sessionQs.length) { endSession(); return; }
+
+  const cat = CATEGORIES.find(c => c.id === currentCatId);
+  const qi  = sessionQs[sessionIdx];
+  const raw = cat.questions[qi];
+  sessionIdx++;
+
+  const correct = raw.opts[raw.a];
+  const wrongs  = raw.opts.filter((_, i) => i !== raw.a);
+  const np = rnd(4);
+  const newOpts = [...wrongs];
+  newOpts.splice(np, 0, correct);
+  curQ = { ...raw, opts: newOpts, a: np };
+
+  const done  = sessionIdx - 1;
+  const total = sessionQs.length;
+  document.getElementById('qpf').style.width = Math.round((done / total) * 100) + '%';
+  document.getElementById('q-rem').textContent = done + ' / ' + total + ' answered';
+  document.getElementById('sc-done').textContent  = sC;
+  document.getElementById('sc-total').textContent = total;
+  document.getElementById('lang-tag').textContent =
+    curQ.lang === 'gr' ? '🇬🇷 Greek → English' : '🇬🇧 English → Greek';
+  document.getElementById('q-text').textContent = curQ.q;
+
+  const grid = document.getElementById('opts-grid');
+  grid.innerHTML = '';
+  curQ.opts.forEach((o, i) => {
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = o;
+    b.onclick = () => handleAns(i, b);
+    grid.appendChild(b);
+  });
+
+  updateStarBtn();
+}
+
+function handleAns(idx, btn) {
+  if (blocked) return;
+  blocked = true;
+
+  document.querySelectorAll('#opts-grid .opt').forEach(b => b.disabled = true);
+
+  const fb  = document.getElementById('fb-bar');
+  const ok  = (idx === curQ.a);
+
+  const realCatId = curQ._origCat || currentCatId;
+  const realIdx   = (curQ._origIdx !== undefined) ? curQ._origIdx : (sessionIdx - 1);
+  const mk        = favKey(realCatId, realIdx);
+
+  if (ok) {
+    btn.classList.add('ok');
+    fb.className = 'show fb-c';
+    document.getElementById('fb-msg').textContent = '✅ Σωστό!';
+    document.getElementById('fb-ans').innerHTML   = '';
+    sC++;
+
+    if (currentCatId !== 'favorites') {
+      mistakeKeys.delete(mk);
+    }
+
+    if (realCatId !== 'favorites' && realCatId !== 'mistakes') {
+      if (!stats[realCatId]) stats[realCatId] = { correct: 0, answered: 0 };
+      stats[realCatId].correct++;
+      stats[realCatId].answered++;
+    }
+  } else {
+    btn.classList.add('bad');
+    const allOpts = document.querySelectorAll('#opts-grid .opt');
+    if (allOpts[curQ.a]) allOpts[curQ.a].classList.add('ok');
+
+    fb.className = 'show fb-w';
+    document.getElementById('fb-msg').textContent = '❌ Λάθος';
+    document.getElementById('fb-ans').innerHTML =
+      'Correct:<br><strong>' + curQ.opts[curQ.a] + '</strong>';
+    sW++;
+    wrongItems.push({ q: curQ.q, ans: curQ.opts[curQ.a] });
+
+    if (realCatId !== 'favorites' && realCatId !== 'mistakes') {
+      if (!stats[realCatId]) stats[realCatId] = { correct: 0, answered: 0 };
+      stats[realCatId].answered++;
+      mistakeKeys.add(mk);
+    }
+    if (currentCatId === 'mistakes') {
+      mistakeKeys.add(mk);
+      favs.add(mk);
+      saveState();
+      updateStarBtn();
+    }
+  }
+
+  saveState();
+  updateSessUI();
+  setTimeout(loadQ, 1500);
+}
+
+function updateSessUI() {
+  document.getElementById('sc-done').textContent = sC;
+  document.getElementById('ss-c').textContent    = sC;
+  document.getElementById('ss-w').textContent    = sW;
+  const total = sessionQs.length;
+  const done  = sessionIdx;
+  const pct   = done > 0 ? Math.round((sC / done) * 100) : 0;
+  document.getElementById('ss-p').textContent = done > 0 ? pct + '%' : '—';
+}
+
+function endSession() {
+  const total = sessionQs.length;
+  const pct   = total > 0 ? Math.round((sC / total) * 100) : 100;
+
+  // ── SAVE last completed session % for normal (non-special) categories ──
+  const cat = CATEGORIES.find(c => c.id === currentCatId);
+  if (cat && !cat.special) {
+    lastSessionPct[currentCatId] = pct;
+    saveState();
+  }
+
+  let tr = '🏆', ti = 'Perfect!',        su = 'You mastered every question!';
+  if (pct < 50)  { tr = '📚'; ti = 'Keep Practicing!'; su = 'Review and try again.'; }
+  else if (pct < 75) { tr = '💪'; ti = 'Good Effort!'; su = "You're getting there!"; }
+  else if (pct < 100){ tr = '⭐'; ti = 'Well Done!';   su = 'Almost perfect!'; }
+
+  document.getElementById('sum-trophy').textContent  = tr;
+  document.getElementById('sum-title').textContent   = ti;
+  document.getElementById('sum-sub').textContent     = su;
+  document.getElementById('sum-pct').textContent     = pct + '%';
+  document.getElementById('sum-pct').style.color     =
+    pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--gold)' : 'var(--red)';
+  document.getElementById('sm-c').textContent = sC;
+  document.getElementById('sm-w').textContent = sW;
+  document.getElementById('sm-t').textContent = total;
+
+  const ws = document.getElementById('wrong-section');
+  ws.innerHTML = '';
+  if (wrongItems.length) {
+    const tt = document.createElement('div');
+    tt.className = 'wrong-ttl';
+    tt.textContent = '❌ Questions you missed:';
+    ws.appendChild(tt);
+    const seen = new Set();
+    for (const item of wrongItems) {
+      if (seen.has(item.q)) continue;
+      seen.add(item.q);
+      const d = document.createElement('div');
+      d.className = 'wrong-item';
+      d.innerHTML = `<div class="wi-q">${item.q}</div><div class="wi-a">✓ ${item.ans}</div>`;
+      ws.appendChild(d);
+    }
+  }
+
+  showView('summary');
+}
+
+// ═══════════════════════════════════════════════
+// MATCH GAME
+// ═══════════════════════════════════════════════
+let mRounds = [], mIdx = 0, mSel = null, mC = 0, mW = 0;
+
+function buildMatchRounds() {
+  const rounds = [];
+  CONJ.forEach(verb => {
+    Object.entries(verb.tenses).forEach(([tense, forms]) => {
+      const pairs = PRONOUNS.map((pr, i) => ({
+        pr, prEn: PRON_EN[i], form: forms[i]
+      })).filter(p => p.form !== '—');
+      if (pairs.length >= 3) rounds.push({ verbLabel: verb.label, tense, pairs });
+    });
+  });
+  return shuffle(rounds);
+}
+
+function startMatch() {
+  mRounds = buildMatchRounds(); mIdx = 0; mC = 0; mW = 0; mSel = null;
+  document.getElementById('m-done').textContent  = '1';
+  document.getElementById('m-total').textContent = mRounds.length;
+  document.getElementById('m-sc').textContent = '0';
+  document.getElementById('m-sw').textContent = '0';
+  document.getElementById('m-sp').textContent = '—';
+  showView('match');
+  renderMatchRound();
+}
+
+function renderMatchRound() {
+  if (mIdx >= mRounds.length) {
+    document.getElementById('m-verb-info').textContent  = '🎉 All ' + mRounds.length + ' rounds complete!';
+    document.getElementById('m-tense-info').textContent = 'Score: ' + mC + ' correct, ' + mW + ' wrong';
+    document.getElementById('m-instr').textContent      = 'Go back to try again or explore other categories.';
+    document.getElementById('m-left').innerHTML  = '';
+    document.getElementById('m-right').innerHTML = '';
+    return;
+  }
+  mSel = null;
+  const r = mRounds[mIdx];
+  document.getElementById('m-verb-info').textContent  = r.verbLabel;
+  document.getElementById('m-tense-info').textContent =
+    r.tense.toUpperCase() + ' TENSE — Round ' + (mIdx + 1) + ' of ' + mRounds.length;
+  document.getElementById('m-pf').style.width   = Math.round((mIdx / mRounds.length) * 100) + '%';
+  document.getElementById('m-done').textContent = mIdx + 1;
+  document.getElementById('m-fb').className     = 'm-fb';
+  document.getElementById('m-instr').textContent = 'Tap a pronoun, then tap its matching verb form';
+
+  const pairs   = shuffle([...r.pairs]);
+  const shForms = shuffle(pairs.map(p => p.form));
+  const left  = document.getElementById('m-left');  left.innerHTML  = '';
+  const right = document.getElementById('m-right'); right.innerHTML = '';
+
+  pairs.forEach(pair => {
+    const b = document.createElement('div');
+    b.className = 'm-item';
+    b.textContent = pair.pr;
+    b.dataset.pr      = pair.pr;
+    b.dataset.en      = pair.prEn;
+    b.dataset.correct = pair.form;
+    b.onclick = () => mSelectLeft(b);
+    left.appendChild(b);
+  });
+  shForms.forEach(form => {
+    const b = document.createElement('div');
+    b.className = 'm-item';
+    b.textContent  = form;
+    b.dataset.form = form;
+    b.onclick = () => mSelectRight(b);
+    right.appendChild(b);
+  });
+}
+
+function mSelectLeft(el) {
+  if (el.classList.contains('ok') || el.classList.contains('done')) return;
+  document.querySelectorAll('#m-left .m-item').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel'); mSel = el;
+}
+
+function mSelectRight(el) {
+  if (!mSel || el.classList.contains('ok') || el.classList.contains('done')) return;
+  const form = el.dataset.form, correct = mSel.dataset.correct;
+  const fb = document.getElementById('m-fb');
+  if (form === correct) {
+    mSel.classList.remove('sel');
+    mSel.classList.add('ok', 'done');
+    el.classList.add('ok', 'done');
+    mC++;
+    fb.textContent = '✅ ' + mSel.dataset.pr + ' (' + mSel.dataset.en + ') → ' + form;
+    fb.className   = 'm-fb show fb-c';
+    mSel = null;
+    updateMStats();
+    const allDone = [...document.querySelectorAll('#m-left .m-item')].every(b => b.classList.contains('ok'));
+    if (allDone) { mIdx++; setTimeout(renderMatchRound, 1100); }
+  } else {
+    mW++;
+    mSel.classList.add('bad'); el.classList.add('bad');
+    fb.textContent = '❌ Wrong! Try again.';
+    fb.className   = 'm-fb show fb-w';
+    updateMStats();
+    setTimeout(() => {
+      el.classList.remove('bad');
+      mSel.classList.remove('bad', 'sel');
+      mSel = null;
+      fb.className = 'm-fb';
+    }, 800);
+  }
+}
+
+function updateMStats() {
+  const t = mC + mW;
+  document.getElementById('m-sc').textContent = mC;
+  document.getElementById('m-sw').textContent = mW;
+  document.getElementById('m-sp').textContent = t > 0 ? Math.round((mC / t) * 100) + '%' : '—';
+}
+
+// ═══════════════════════════════════════════════
+// ALL FORMS — 2-step typing test
+// Step 1: user types the Present form → Check
+// Step 2: user types Past, Future, Imperative → Check
+// Correct answers always shown after each step
+// ═══════════════════════════════════════════════
+let afQ = [], afIdx = 0, afPerf = 0, afAns = 0;
+let afPresOk = false;   // was the present correct?
+
+function startAF() {
+  afQ = shuffle([...VB]); afIdx = 0; afPerf = 0; afAns = 0; afPresOk = false;
+  document.getElementById('af-total').textContent = afQ.length;
+  document.getElementById('af-sc').textContent    = '0';
+  document.getElementById('af-sw').textContent    = '0';
+  document.getElementById('af-sp').textContent    = '—';
+  showView('allforms');
+  renderAF();
+}
+
+function renderAF() {
+  // Reset step visibility
+  document.getElementById('af-step1').style.display   = 'block';
+  document.getElementById('af-step2').style.display   = 'none';
+  document.getElementById('af-answer-box').classList.remove('show');
+  document.getElementById('af-next-btn').style.display = 'none';
+  document.getElementById('af-fb-pres').className = 'af-fb';
+  document.getElementById('af-fb-rest').className = 'af-fb';
+  document.getElementById('af-check-btn').style.display  = 'block';
+  document.getElementById('af-check-btn2').style.display = 'block';
+  afPresOk = false;
+
+  if (afIdx >= afQ.length) {
+    const pct = afQ.length > 0 ? Math.round((afPerf / afQ.length) * 100) : 0;
+    document.getElementById('af-word').textContent = 'Done! ' + afPerf + '/' + afQ.length + ' perfect (' + pct + '%)';
+    document.getElementById('af-q-lbl').textContent = '';
+    document.getElementById('af-step1').style.display = 'none';
+    document.getElementById('af-step2').style.display = 'none';
+    return;
+  }
+
+  const v = afQ[afIdx];
+  document.getElementById('af-done').textContent  = afIdx + 1;
+  document.getElementById('af-total').textContent = afQ.length;
+  document.getElementById('af-pf').style.width    = Math.round((afIdx / afQ.length) * 100) + '%';
+  document.getElementById('af-prog').textContent  = 'Question ' + (afIdx + 1) + ' of ' + afQ.length;
+  document.getElementById('af-word').textContent  = v[1];   // English verb
+  document.getElementById('af-q-lbl').textContent = 'What is the present tense in Greek?';
+
+  // Reset present input
+  const presEl = document.getElementById('af-pres');
+  presEl.value = ''; presEl.className = 'af-inp'; presEl.disabled = false;
+
+  // Reset other inputs
+  ['af-past','af-fut','af-imp'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = ''; el.className = 'af-inp'; el.disabled = false;
+  });
+}
+
+// STEP 1: Check present tense
+function checkAFPresent() {
+  const v = afQ[afIdx];
+  const correctPres = v[2];
+  const el = document.getElementById('af-pres');
+  const uv = norm(el.value);
+  const cv = norm(correctPres);
+  afPresOk = (uv === cv);
+
+  el.classList.add(afPresOk ? 'ok' : 'bad');
+  el.disabled = true;
+
+  const fb = document.getElementById('af-fb-pres');
+  if (afPresOk) {
+    fb.textContent = '✅ Correct! Present: ' + correctPres;
+    fb.className   = 'af-fb show fb-c';
+  } else {
+    fb.textContent = '❌ Wrong. Correct present: ' + correctPres;
+    fb.className   = 'af-fb show fb-w';
+  }
+
+  // Hide step 1 check button, reveal step 2
+  document.getElementById('af-check-btn').style.display = 'none';
+  document.getElementById('af-step2').style.display = 'block';
+  // Fill correct present in answer reveal box (always)
+  document.getElementById('af-ans-pres').textContent = correctPres;
+}
+
+// STEP 2: Check past, future, imperative
+function checkAFRest() {
+  const v = afQ[afIdx];
+  const correct = [v[3], v[4], v[5]];   // past, future, imperative
+  const ids     = ['af-past','af-fut','af-imp'];
+  let allRest = true;
+
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id);
+    const cv = norm(correct[i]);
+    const uv = norm(el.value);
+    const ok = uv === cv || (cv === '—' && (uv === '' || uv === '—'));
+    el.classList.add(ok ? 'ok' : 'bad');
+    el.disabled = true;
+    if (!ok) allRest = false;
+  });
+
+  // Score: perfect only if BOTH present and all rest were correct
+  const allPerfect = afPresOk && allRest;
+  afAns++;
+  if (allPerfect) afPerf++;
+
+  const fb = document.getElementById('af-fb-rest');
+  if (allRest) {
+    fb.textContent = afPresOk ? '✅ Perfect! All forms correct!' : '✅ Remaining forms correct!';
+    fb.className   = 'af-fb show fb-c';
+  } else {
+    fb.textContent = '❌ Some mistakes — see correct answers below:';
+    fb.className   = 'af-fb show fb-w';
+  }
+
+  // Reveal full answer box
+  document.getElementById('af-ans-past').textContent = correct[0];
+  document.getElementById('af-ans-fut').textContent  = correct[1];
+  document.getElementById('af-ans-imp').textContent  = correct[2] === '—' ? '— (no imperative)' : correct[2];
+  document.getElementById('af-answer-box').classList.add('show');
+
+  document.getElementById('af-sc').textContent  = afPerf;
+  document.getElementById('af-sw').textContent  = afAns - afPerf;
+  document.getElementById('af-sp').textContent  = afAns > 0 ? Math.round((afPerf / afAns) * 100) + '%' : '—';
+  document.getElementById('af-check-btn2').style.display = 'none';
+  document.getElementById('af-next-btn').style.display   = 'block';
+  afIdx++;
+}
+
+function nextAF() { renderAF(); }
+
+// ═══════════════════════════════════════════════
+// STATS — shows lastSessionPct for each category
+// ═══════════════════════════════════════════════
+function renderStats() {
+  let tc = 0, ta = 0;
+  for (const c of CATEGORIES) {
+    if (c.special) continue;
+    const s = stats[c.id] || { correct: 0, answered: 0 };
+    tc += s.correct; ta += s.answered;
+  }
+  const tp = ta > 0 ? Math.round((tc / ta) * 100) : 0;
+  document.getElementById('st-c').textContent = tc;
+  document.getElementById('st-a').textContent = ta;
+  document.getElementById('st-p').textContent = tp + '%';
+
+  const rows = document.getElementById('stats-rows');
+  rows.innerHTML = '';
+  for (const c of CATEGORIES) {
+    if (c.special) continue;
+    const lsp = lastSessionPct[c.id];
+    const hasRun = (lsp !== undefined && lsp !== null);
+    const pctVal = hasRun ? lsp : 0;
+    const bc = pctVal >= 80 ? '#059669' : pctVal >= 50 ? '#d97706' : pctVal > 0 ? '#dc2626' : '#cbd5e1';
+    const pc = pctVal >= 80 ? 'vg' : pctVal >= 50 ? 'vb' : pctVal > 0 ? 'vr' : '';
+    const row = document.createElement('div');
+    row.className = 'stat-row';
+    row.innerHTML = `<div class="sr-em">${c.emoji}</div>
+      <div class="sr-info">
+        <div class="sr-name">${c.name} <span style="color:var(--muted);font-size:9px">(${c.questions.length}q)</span></div>
+        <div class="sr-bar"><div class="sr-bar-fill" style="width:${pctVal}%;background:${bc}"></div></div>
+      </div>
+      <div class="sr-right">
+        <span class="sr-pct ${pc}">${hasRun ? pctVal + '%' : '—'}</span>
+        <span class="sr-frac">${hasRun ? 'last run' : 'not yet'}</span>
+      </div>`;
+    row.onclick = () => launchCat(c.id);
+    rows.appendChild(row);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// PHRASES
+// ═══════════════════════════════════════════════
+function renderPhrases() {
+  const el = document.getElementById('phrases-body');
+  el.innerHTML = '';
+  PHRASES.forEach(sec => {
+    const div = document.createElement('div');
+    div.className = 'ph-section';
+    const hdr = document.createElement('div');
+    hdr.className = 'ph-hdr';
+    hdr.innerHTML = `<span class="ph-hdr-icon">${sec.icon}</span>` +
+      `<span class="ph-hdr-title">${sec.title}</span><span class="ph-toggle">▼</span>`;
+    const body = document.createElement('div');
+    body.className = 'ph-body';
+    sec.items.forEach(item => {
+      const d = document.createElement('div');
+      d.className = 'ph-item';
+      d.innerHTML = `<div><div class="ph-gr">${item.gr}</div>` +
+        `${item.note ? `<div class="ph-note">${item.note}</div>` : ''}</div>` +
+        `<div class="ph-en">${item.en}</div>`;
+      body.appendChild(d);
+    });
+    hdr.onclick = () => {
+      const open = body.style.display === 'block';
+      body.style.display = open ? 'none' : 'block';
+      hdr.querySelector('.ph-toggle').style.transform = open ? '' : 'rotate(180deg)';
+    };
+    div.appendChild(hdr); div.appendChild(body); el.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el => el.style.display = 'none');
+  const target = document.getElementById('view-' + v);
+  if (target) target.style.display = 'block';
+  curView = v;
+  window.scrollTo(0, 0);
+}
+
+function showMenu() {
+  renderMenu();
+  showView('menu');
+  ['nav-home','nav-phrases','nav-stats'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  const nh = document.getElementById('nav-home');
+  if (nh) nh.classList.add('active');
+}
+
+function switchTab(tab) {
+  ['nav-home','nav-phrases','nav-stats'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  const active = document.getElementById('nav-' + tab);
+  if (active) active.classList.add('active');
+  if (tab === 'menu')         { renderMenu();    showView('menu');    }
+  else if (tab === 'phrases') { renderPhrases(); showView('phrases'); }
+  else                        { renderStats();   showView('stats');   }
+}
+
+function confirmReset() {
+  if (confirm('⚠️ Reset all progress and favorites?\n\nThis cannot be undone.')) {
+    localStorage.removeItem(SK);
+    stats = {}; favs = new Set(); mistakeKeys = new Set(); lastSessionPct = {};
+    loadState(); renderMenu();
+    if (curView === 'stats') renderStats();
+    if (['quiz','summary','match','allforms'].includes(curView)) showMenu();
+    alert('Progress reset! 💪');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+initCats();
+loadState();
+renderMenu();
+showView('menu');
+</script>
+</body>
+</html>

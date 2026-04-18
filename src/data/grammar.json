@@ -1,0 +1,122 @@
+[
+  {
+    "t": "1. Articles — ο, η, το (Definite)",
+    "c": "Every Greek noun needs an article. The article tells you the GENDER.\n\nDEFINITE ARTICLES (the):\n  Singular:  ο (masc)    η (fem)     το (neuter)\n  Plural:    οι (m/f)    οι (m/f)    τα (neuter)\n\n  ο άντρας = the man    η γυναίκα = the woman\n  το παιδί = the child  τα παιδιά = the children\n\nINDEFINITE ARTICLES (a/an):\n  ένας (masc)    μία/μια (fem)    ένα (neuter)\n\n  ένας φίλος = a friend    μία γυναίκα = a woman\n  ένα σπίτι = a house\n\nTIP: ALWAYS learn new nouns WITH their article!\n  ✓ το σπίτι    ✗ σπίτι (alone)"
+  },
+  {
+    "t": "2. Gender — How to Guess",
+    "c": "MASCULINE (ο) — usually ends in:\n  -ος → ο φίλος, ο δρόμος, ο δάσκαλος\n  -ας → ο πατέρας, ο άντρας, ο μήνας\n  -ης → ο μαθητής, ο πελάτης, ο εργάτης\n\nFEMININE (η) — usually ends in:\n  -α  → η γυναίκα, η ώρα, η θάλασσα\n  -η  → η αδερφή, η πόλη, η ζωή\n  -ση → η εξέταση, η εκτύπωση\n\nNEUTER (το) — usually ends in:\n  -ο  → το βιβλίο, το γραφείο\n  -ι  → το σπίτι, το παιδί\n  -μα → το όνομα, το πρόβλημα\n\nDUAL-GENDER nouns (ο or η):\n  ο/η γιατρός, ο/η δικηγόρος, ο/η υπάλληλος\n\nEXCEPTIONS to remember:\n  η οδός (street) — fem despite -ος\n  το μάθημα — neuter despite ending"
+  },
+  {
+    "t": "3. Cases — Ονομαστική, Αιτιατική, Γενική",
+    "c": "Greek changes articles AND noun endings based on case.\n\nNOMINATIVE (subject — who does it?)\n  Ο φίλος μιλάει. = The friend speaks.\n\nACCUSATIVE (object — who/what do I see?)\n  Βλέπω τον φίλο. = I see the friend.\n\nGENITIVE (possession — whose?)\n  Το σπίτι του φίλου. = The friend's house.\n\n═══ ARTICLE TABLE ═══\n              Nom     Acc     Gen\nMasc sing:    ο       τον     του\nFem sing:     η       την     της\nNeut sing:    το      το      του\nMasc pl:      οι      τους    των\nFem pl:       οι      τις     των\nNeut pl:      τα      τα      των\n\nWHEN TO USE ACCUSATIVE:\n • After verbs: βλέπω τον φίλο, αγοράζω το ψωμί\n • After σε: πάω στο σπίτι (σε+το = στο)\n • With months: τον Μάιο, τον Αύγουστο\n • After για, με, χωρίς: για τον φίλο"
+  },
+  {
+    "t": "4. Noun Plurals",
+    "c": "MASCULINE:\n  -ος → -οι    ο φίλος → οι φίλοι\n  -ας → -ες    ο πατέρας → οι πατέρες\n  -ης → -ες    ο μαθητής → οι μαθητές\n\nFEMININE:\n  -α  → -ες    η γυναίκα → οι γυναίκες\n  -η  → -ες    η αδερφή → οι αδερφές\n  -η  → -εις   η πόλη → οι πόλεις\n\nNEUTER:\n  -ο  → -α     το βιβλίο → τα βιβλία\n  -ι  → -ια    το παιδί → τα παιδιά\n  -μα → -ματα  το όνομα → τα ονόματα\n\nACCUSATIVE PLURALS:\n  Masc: τους φίλους  (not φίλοι!)\n  Fem:  τις γυναίκες\n  Neut: τα παιδιά (same as nominative)\n\nACCENT may shift: ο άνθρωπος → οι άνθρωποι"
+  },
+  {
+    "t": "5. Adjective Agreement",
+    "c": "Adjectives MUST match noun in gender, number, and case.\n\nμεγάλος (big) — all forms:\n  Masc: ο μεγάλος   τον μεγάλο   του μεγάλου\n  Fem:  η μεγάλη    τη μεγάλη    της μεγάλης\n  Neut: το μεγάλο   το μεγάλο    του μεγάλου\n\nPATTERN for regular adjectives:\n  Masc: -ος    Fem: -η/-α    Neut: -ο\n  καλός / καλή / καλό\n  ωραίος / ωραία / ωραίο\n  φιλικός / φιλική / φιλικό\n\nPLURAL:\n  Masc: -οι    Fem: -ες    Neut: -α\n  οι μεγάλοι δρόμοι / οι μεγάλες πόλεις / τα μεγάλα σπίτια\n\nPOSITION: Usually before the noun\n  Ένα μεγάλο σπίτι = A big house\n  Η ωραία πόλη = The beautiful city"
+  },
+  {
+    "t": "6. Personal & Object Pronouns",
+    "c": "SUBJECT (often dropped in Greek):\n  εγώ (I)  εσύ (you)  αυτός/ή/ό (he/she/it)\n  εμείς (we)  εσείς (you pl/formal)  αυτοί/ές/ά (they)\n\nDIRECT OBJECT (me, you, him...):\n  με    σε    τον/την/το    μας    σας    τους/τις/τα\n  Σε βλέπω. = I see you.\n  Τον ακούω. = I hear him.\n\nINDIRECT OBJECT (to me, to you...):\n  μου   σου   του/της   μας   σας   τους\n  Μου δίνει. = He gives (to) me.\n  Σου μιλάω. = I speak to you.\n\nWORD ORDER: pronoun BEFORE the verb!\n  Τον βλέπω. ✓ (I see him)\n  Μου λέει. ✓ (He tells me)\n  \nDOUBLE PRONOUNS: indirect + direct\n  Μου το δίνει. = He gives it to me.\n  Σου τον στέλνω. = I send him to you."
+  },
+  {
+    "t": "7. Possessives — μου, σου, του...",
+    "c": "Possessives go AFTER the noun:\n  μου (my)   σου (your)   του (his)   της (her)\n  μας (our)  σας (your)   τους (their)\n\n  το σπίτι μου = my house\n  ο φίλος σου = your friend\n  η μητέρα της = her mother\n  \nALWAYS use article + noun + possessive:\n  Η δουλειά μου = my job ✓\n  Δουλειά μου = ✗ (needs article!)\n\nFor emphasis: δικός/δική/δικό\n  Αυτό είναι δικό μου. = This is MINE.\n  Δικός σου είναι; = Is it yours?\n\n  δικός μου (m), δική μου (f), δικό μου (n)"
+  },
+  {
+    "t": "8. Verb Types & Conjugation Patterns",
+    "c": "Greek verbs fall into distinct groups. Knowing the group \nhelps you conjugate ANY verb in that group!\n\n═══ GROUP A: -ω verbs (most common!) ═══\nPattern: γράφ-ω, γράφ-εις, γράφ-ει, γράφ-ουμε, γράφ-ετε, γράφ-ουν\n  Endings: -ω, -εις, -ει, -ουμε, -ετε, -ουν\n  Examples: γράφω, δουλεύω, ανοίγω, κλείνω, αρχίζω\n\n═══ GROUP B1: -άω verbs ═══\nPattern: μιλ-άω, μιλ-άς, μιλ-ά, μιλ-άμε, μιλ-άτε, μιλ-άνε\n  Endings: -άω, -άς, -ά, -άμε, -άτε, -άνε\n  Examples: μιλάω, ρωτάω, αγαπάω, ξυπνάω, γελάω\n\n═══ GROUP B2: -ώ verbs (stressed) ═══\nPattern: μπορ-ώ, μπορ-είς, μπορ-εί, μπορ-ούμε, μπορ-είτε, μπορ-ούν\n  Endings: -ώ, -είς, -εί, -ούμε, -είτε, -ούν\n  Examples: μπορώ, οδηγώ, προτιμώ, τηλεφωνώ\n\n═══ PASSIVE/REFLEXIVE: -ομαι/-άμαι ═══\nPattern: έρχ-ομαι, έρχ-εσαι, έρχ-εται, ερχ-όμαστε, \n         έρχ-εστε, έρχ-ονται\n  Examples: έρχομαι, κοιμάμαι, σηκώνομαι, φοβάμαι\n\n═══ IRREGULAR: unique patterns ═══\n  είμαι, λέω, τρώω, πίνω, πάω — must memorize!"
+  },
+  {
+    "t": "9. Past Tense (Αόριστος) — How to Form It",
+    "c": "The past (Aorist) describes COMPLETED actions.\n\nFORMATION: augment (ε-/ή-) + past stem + endings\n\nGROUP A past: stem changes + -α, -ες, -ε, -αμε, -ατε, -αν\n  γράφω → έγραψα    (φ→ψ)\n  δουλεύω → δούλεψα  (ευ→εψ)\n  ανοίγω → άνοιξα    (γ→ξ)\n  αρχίζω → άρχισα    (ζ→σ)\n\nCOMMON STEM CHANGES in past:\n  -φω → -ψα     (γράφω → έγραψα)\n  -βω → -ψα     (αλλάζω → doesn't apply)\n  -ζω → -σα     (αρχίζω → άρχισα)\n  -ευω → -εψα   (δουλεύω → δούλεψα)\n  -γω → -ξα     (ανοίγω → άνοιξα)\n\nGROUP B1 past: -ησα, -ησες, -ησε, -ήσαμε, -ήσατε, -ησαν\n  μιλάω → μίλησα    ρωτάω → ρώτησα\n\nGROUP B2 past: -ησα/-εσα\n  μπορώ → μπόρεσα   τηλεφωνώ → τηλεφώνησα\n\nPASSIVE past: -ηκα, -ηκες, -ηκε, -ήκαμε, -ήκατε, -ηκαν\n  κοιμάμαι → κοιμήθηκα\n\nAUGMENT: ε- or ή- added before verbs starting with consonant\n  Only when stressed: έ-γραψα but γράψ-αμε (no augment)"
+  },
+  {
+    "t": "10. Future Tense — θα + verb",
+    "c": "Future = θα + subjunctive stem (often = past stem)\n\n  θα γράψω = I will write\n  θα μιλήσω = I will speak\n  θα φάω = I will eat (τρώω→φάω!)\n\nPATTERN:\n  θα + past stem + present endings\n  θα γράψ-ω, θα γράψ-εις, θα γράψ-ει...\n\nEXAMPLES:\n  Present → Future\n  γράφω → θα γράψω\n  δουλεύω → θα δουλέψω\n  μιλάω → θα μιλήσω\n  τρώω → θα φάω\n  πίνω → θα πιω\n  πάω → θα πάω\n  έρχομαι → θα έρθω\n  βλέπω → θα δω\n\nNEGATION: δεν θα + verb\n  Δεν θα πάω. = I won't go.\n  Δεν θα μείνω. = I won't stay.\n\nKEY: Learn the past stem and you know the future!"
+  },
+  {
+    "t": "11. Negation — δεν / μην",
+    "c": "δεν = don't/doesn't/didn't (statements & questions)\n  Δεν δουλεύω σήμερα. = I don't work today.\n  Δεν πήγα χθες. = I didn't go yesterday.\n  Δεν θα έρθω αύριο. = I won't come tomorrow.\n  Δεν θέλεις; = Don't you want?\n\nμην = don't (commands & after να)\n  Μην τρέχεις! = Don't run!\n  Μην ανησυχείς. = Don't worry.\n  Πρέπει να μην φεύγεις. = You must not leave.\n\n\"NEVER\" = ποτέ δεν + verb\n  Ποτέ δεν καπνίζω. = I never smoke.\n  ⚠ NOT: δεν ποτέ ✗\n\n\"NOTHING\" = τίποτα / \"NOBODY\" = κανένας\n  Δεν θέλω τίποτα. = I don't want anything.\n  Δεν ξέρω κανέναν. = I don't know anyone.\n\nCAREFUL: ποτέ (never) ≠ πότε (when?)"
+  },
+  {
+    "t": "12. Questions — Formation",
+    "c": "BY INTONATION (voice goes up ↑):\n  Μιλάς ελληνικά; = Do you speak Greek?\n  Δουλεύεις σήμερα; = Do you work today?\n\nQUESTION WORDS:\n  Τι;      = What?      Τι κάνεις;\n  Πού;     = Where?     Πού μένεις;\n  Πότε;    = When?      Πότε φεύγεις;\n  Πώς;     = How?       Πώς είσαι;\n  Γιατί;   = Why?       Γιατί δεν έρχεσαι;\n  Ποιος;   = Who?       Ποιος είναι;\n  Πόσο;    = How much?  Πόσο κοστίζει;\n  Πόσοι;   = How many?  Πόσοι μαθητές;\n\n⚠ ACCENT TRAPS:\n  πότε (when?) ≠ ποτέ (never)\n  πού (where?) ≠ που (that/which)\n  πώς (how?) ≠ πως (that)\n\nANSWERING: Ναι (yes), Όχι (no)"
+  },
+  {
+    "t": "13. Prepositions & σε Contractions",
+    "c": "KEY PREPOSITIONS:\n  σε (in/at/to)  από (from)  με (with)  για (for)\n  χωρίς (without)  μέχρι (until)  πριν (before)  μετά (after)\n\nσε + ARTICLE = CONTRACTION (very common!):\n  σε + τον → στον    Πάω στον γιατρό.\n  σε + την → στην    Μένω στην Κύπρο.\n  σε + το  → στο     Πάω στο σπίτι.\n  σε + τη  → στη     Πάω στη δουλειά.\n  σε + τους → στους  Μιλάω στους φίλους.\n  σε + τις → στις    Στις 5 η ώρα.\n  σε + τα  → στα     Πάω στα μαγαζιά.\n\nPLACE EXPRESSIONS:\n  πάνω σε = on         κάτω από = under\n  δίπλα σε = next to   μπροστά σε = in front of\n  πίσω από = behind    απέναντι από = opposite\n  ανάμεσα σε = between κοντά σε = near"
+  },
+  {
+    "t": "14. Comparatives & Superlatives",
+    "c": "COMPARATIVE — πιο + adjective:\n  μεγάλος → πιο μεγάλος = bigger\n  εύκολος → πιο εύκολος = easier\n\n\"THAN\" = από\n  Η Αθήνα είναι πιο μεγάλη ΑΠΟ τη Λευκωσία.\n  \n\"LESS\" = λιγότερο\n  Λιγότερο δύσκολο = less difficult\n\nSUPERLATIVE — ο/η/το πιο + adjective:\n  ο πιο μεγάλος = the biggest\n  η πιο όμορφη πόλη = the most beautiful city\n  το πιο εύκολο μάθημα = the easiest lesson\n\nIRREGULAR comparatives:\n  καλός → καλύτερος (better)\n  κακός → χειρότερος (worse)\n  μεγάλος → μεγαλύτερος (bigger/older)\n  μικρός → μικρότερος (smaller/younger)\n  πολύ → περισσότερο (more)\n  λίγο → λιγότερο (less)"
+  },
+  {
+    "t": "15. Μου αρέσει — I Like",
+    "c": "STRUCTURE: μου αρέσει + singular noun / να + verb\n            μου αρέσουν + plural noun\n\n  Μου αρέσει η μουσική. = I like music.\n  Μου αρέσει να ταξιδεύω. = I like to travel.\n  Μου αρέσουν τα φρούτα. = I like fruits.\n\nALL PERSONS:\n  μου αρέσει = I like       μας αρέσει = we like\n  σου αρέσει = you like     σας αρέσει = you like\n  του αρέσει = he likes     τους αρέσει = they like\n  της αρέσει = she likes\n\nNEGATIVE: Δεν μου αρέσει\nPAST: μου άρεσε / μου άρεσαν\nFUTURE: θα μου αρέσει\n\n⚠ The THING liked is the SUBJECT, not you!\n  Μου αρέσει ο καφές. = Coffee pleases me."
+  },
+  {
+    "t": "16. Μπορώ & Πρέπει — Can & Must",
+    "c": "ΜΠΟΡΩ + ΝΑ + verb = CAN / BE ABLE TO\n  Μπορώ να μιλήσω. = I can speak.\n  Μπορείς να έρθεις; = Can you come?\n  Δεν μπορώ να κοιμηθώ. = I can't sleep.\n\nΠΡΕΠΕΙ + ΝΑ + verb = MUST / HAVE TO\n  Πρέπει να δουλέψω. = I must work.\n  Πρέπει να φύγουμε. = We must leave.\n  Δεν πρέπει να φεύγεις. = You must not leave.\n\n⚠ πρέπει NEVER changes! Same for all persons.\n\nΘΕΛΩ + ΝΑ + verb = WANT TO\n  Θέλω να φάω. = I want to eat.\n  Θέλεις να πας; = Do you want to go?\n\nAfter να: the verb is in SUBJUNCTIVE form\n  (looks like future without θα)\n  θα πάω → να πάω\n  θα φάω → να φάω"
+  },
+  {
+    "t": "17. There is/are — υπάρχει/υπάρχουν",
+    "c": "υπάρχει = there is (singular)\nυπάρχουν = there are (plural)\n\n  Υπάρχει ένα εστιατόριο εδώ.\n  = There is a restaurant here.\n\n  Υπάρχουν πολλά πάρκα στη Λευκωσία.\n  = There are many parks in Nicosia.\n\nNEGATIVE: Δεν υπάρχει/υπάρχουν\n  Δεν υπάρχει φαρμακείο κοντά.\n  = There isn't a pharmacy nearby.\n\nQUESTION: Υπάρχει... εδώ κοντά;\n  Υπάρχει τράπεζα εδώ κοντά;\n  = Is there a bank near here?\n\nPAST: υπήρχε / υπήρχαν\n  Υπήρχε ένα σχολείο εδώ πριν.\n  = There was a school here before."
+  },
+  {
+    "t": "18. Connectors — For Writing",
+    "c": "ESSENTIAL for the writing exam:\n\nADDING: και (and), επίσης (also), ακόμα (also)\nCONTRAST: αλλά (but), όμως (however)\nREASON: επειδή/γιατί (because)\nRESULT: γι' αυτό (therefore), έτσι (so)\nTIME: όταν (when), πριν (before), μετά (after), αφού (after)\nCONDITION: αν (if)\nSEQUENCE: πρώτα (first) → μετά (then) → τέλος (finally)\nOPINION: Κατά τη γνώμη μου, Νομίζω ότι, Πιστεύω ότι\n\nMODEL PARAGRAPH:\n  Κατά τη γνώμη μου, η Κύπρος είναι πολύ \n  όμορφη χώρα. Πρώτα, έχει ωραίες παραλίες. \n  Επίσης, ο καιρός είναι καλός. Αλλά μερικές \n  φορές κάνει πολλή ζέστη. Γι' αυτό προτιμώ \n  το φθινόπωρο. Τέλος, μου αρέσει πολύ \n  το φαγητό, για παράδειγμα το χαλούμι."
+  },
+  {
+    "t": "19. Commands — Προστακτική",
+    "c": "INFORMAL (εσύ):\n  Έλα! = Come!        Πήγαινε! = Go!\n  Γράψε! = Write!     Διάβασε! = Read!\n  Φάε! = Eat!         Πιες! = Drink!\n  Κάθισε! = Sit!      Μίλα! = Speak!\n  Άκουσε! = Listen!   Περίμενε! = Wait!\n  Φέρε! = Bring!      Δώσε! = Give!\n\nFORMAL/PLURAL (εσείς):\n  Ελάτε!    Πηγαίνετε!   Γράψτε!\n  Διαβάστε! Φάτε!        Πιείτε!\n  Καθίστε!  Μιλήστε!     Ακούστε!\n\nNEGATIVE: μην + verb\n  Μην τρέχεις! = Don't run!\n  Μην ανησυχείτε! = Don't worry! (formal)\n  Μην φεύγεις! = Don't leave!"
+  },
+  {
+    "t": "20. Time, Dates & Age",
+    "c": "TELLING TIME:\n  Τι ώρα είναι; = What time is it?\n  Είναι τρεις η ώρα. = It's 3:00.\n  Είναι τρεις και μισή. = It's 3:30.\n  Είναι τρεις και τέταρτο. = It's 3:15.\n  Είναι τέσσερις παρά τέταρτο. = It's 3:45.\n  Στις πέντε. = At 5 o'clock.\n\nDATES — months use accusative with τον/τη:\n  Η εξέταση είναι στις 19 Μαΐου.\n  Γεννήθηκα στις 5 Μαρτίου.\n  τον Ιανουάριο, τον Μάιο\n\nAGE:\n  Είμαι 28 χρονών. = I am 28 years old.\n  Πόσο χρονών είσαι; = How old are you?\n\nORDINALS for dates/floors:\n  Μένω στον τρίτο όροφο. = 3rd floor."
+  },
+  {
+    "t": "21. Reflexive Verbs — -ομαι/-άμαι",
+    "c": "Actions you do to YOURSELF:\n\nCOMMON REFLEXIVE VERBS:\n  κοιμάμαι = I sleep     σηκώνομαι = I get up\n  ντύνομαι = I dress      πλένομαι = I wash myself\n  χτενίζομαι = I comb     ετοιμάζομαι = I get ready\n  ξυρίζομαι = I shave\n\nPRESENT PATTERN:\n  -ομαι, -εσαι, -εται, -όμαστε, -εστε, -ονται\n\nPAST: add -ηκα endings\n  κοιμήθηκα, σηκώθηκα, ντύθηκα\n\nDAILY ROUTINE example:\n  Ξυπνάω στις 7, σηκώνομαι, πλένομαι,\n  ντύνομαι και πηγαίνω στη δουλειά.\n  Γυρίζω σπίτι στις 6, μαγειρεύω,\n  τρώω, βλέπω τηλεόραση και κοιμάμαι."
+  },
+  {
+    "t": "22. Demonstratives — αυτός/εκείνος",
+    "c": "THIS = αυτός/αυτή/αυτό\n  αυτό το σπίτι = this house\n  αυτή η γυναίκα = this woman\n  αυτός ο άντρας = this man\n\nTHAT = εκείνος/εκείνη/εκείνο\n  εκείνο το βιβλίο = that book\n  εκείνη η πόλη = that city\n\nSUCH = τέτοιος/τέτοια/τέτοιο\n  Δεν θέλω τέτοιο πράγμα.\n\nRelative pronoun — που (who/that/which):\n  Ο άνθρωπος που βλέπω = The person that I see\n  Το σπίτι που μένω = The house where I live\n  Η γυναίκα που μιλάει = The woman who speaks"
+  },
+  {
+    "t": "23. Sentence Structure for Exam",
+    "c": "BASIC ORDER: Subject + Verb + Object\n  Εγώ γράφω γράμμα. = I write a letter.\n\nGreek is FLEXIBLE — all correct:\n  Γράφω γράμμα. (subject dropped — normal!)\n  Γράμμα γράφω. (emphasis on letter)\n\nUSEFUL EXAM PATTERNS:\n\nDaily routine:\n  Κάθε μέρα ξυπνάω στις 7. Μετά πηγαίνω \n  στη δουλειά. Το μεσημέρι τρώω. Το βράδυ \n  γυρίζω σπίτι και ξεκουράζομαι.\n\nDescribing a place:\n  Η Λευκωσία είναι μεγάλη πόλη. Έχει πολλά \n  εστιατόρια και καφετέριες. Υπάρχουν πολλά \n  πάρκα. Μου αρέσει πολύ.\n\nExpressing opinion:\n  Κατά τη γνώμη μου... / Νομίζω ότι...\n  Πιστεύω ότι... / Μου αρέσει γιατί...\n\nPast event:\n  Χθες πήγα στο εστιατόριο με φίλους. \n  Φάγαμε ψάρι και ήπιαμε κρασί. Ήταν ωραία!"
+  },
+  {
+    "t": "24. Talking About Yourself — A2 Speaking",
+    "c": "FOR THE ORAL EXAM — practice these topics:\n\nINTRODUCTION:\n  Με λένε [name]. Είμαι από [country].\n  Μένω στη Λευκωσία εδώ και [X] χρόνια.\n  Είμαι [age] χρονών. Είμαι παντρεμένος/η.\n\nFAMILY:\n  Έχω [X] αδερφό/αδερφή/παιδιά.\n  Η οικογένειά μου ζει στ... \n\nWORK:\n  Εργάζομαι σε μια εταιρεία.\n  Δουλεύω ως [profession].\n  Η δουλειά μου είναι ενδιαφέρουσα.\n\nFREE TIME:\n  Στον ελεύθερο χρόνο μου...\n  Μου αρέσει να [verb].\n  Πηγαίνω στο γυμναστήριο / διαβάζω / \n  βγαίνω με φίλους.\n\nWHY GREEK:\n  Μαθαίνω ελληνικά γιατί μένω στην Κύπρο.\n  Θέλω να πάρω υπηκοότητα.\n  Μου αρέσει η ελληνική γλώσσα."
+  },
+  {
+    "t": "25. Describing a Picture — Speaking Exam",
+    "c": "In the speaking exam you describe a picture.\n\nUSEFUL STRUCTURES:\n  Στην εικόνα/φωτογραφία βλέπω...\n  = In the picture I see...\n\n  Υπάρχει/Υπάρχουν... = There is/are...\n  Είναι... = It is... / They are...\n\nPEOPLE:\n  Βλέπω έναν άντρα/μια γυναίκα/ένα παιδί.\n  Φοράει... (he/she wears)\n  Κρατάει... (he/she holds)\n  Κάθεται/Στέκεται... (sits/stands)\n\nPLACE & WEATHER:\n  Είναι σε ένα πάρκο/εστιατόριο/σπίτι.\n  Ο καιρός είναι καλός/κακός.\n  Έχει ήλιο/βροχή.\n\nACTIONS:\n  Τρώνε/Πίνουν/Μιλάνε/Γελάνε\n  Παίζουν/Περπατάνε/Κάθονται\n\nGUESSING:\n  Νομίζω ότι... = I think that...\n  Φαίνεται ότι... = It seems that...\n  Ίσως... = Maybe..."
+  },
+  {
+    "t": "26. Accent Rules — Τόνος",
+    "c": "Every Greek word of 2+ syllables has ONE accent mark.\n\nRULES:\n1. Accent can only be on last 3 syllables\n2. One accent per word only\n3. Accent shows which syllable is stressed\n\nWHERE IT GOES:\n  Most nouns: fixed accent (learn with word)\n  Verbs: can shift in past tense\n    γράφω → έγραψα (accent moves!)\n\nACCENT MATTERS — different meanings:\n  πότε (when?) ≠ ποτέ (never)\n  πού (where?) ≠ που (that/which)\n  πώς (how?) ≠ πως (that)\n\nMONOSYLLABIC words with accent:\n  ή (or), πού (where), πώς (how), πότε (when)\n  \nWithout accent:\n  ο, η, το, και, σε, με, που, πως, αν\n\n⚠ In the exam, wrong accents lose marks!"
+  },
+  {
+    "t": "27. Accusative After σε — Common Phrases",
+    "c": "After σε (and contractions στο/στη/στον etc.),\nuse ACCUSATIVE case:\n\nPLACES: Πάω...\n  στο σπίτι, στο σχολείο, στο γραφείο\n  στη δουλειά, στη Λευκωσία, στην Ελλάδα\n  στον γιατρό, στον κινηματογράφο\n\nTIME: στις + number\n  στις τρεις = at three o'clock\n  στις 19 Μαΐου = on May 19th\n\nMONTHS with τον (accusative):\n  τον Ιανουάριο, τον Φεβρουάριο...\n  τον Αύγουστο (NOT Αύγουστος!)\n\nDAYS with τη/το:\n  τη Δευτέρα = on Monday\n  το Σάββατο = on Saturday\n  \n⚠ Common exam error:\n  Πήγα στην Αθήνα τον Αύγουστο. ✓\n  Πήγα στην Αθήνα τον Αύγουστος. ✗"
+  },
+  {
+    "t": "28. Writing Exam — Structure & Tips",
+    "c": "A2 WRITING: Short text (60-80 words)\n\nSTRUCTURE:\n  1. Opening sentence (topic)\n  2. 3-4 supporting sentences\n  3. Closing sentence\n\nCOMMON TOPICS:\n  • Describe your daily routine\n  • Write about your city/neighborhood\n  • Write about a hobby\n  • Write about a past trip\n  • Write to a friend about plans\n  • Describe your family\n  • Write about a holiday/celebration\n\nCHECKLIST:\n  ✓ Use connectors (και, αλλά, επειδή, γι' αυτό)\n  ✓ Mix present/past/future tenses\n  ✓ Use μου αρέσει, νομίζω ότι\n  ✓ Include time expressions\n  ✓ Check noun-adjective agreement\n  ✓ Check verb endings\n  ✓ Count words (60-80)\n  ✓ Check accents!"
+  },
+  {
+    "t": "29. Directions — Asking & Giving",
+    "c": "ASKING:\n  Πού είναι η τράπεζα; = Where is the bank?\n  Πώς πάω στο νοσοκομείο; = How do I get to the hospital?\n  Είναι μακριά; = Is it far?\n\nGIVING DIRECTIONS:\n  Πήγαινε/Πηγαίνετε ευθεία. = Go straight.\n  Στρίψε/Στρίψτε δεξιά. = Turn right.\n  Στρίψε/Στρίψτε αριστερά. = Turn left.\n  \n  Είναι δίπλα στο σούπερ μάρκετ.\n  = It's next to the supermarket.\n  \n  Είναι απέναντι από την εκκλησία.\n  = It's opposite the church.\n\n  Πάρε τον πρώτο δρόμο δεξιά.\n  = Take the first street on the right.\n\n  Μετά από 200 μέτρα, στα αριστερά.\n  = After 200 meters, on the left."
+  },
+  {
+    "t": "30. Conditional & Wishes",
+    "c": "REAL CONDITION (likely): αν + present, present/future\n  Αν έχεις χρόνο, έλα.\n  = If you have time, come.\n  \n  Αν βρέξει, θα μείνω σπίτι.\n  = If it rains, I will stay home.\n\nPOLITE REQUESTS: θα ήθελα (I would like)\n  Θα ήθελα ένα καφέ, παρακαλώ.\n  = I would like a coffee, please.\n\n  Θα ήθελα να κάνω μια ερώτηση.\n  = I would like to ask a question.\n\nWISHES:\n  Μακάρι! = I wish! / If only!\n  Ελπίζω να... = I hope to...\n  Ελπίζω να περάσω τις εξετάσεις.\n  = I hope to pass the exams.\n\nSUGGESTIONS:\n  Να πάμε σινεμά; = Shall we go to the cinema?\n  Γιατί δεν πας; = Why don't you go?"
+  }
+]
