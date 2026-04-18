@@ -266,7 +266,7 @@ function TabBar({ view, setView }: { view: View; setView: (next: View) => void }
       {tabs.map(([key, label]) => (
         <button
           key={key}
-          className={view === key ? (key === "profile" ? "tab profile-tab active" : "tab active") : key === "profile" ? "tab profile-tab" : "tab"}
+          className={view === key ? (key === "profile" ? "tab active" : "tab active") : key === "profile" ? "tab" : "tab"}
           onClick={() => startTransition(() => setView(key))}
           aria-label={key === "profile" ? "Profile" : label}
           title={key === "profile" ? "Profile" : label}
