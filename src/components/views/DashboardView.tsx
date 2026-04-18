@@ -12,6 +12,9 @@ type DashboardViewProps = {
   overallAccuracy: number;
   totalSessions: number;
   mistakesCount: number;
+  overallCompletionPercent: number;
+  overallPassedUnits: number;
+  overallTotalUnits: number;
   totalWords: number;
   categoryCount: number;
   phraseSectionCount: number;
@@ -30,6 +33,9 @@ export function DashboardView({
   overallAccuracy,
   totalSessions,
   mistakesCount,
+  overallCompletionPercent,
+  overallPassedUnits,
+  overallTotalUnits,
   totalWords,
   categoryCount,
   phraseSectionCount,
@@ -62,6 +68,19 @@ export function DashboardView({
             <div className="dashboard-kpi">
               <strong>{mistakesCount}</strong>
               <span>cards to recover</span>
+            </div>
+          </div>
+          <div className="completion-card dashboard-completion-card">
+            <div className="completion-head">
+              <div>
+                <span className="mini-label">Overall completion</span>
+                <strong>{overallPassedUnits} / {overallTotalUnits} passed</strong>
+                <p>Study areas count as passed once their best score is above 80%.</p>
+              </div>
+              <div className="completion-percent">{overallCompletionPercent}%</div>
+            </div>
+            <div className="progress-track completion-track">
+              <div className="progress-fill" style={{ width: `${overallCompletionPercent}%` }} />
             </div>
           </div>
           <div className="dashboard-cta-row">

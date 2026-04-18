@@ -3,6 +3,9 @@ import type { VocabEntry } from "../../features/study/types";
 type VocabViewProps = {
   categoryEntries: [string, VocabEntry[]][];
   vocabCategoryBestScores: Record<string, number | null>;
+  passedCategories: number;
+  totalCategories: number;
+  completionPercent: number;
   selectedCategory: string | null;
   vocabSearch: string;
   onSelectCategory: (category: string) => void;
@@ -13,6 +16,9 @@ type VocabViewProps = {
 export function VocabView({
   categoryEntries,
   vocabCategoryBestScores,
+  passedCategories,
+  totalCategories,
+  completionPercent,
   selectedCategory,
   vocabSearch,
   onSelectCategory,
@@ -36,6 +42,22 @@ export function VocabView({
         <div>
           <h3>Vocabulary decks</h3>
           <p>Open a category, check your best score, and jump back into the direction you want to improve.</p>
+        </div>
+      </div>
+
+      <div className="vocab-progress-card">
+        <div className="vocab-progress-head">
+          <div>
+            <span className="mini-label">Category completion</span>
+            <strong>
+              {passedCategories} / {totalCategories} passed
+            </strong>
+            <p>Categories count as passed once your best score is above 80%.</p>
+          </div>
+          <div className="vocab-progress-percent">{completionPercent}%</div>
+        </div>
+        <div className="progress-track vocab-progress-track">
+          <div className="progress-fill" style={{ width: `${completionPercent}%` }} />
         </div>
       </div>
 

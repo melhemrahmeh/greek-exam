@@ -2,11 +2,23 @@ import { phraseSections } from "../../features/study/data";
 
 type PhrasesViewProps = {
   openPhrase: string | null;
+  passedPhraseSections: number;
+  totalPhraseSections: number;
+  phrasesCompletionPercent: number;
+  phraseSectionBestScores: Record<string, number | null>;
   onTogglePhrase: (title: string) => void;
   onBuildPhraseQuiz: (direction: "gr-en" | "en-gr", sectionTitle?: string) => void;
 };
 
-export function PhrasesView({ openPhrase, onTogglePhrase, onBuildPhraseQuiz }: PhrasesViewProps) {
+export function PhrasesView({
+  openPhrase,
+  passedPhraseSections,
+  totalPhraseSections,
+  phrasesCompletionPercent,
+  phraseSectionBestScores,
+  onTogglePhrase,
+  onBuildPhraseQuiz,
+}: PhrasesViewProps) {
   return (
     <>
       <section className="panel">
@@ -24,17 +36,33 @@ export function PhrasesView({ openPhrase, onTogglePhrase, onBuildPhraseQuiz }: P
             </button>
           </div>
         </div>
+
+        <div className="completion-card">
+          <div className="completion-head">
+            <div>
+              <span className="mini-label">Phrase completion</span>
+              <strong>{passedPhraseSections} / {totalPhraseSections} passed</strong>
+              <p>A phrase section counts as passed once your best section score is above 80%.</p>
+            </div>
+            <div className="completion-percent">{phrasesCompletionPercent}%</div>
+          </div>
+          <div className="progress-track completion-track">
+            <div className="progress-fill" style={{ width: `${phrasesCompletionPercent}%` }} />
+          </div>
+        </div>
       </section>
 
       <section className="panel">
         <div className="accordion-list">
           {phraseSections.map((section) => {
             const isOpen = openPhrase === section.title;
+            const bestScore = phraseSectionBestScores[section.title];
+
             return (
               <article key={section.title} className="accordion-card">
                 <button className="accordion-toggle" onClick={() => onTogglePhrase(section.title)}>
                   <span>{section.title}</span>
-                  <span>{isOpen ? "Hide" : "Show"}</span>
+                  <span>{bestScore !== null ? `best ${bestScore}%` : isOpen ? "Hide" : "Show"}</span>
                 </button>
                 {isOpen && (
                   <div className="phrase-list">

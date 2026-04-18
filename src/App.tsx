@@ -16,7 +16,7 @@ import { ProgressView } from "./components/views/ProgressView";
 import { VerbsView } from "./components/views/VerbsView";
 import { VocabView } from "./components/views/VocabView";
 import { emptyStoredState, tenseLabels } from "./features/study/constants";
-import { phraseSections, verbs, vocab } from "./features/study/data";
+import { grammar, phraseSections, verbs, vocab } from "./features/study/data";
 import {
   buildGrammarQuizSession,
   buildPhraseQuizSession,
@@ -185,6 +185,46 @@ export default function App() {
       ) as Record<string, number | null>,
     [categoryEntries, stored.deckStats],
   );
+  const passedVocabCategories = useMemo(
+    () => categoryEntries.filter(([category]) => (vocabCategoryBestScores[category] ?? 0) > 80).length,
+    [categoryEntries, vocabCategoryBestScores],
+  );
+  const vocabCompletionPercent = categoryEntries.length ? Math.round((passedVocabCategories / categoryEntries.length) * 100) : 0;
+  const verbMeaningBestScore = stored.deckStats["verbs:meaning"]?.bestScore ?? null;
+  const verbConjugationBestScore = stored.deckStats["verbs:conjugation"]?.bestScore ?? null;
+  const grammarTopicBestScores = useMemo(
+    () =>
+      grammar.map((_, index) => stored.deckStats[`grammar:${index}`]?.bestScore ?? null),
+    [stored.deckStats],
+  );
+  const passedGrammarTopics = grammarTopicBestScores.filter((score) => (score ?? 0) > 80).length;
+  const grammarCompletionPercent = grammar.length ? Math.round((passedGrammarTopics / grammar.length) * 100) : 0;
+  const phraseSectionBestScores = useMemo(
+    () =>
+      Object.fromEntries(
+        phraseSections.map((section) => [
+          section.title,
+          getBestScore(stored.deckStats[`phrases:${section.title}:gr-en`]?.bestScore, stored.deckStats[`phrases:${section.title}:en-gr`]?.bestScore),
+        ]),
+      ) as Record<string, number | null>,
+    [stored.deckStats],
+  );
+  const passedPhraseSections = useMemo(
+    () => phraseSections.filter((section) => (phraseSectionBestScores[section.title] ?? 0) > 80).length,
+    [phraseSectionBestScores],
+  );
+  const phrasesCompletionPercent = phraseSections.length ? Math.round((passedPhraseSections / phraseSections.length) * 100) : 0;
+  const passedVerbDecks = [verbMeaningBestScore, verbConjugationBestScore].filter((score) => (score ?? 0) > 80).length;
+  const verbsCompletionPercent = Math.round((passedVerbDecks / 2) * 100);
+  const overallPassedUnits = passedVocabCategories + passedGrammarTopics + passedPhraseSections + passedVerbDecks;
+  const overallTotalUnits = categoryEntries.length + grammar.length + phraseSections.length + 2;
+  const overallCompletionPercent = overallTotalUnits ? Math.round((overallPassedUnits / overallTotalUnits) * 100) : 0;
+  const completionByArea = [
+    { label: "Vocabulary", passed: passedVocabCategories, total: categoryEntries.length, percent: vocabCompletionPercent },
+    { label: "Grammar", passed: passedGrammarTopics, total: grammar.length, percent: grammarCompletionPercent },
+    { label: "Phrases", passed: passedPhraseSections, total: phraseSections.length, percent: phrasesCompletionPercent },
+    { label: "Verbs", passed: passedVerbDecks, total: 2, percent: verbsCompletionPercent },
+  ];
   const familyStats = useMemo(() => {
     const grouped = new Map<string, { attempted: number; correct: number; sessions: number; bestScore: number; lastScore: number }>();
 
@@ -225,8 +265,6 @@ export default function App() {
   const needsWorkDeck =
     [...rankedDecks].sort((left, right) => left.stats.lastScore - right.stats.lastScore || left.accuracy - right.accuracy)[0] ?? null;
   const fallbackAnswerPool = useMemo(() => categoryEntries.flatMap(([, entries]) => entries.map(([, en]) => en)), [categoryEntries]);
-  const verbMeaningBestScore = stored.deckStats["verbs:meaning"]?.bestScore ?? null;
-  const verbConjugationBestScore = stored.deckStats["verbs:conjugation"]?.bestScore ?? null;
   const profileEmail = authSession?.user?.email ?? "";
 
   const launchQuiz = (nextSession: StudySession | null) => {
@@ -403,6 +441,9 @@ export default function App() {
             overallAccuracy={overallAccuracy}
             totalSessions={totalSessions}
             mistakesCount={stored.mistakes.length}
+            overallCompletionPercent={overallCompletionPercent}
+            overallPassedUnits={overallPassedUnits}
+            overallTotalUnits={overallTotalUnits}
             totalWords={totalWords}
             categoryCount={categoryEntries.length}
             phraseSectionCount={phraseSections.length}
@@ -422,6 +463,9 @@ export default function App() {
           <VocabView
             categoryEntries={categoryEntries}
             vocabCategoryBestScores={vocabCategoryBestScores}
+            passedCategories={passedVocabCategories}
+            totalCategories={categoryEntries.length}
+            completionPercent={vocabCompletionPercent}
             selectedCategory={selectedCategory}
             vocabSearch={vocabSearch}
             onSelectCategory={setSelectedCategory}
@@ -437,6 +481,8 @@ export default function App() {
             tense={tense}
             verbMeaningBestScore={verbMeaningBestScore}
             verbConjugationBestScore={verbConjugationBestScore}
+            passedVerbDecks={passedVerbDecks}
+            verbsCompletionPercent={verbsCompletionPercent}
             onSelectVerb={setSelectedVerb}
             onVerbSearchChange={setVerbSearch}
             onTenseChange={setTense}
@@ -450,6 +496,10 @@ export default function App() {
         {view === "grammar" && (
           <GrammarView
             selectedGrammar={selectedGrammar}
+            passedGrammarTopics={passedGrammarTopics}
+            totalGrammarTopics={grammar.length}
+            grammarCompletionPercent={grammarCompletionPercent}
+            grammarTopicBestScores={grammarTopicBestScores}
             onSelectGrammar={setSelectedGrammar}
             onBuildGrammarQuiz={(topicIndex) => launchQuiz(buildGrammarQuizSession(topicIndex))}
           />
@@ -458,6 +508,10 @@ export default function App() {
         {view === "phrases" && (
           <PhrasesView
             openPhrase={openPhrase}
+            passedPhraseSections={passedPhraseSections}
+            totalPhraseSections={phraseSections.length}
+            phrasesCompletionPercent={phrasesCompletionPercent}
+            phraseSectionBestScores={phraseSectionBestScores}
             onTogglePhrase={(title) => setOpenPhrase((current) => (current === title ? null : title))}
             onBuildPhraseQuiz={(direction, sectionTitle) => launchQuiz(buildPhraseQuizSession(direction, sectionTitle))}
           />
@@ -469,6 +523,10 @@ export default function App() {
             overallAccuracy={overallAccuracy}
             totalCorrect={totalCorrect}
             totalAttempted={totalAttempted}
+            overallCompletionPercent={overallCompletionPercent}
+            overallPassedUnits={overallPassedUnits}
+            overallTotalUnits={overallTotalUnits}
+            completionByArea={completionByArea}
             familyStats={familyStats}
             rankedDecks={rankedDecks}
           />

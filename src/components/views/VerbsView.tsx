@@ -7,6 +7,8 @@ type VerbsViewProps = {
   tense: keyof typeof tenseLabels;
   verbMeaningBestScore: number | null;
   verbConjugationBestScore: number | null;
+  passedVerbDecks: number;
+  verbsCompletionPercent: number;
   onSelectVerb: (index: number) => void;
   onVerbSearchChange: (value: string) => void;
   onTenseChange: (tense: keyof typeof tenseLabels) => void;
@@ -26,6 +28,8 @@ export function VerbsView({
   tense,
   verbMeaningBestScore,
   verbConjugationBestScore,
+  passedVerbDecks,
+  verbsCompletionPercent,
   onSelectVerb,
   onVerbSearchChange,
   onTenseChange,
@@ -45,6 +49,20 @@ export function VerbsView({
   return (
     <>
       <section className="verb-studio">
+        <div className="completion-card">
+          <div className="completion-head">
+            <div>
+              <span className="mini-label">Verb completion</span>
+              <strong>{passedVerbDecks} / 2 passed</strong>
+              <p>The two quiz decks count as passed once their best score is above 80%.</p>
+            </div>
+            <div className="completion-percent">{verbsCompletionPercent}%</div>
+          </div>
+          <div className="progress-track completion-track">
+            <div className="progress-fill" style={{ width: `${verbsCompletionPercent}%` }} />
+          </div>
+        </div>
+
         <div className="verb-studio-head">
           <div>
             <span className="mini-label">Verb studio</span>
@@ -107,12 +125,7 @@ export function VerbsView({
           </div>
         </div>
 
-        <input
-          className="search-input"
-          value={verbSearch}
-          onChange={(event) => onVerbSearchChange(event.target.value)}
-          placeholder="Search verbs"
-        />
+        <input className="search-input" value={verbSearch} onChange={(event) => onVerbSearchChange(event.target.value)} placeholder="Search verbs" />
 
         <div className="verb-results-head">
           <span className="verb-results-count">{filteredVerbs.length} result(s)</span>
@@ -171,11 +184,7 @@ export function VerbsView({
 
           <div className="tense-switcher">
             {(Object.keys(tenseLabels) as Array<keyof typeof tenseLabels>).map((tenseKey) => (
-              <button
-                key={tenseKey}
-                className={tense === tenseKey ? "switch active" : "switch"}
-                onClick={() => onTenseChange(tenseKey)}
-              >
+              <button key={tenseKey} className={tense === tenseKey ? "switch active" : "switch"} onClick={() => onTenseChange(tenseKey)}>
                 {tenseLabels[tenseKey]}
               </button>
             ))}

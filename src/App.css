@@ -1176,6 +1176,99 @@ button {
   gap: 10px;
 }
 
+.completion-card {
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top right, rgba(18, 107, 120, 0.1), transparent 24%),
+    linear-gradient(180deg, var(--surface), var(--surface-2));
+  box-shadow: var(--shadow-1);
+}
+
+.completion-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: end;
+}
+
+.completion-head strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.completion-head p {
+  margin: 8px 0 0;
+  color: var(--text-muted);
+}
+
+.completion-percent {
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.completion-track {
+  margin-top: 14px;
+}
+
+.completion-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.compact-completion-card {
+  padding: 16px 18px;
+}
+
+.dashboard-completion-card {
+  margin-top: 16px;
+}
+
+.vocab-progress-card {
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top right, rgba(201, 129, 47, 0.12), transparent 24%),
+    linear-gradient(180deg, var(--surface), var(--surface-2));
+  box-shadow: var(--shadow-1);
+}
+
+.vocab-progress-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: end;
+}
+
+.vocab-progress-head strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.vocab-progress-head p {
+  margin: 8px 0 0;
+  color: var(--text-muted);
+}
+
+.vocab-progress-percent {
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.vocab-progress-track {
+  margin-top: 14px;
+}
+
 .vocab-category-card,
 .vocab-detail-card,
 .vocab-word-row {
@@ -1304,9 +1397,24 @@ button {
   color: var(--text);
 }
 
+[data-theme="dark"] .completion-card {
+  color: var(--text);
+  background:
+    radial-gradient(circle at top right, rgba(103, 205, 232, 0.16), transparent 24%),
+    linear-gradient(180deg, #152138, #101a2d);
+  border-color: #314668;
+}
+
 [data-theme="dark"] .vocab-category-card {
   background: linear-gradient(180deg, #152137, #10192b);
   border-color: #31476b;
+}
+
+[data-theme="dark"] .vocab-progress-card {
+  background:
+    radial-gradient(circle at top right, rgba(240, 178, 106, 0.16), transparent 24%),
+    linear-gradient(180deg, #152138, #101a2d);
+  border-color: #314668;
 }
 
 [data-theme="dark"] .vocab-category-card.active {
@@ -1329,6 +1437,8 @@ button {
 
 [data-theme="dark"] .vocab-category-main small,
 [data-theme="dark"] .vocab-category-score span,
+[data-theme="dark"] .completion-head p,
+[data-theme="dark"] .vocab-progress-head p,
 [data-theme="dark"] .vocab-detail-top p,
 [data-theme="dark"] .vocab-detail-score small,
 [data-theme="dark"] .vocab-word-row small {
@@ -1925,6 +2035,7 @@ button {
   .verb-browser-grid,
   .verb-detail-hero,
   .verb-detail-glance,
+  .completion-grid,
   .conjugation-grid,
   .summary-metrics,
   .summary-actions,
@@ -1985,6 +2096,7 @@ button {
   .verb-browser-grid,
   .verb-detail-hero,
   .verb-detail-glance,
+  .completion-grid,
   .conjugation-grid,
   .summary-metrics,
   .summary-actions,
@@ -1993,6 +2105,7 @@ button {
   .match-layout,
   .form-grid,
   .two-column,
+  .completion-head,
   .phrase-actions {
     grid-template-columns: 1fr;
   }

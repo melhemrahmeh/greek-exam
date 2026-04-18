@@ -26,7 +26,23 @@ export function QuizRunner({
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswer[]>(() => new Array(session.items.length).fill(null));
   const [showSummary, setShowSummary] = useState(false);
+  const [showMistakeReview, setShowMistakeReview] = useState(false);
   const submittedRef = useRef(false);
+  const mistakesRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setIndex(0);
+    setAnswers(new Array(session.items.length).fill(null));
+    setShowSummary(false);
+    setShowMistakeReview(false);
+    submittedRef.current = false;
+  }, [session]);
+
+  useEffect(() => {
+    if (showMistakeReview) {
+      mistakesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [showMistakeReview]);
 
   const current = session.items[index];
   const currentAnswer = answers[index];
@@ -87,19 +103,19 @@ export function QuizRunner({
             </div>
 
             <div className="summary-actions">
-              <button className="primary-button" onClick={onRestart}>
+              <button
+                className="primary-button"
+                onClick={() => {
+                  setShowMistakeReview(false);
+                  onRestart();
+                }}
+              >
                 Retry quiz
               </button>
               <button
                 className="secondary-button"
                 disabled={!wrongCount}
-                onClick={() => {
-                  const firstWrongIndex = answers.findIndex((answer) => !answer?.correct);
-                  if (firstWrongIndex >= 0) {
-                    setIndex(firstWrongIndex);
-                    setShowSummary(false);
-                  }
-                }}
+                onClick={() => setShowMistakeReview(true)}
               >
                 Review mistakes
               </button>
@@ -108,15 +124,15 @@ export function QuizRunner({
               </button>
             </div>
 
-            <div className="summary-list">
-              <div className="split-header">
-                <div>
-                  <h3>Quick recap</h3>
-                  <p>Your missed prompts are listed first so it is easy to revisit weak spots.</p>
+            {showMistakeReview && (
+              <div ref={mistakesRef} className="summary-list">
+                <div className="split-header">
+                  <div>
+                    <h3>Mistakes list</h3>
+                    <p>Your missed prompts are listed here with the correct answers.</p>
+                  </div>
                 </div>
-              </div>
-              {wrongCount ? (
-                wrongItems.slice(0, 8).map((item) => (
+                {wrongItems.map((item) => (
                   <div key={item.id} className="list-row summary-row">
                     <div>
                       <strong>{item.prompt}</strong>
@@ -124,11 +140,13 @@ export function QuizRunner({
                     </div>
                     <span>{item.answer}</span>
                   </div>
-                ))
-              ) : (
-                <div className="empty-state">No mistakes in this run. Try another deck or increase the challenge.</div>
-              )}
-            </div>
+                ))}
+              </div>
+            )}
+
+            {!wrongCount && (
+              <div className="empty-state">No mistakes in this run. Try another deck or increase the challenge.</div>
+            )}
           </section>
         </main>
       </div>

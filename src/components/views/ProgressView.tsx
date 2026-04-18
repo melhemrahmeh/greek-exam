@@ -19,6 +19,10 @@ type ProgressViewProps = {
   overallAccuracy: number;
   totalCorrect: number;
   totalAttempted: number;
+  overallCompletionPercent: number;
+  overallPassedUnits: number;
+  overallTotalUnits: number;
+  completionByArea: Array<{ label: string; passed: number; total: number; percent: number }>;
   familyStats: FamilyStat[];
   rankedDecks: RankedDeck[];
 };
@@ -28,6 +32,10 @@ export function ProgressView({
   overallAccuracy,
   totalCorrect,
   totalAttempted,
+  overallCompletionPercent,
+  overallPassedUnits,
+  overallTotalUnits,
+  completionByArea,
   familyStats,
   rankedDecks,
 }: ProgressViewProps) {
@@ -57,6 +65,44 @@ export function ProgressView({
             <span className="mini-label">Answered</span>
             <strong>{totalAttempted}</strong>
           </article>
+        </div>
+        <div className="completion-card">
+          <div className="completion-head">
+            <div>
+              <span className="mini-label">Overall completion</span>
+              <strong>{overallPassedUnits} / {overallTotalUnits} passed</strong>
+              <p>Vocabulary, grammar, phrases, and verbs all count once their best score is above 80%.</p>
+            </div>
+            <div className="completion-percent">{overallCompletionPercent}%</div>
+          </div>
+          <div className="progress-track completion-track">
+            <div className="progress-fill" style={{ width: `${overallCompletionPercent}%` }} />
+          </div>
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="split-header">
+          <div>
+            <h3>Completion by area</h3>
+            <p>Each area tracks how many units are fully passed using the same 80% rule.</p>
+          </div>
+        </div>
+        <div className="completion-grid">
+          {completionByArea.map((area) => (
+            <article key={area.label} className="completion-card compact-completion-card">
+              <div className="completion-head">
+                <div>
+                  <span className="mini-label">{area.label}</span>
+                  <strong>{area.passed} / {area.total} passed</strong>
+                </div>
+                <div className="completion-percent">{area.percent}%</div>
+              </div>
+              <div className="progress-track completion-track">
+                <div className="progress-fill" style={{ width: `${area.percent}%` }} />
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 

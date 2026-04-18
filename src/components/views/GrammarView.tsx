@@ -3,11 +3,23 @@ import { safeTopicTitle } from "../../features/study/utils";
 
 type GrammarViewProps = {
   selectedGrammar: number | null;
+  passedGrammarTopics: number;
+  totalGrammarTopics: number;
+  grammarCompletionPercent: number;
+  grammarTopicBestScores: Array<number | null>;
   onSelectGrammar: (index: number) => void;
   onBuildGrammarQuiz: (topicIndex?: number) => void;
 };
 
-export function GrammarView({ selectedGrammar, onSelectGrammar, onBuildGrammarQuiz }: GrammarViewProps) {
+export function GrammarView({
+  selectedGrammar,
+  passedGrammarTopics,
+  totalGrammarTopics,
+  grammarCompletionPercent,
+  grammarTopicBestScores,
+  onSelectGrammar,
+  onBuildGrammarQuiz,
+}: GrammarViewProps) {
   const selectedGrammarData = selectedGrammar !== null ? grammar[selectedGrammar] : null;
 
   return (
@@ -23,6 +35,20 @@ export function GrammarView({ selectedGrammar, onSelectGrammar, onBuildGrammarQu
           </button>
         </div>
 
+        <div className="completion-card">
+          <div className="completion-head">
+            <div>
+              <span className="mini-label">Grammar completion</span>
+              <strong>{passedGrammarTopics} / {totalGrammarTopics} passed</strong>
+              <p>A topic counts as passed once its best topic quiz score is above 80%.</p>
+            </div>
+            <div className="completion-percent">{grammarCompletionPercent}%</div>
+          </div>
+          <div className="progress-track completion-track">
+            <div className="progress-fill" style={{ width: `${grammarCompletionPercent}%` }} />
+          </div>
+        </div>
+
         <div className="list-stack">
           {grammar.map((topic, index) => (
             <button key={topic.t} className="list-button list-row" onClick={() => onSelectGrammar(index)}>
@@ -30,7 +56,7 @@ export function GrammarView({ selectedGrammar, onSelectGrammar, onBuildGrammarQu
                 <strong>{safeTopicTitle(topic.t)}</strong>
                 <small>Topic {index + 1}</small>
               </div>
-              <span>{selectedGrammar === index ? "open" : "view"}</span>
+              <span>{grammarTopicBestScores[index] !== null ? `best ${grammarTopicBestScores[index]}%` : selectedGrammar === index ? "open" : "view"}</span>
             </button>
           ))}
         </div>
