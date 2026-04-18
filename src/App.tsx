@@ -1,4 +1,6 @@
 import { startTransition, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import type { FormEvent } from "react";
+import type { Session } from "@supabase/supabase-js";
 import "./App.css";
 import VOCAB from "./data/vocab.json";
 import VERBS from "./data/verbs.json";
@@ -6,9 +8,10 @@ import GRAMMAR from "./data/grammar.json";
 import GRAMMAR_QUIZ from "./data/grammar-quiz.json";
 import PERSONS from "./data/persons.json";
 import { matchLessons as rawMatchLessons, phraseSections as rawPhraseSections } from "./data/extras";
+import { supabase, supabaseConfigured } from "./lib/supabase";
 
 type Theme = "light" | "dark";
-type View = "dashboard" | "vocab" | "verbs" | "grammar" | "phrases" | "progress";
+type View = "dashboard" | "vocab" | "verbs" | "grammar" | "phrases" | "progress" | "profile";
 type VocabEntry = [string, string];
 type VocabData = Record<string, VocabEntry[]>;
 type Verb = { inf: string; en: string; type: string; p: string[]; pa: string[]; f: string[] };
@@ -40,9 +43,8 @@ type QuizSession = {
 };
 type MatchSession = { kind: "match" };
 type TypingSession = { kind: "typing" };
-type Session = QuizSession | MatchSession | TypingSession;
-
-const STORAGE_KEY = "greek-study-hub-v2";
+type StudySession = QuizSession | MatchSession | TypingSession;
+type AuthMode = "login" | "register";
 const STANDARD_QUIZ_LENGTH = 24;
 const LONG_QUIZ_LENGTH = 30;
 const REVIEW_QUIZ_LENGTH = 24;
@@ -57,6 +59,13 @@ const typeDescriptions: Record<string, string> = {
   passive: "Reflexive/passive-style forms in -ομαι / -άμαι.",
   irregular: "High-frequency irregular verb. Best learned through repetition and recognition.",
   impersonal: "Impersonal form used the same way for every person.",
+};
+
+const emptyStoredState: StoredState = {
+  theme: "light",
+  deckStats: {},
+  favorites: [],
+  mistakes: [],
 };
 
 function looksBroken(value: string) {
@@ -141,6 +150,15 @@ function dedupeCards(cards: ReviewCard[]) {
     seen.add(card.id);
     return true;
   });
+}
+
+function normalizeStoredState(value?: Partial<StoredState> | null): StoredState {
+  return {
+    theme: value?.theme === "dark" ? "dark" : "light",
+    deckStats: value?.deckStats ?? {},
+    favorites: dedupeCards(value?.favorites ?? []),
+    mistakes: dedupeCards(value?.mistakes ?? []),
+  };
 }
 
 function buildChoices(answer: string, pool: string[], count = 4) {
@@ -240,6 +258,7 @@ function TabBar({ view, setView }: { view: View; setView: (next: View) => void }
     ["grammar", "Grammar"],
     ["phrases", "Phrases"],
     ["progress", "Progress"],
+    ["profile", "profile"],
   ];
 
   return (
@@ -247,13 +266,98 @@ function TabBar({ view, setView }: { view: View; setView: (next: View) => void }
       {tabs.map(([key, label]) => (
         <button
           key={key}
-          className={view === key ? "tab active" : "tab"}
+          className={view === key ? (key === "profile" ? "tab profile-tab active" : "tab active") : key === "profile" ? "tab profile-tab" : "tab"}
           onClick={() => startTransition(() => setView(key))}
+          aria-label={key === "profile" ? "Profile" : label}
+          title={key === "profile" ? "Profile" : label}
         >
           {label}
         </button>
       ))}
     </nav>
+  );
+}
+
+function AuthScreen({
+  mode,
+  email,
+  password,
+  loading,
+  error,
+  message,
+  configured,
+  theme,
+  onModeChange,
+  onEmailChange,
+  onPasswordChange,
+  onSubmit,
+  onToggleTheme,
+}: {
+  mode: AuthMode;
+  email: string;
+  password: string;
+  loading: boolean;
+  error: string;
+  message: string;
+  configured: boolean;
+  theme: Theme;
+  onModeChange: (mode: AuthMode) => void;
+  onEmailChange: (value: string) => void;
+  onPasswordChange: (value: string) => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onToggleTheme: () => void;
+}) {
+  return (
+    <div className="app-shell">
+      <AppHeader
+        title="Greek Exam Studio"
+        subtitle="Sign in to sync your quiz progress, saved cards, and study history with Supabase."
+        eyebrow="Cloud sync enabled"
+        onToggleTheme={onToggleTheme}
+        theme={theme}
+      />
+      <main className="content">
+        <section className="panel auth-panel">
+          <div className="split-header">
+            <div>
+              <h3>{mode === "login" ? "Login" : "Register"}</h3>
+              <p>{configured ? "Your progress will save to your account instead of the browser." : "Add Supabase environment variables before signing in."}</p>
+            </div>
+            <div className="auth-toggle">
+              <button className={mode === "login" ? "switch active" : "switch"} onClick={() => onModeChange("login")}>
+                Login
+              </button>
+              <button className={mode === "register" ? "switch active" : "switch"} onClick={() => onModeChange("register")}>
+                Register
+              </button>
+            </div>
+          </div>
+
+          {!configured && (
+            <div className="empty-state">
+              Supabase is not configured yet. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from `.env.example`, then run the SQL in `supabase/schema.sql`.
+            </div>
+          )}
+
+          <form className="auth-form" onSubmit={onSubmit}>
+            <label className="field">
+              <span>Email</span>
+              <input type="email" value={email} onChange={(event) => onEmailChange(event.target.value)} placeholder="you@example.com" />
+            </label>
+            <label className="field">
+              <span>Password</span>
+              <input type="password" value={password} onChange={(event) => onPasswordChange(event.target.value)} placeholder="At least 6 characters" />
+            </label>
+            <button className="primary-button" type="submit" disabled={loading || !configured}>
+              {loading ? "Please wait..." : mode === "login" ? "Login" : "Create account"}
+            </button>
+          </form>
+
+          {error && <div className="feedback-box auth-error">{error}</div>}
+          {message && <div className="feedback-box auth-message">{message}</div>}
+        </section>
+      </main>
+    </div>
   );
 }
 
@@ -714,25 +818,18 @@ function TypingChallenge({
 
 export default function App() {
   const [view, setView] = useState<View>("dashboard");
-  const [session, setSession] = useState<Session | null>(null);
-  const [stored, setStored] = useState<StoredState>(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) {
-        return { theme: "light", deckStats: {}, favorites: [], mistakes: [] };
-      }
-      const parsed = JSON.parse(raw) as Partial<StoredState>;
-      return {
-        theme: parsed.theme === "dark" ? "dark" : "light",
-        deckStats: parsed.deckStats ?? {},
-        favorites: dedupeCards(parsed.favorites ?? []),
-        mistakes: dedupeCards(parsed.mistakes ?? []),
-      };
-    } catch {
-      return { theme: "light", deckStats: {}, favorites: [], mistakes: [] };
-    }
-  });
-  const [theme, setTheme] = useState<Theme>(stored.theme);
+  const [session, setSession] = useState<StudySession | null>(null);
+  const [stored, setStored] = useState<StoredState>(emptyStoredState);
+  const [theme, setTheme] = useState<Theme>("light");
+  const [authSession, setAuthSession] = useState<Session | null>(null);
+  const [authReady, setAuthReady] = useState(!supabaseConfigured);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [authMessage, setAuthMessage] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedVerb, setSelectedVerb] = useState<number | null>(null);
   const [selectedGrammar, setSelectedGrammar] = useState<number | null>(null);
@@ -742,18 +839,105 @@ export default function App() {
   const deferredVocabSearch = useDeferredValue(vocabSearch);
   const [tense, setTense] = useState<keyof typeof tenseLabels>("p");
   const [openPhrase, setOpenPhrase] = useState<string | null>(phraseSections[0]?.title ?? null);
+  const hasHydratedProgress = useRef(false);
+  const lastSavedPayload = useRef("");
+  const authUserId = authSession?.user?.id ?? null;
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...stored, theme }));
-  }, [stored, theme]);
+  }, [theme]);
+
+  useEffect(() => {
+    if (!supabase) return;
+
+    let active = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
+      setAuthSession(data.session);
+      setAuthReady(true);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setAuthSession(nextSession);
+      if (!nextSession) {
+        hasHydratedProgress.current = false;
+        lastSavedPayload.current = "";
+        setStored(emptyStoredState);
+        setSession(null);
+      }
+      setAuthReady(true);
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!authUserId || !supabase) return;
+
+    let active = true;
+
+    (async () => {
+      setIsSyncing(true);
+      const { data, error } = await supabase
+        .from("user_progress")
+        .select("data")
+        .eq("user_id", authUserId)
+        .maybeSingle();
+
+      if (!active) return;
+
+      if (error) {
+        setAuthError(error.message);
+        setStored(emptyStoredState);
+      } else {
+        const normalized = normalizeStoredState((data?.data as Partial<StoredState> | null | undefined) ?? emptyStoredState);
+        setStored(normalized);
+        setTheme(normalized.theme);
+        lastSavedPayload.current = JSON.stringify(normalized);
+      }
+
+      hasHydratedProgress.current = true;
+      setIsSyncing(false);
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [authUserId]);
+
+  useEffect(() => {
+    if (!supabase || !authUserId || !authReady || !hasHydratedProgress.current) return;
+
+    const client = supabase;
+
+    const payload: StoredState = { ...stored, theme };
+    const serialized = JSON.stringify(payload);
+    if (serialized === lastSavedPayload.current) return;
+
+    lastSavedPayload.current = serialized;
+    const timeout = window.setTimeout(async () => {
+      const { error } = await client.from("user_progress").upsert({
+        user_id: authUserId,
+        data: payload,
+        updated_at: new Date().toISOString(),
+      });
+
+      if (error) {
+        setAuthError(error.message);
+      }
+    }, 250);
+
+    return () => window.clearTimeout(timeout);
+  }, [authReady, authUserId, stored, theme]);
 
   const saveState = (updater: (current: StoredState) => StoredState) => {
-    setStored((current) => {
-      const next = updater(current);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      return next;
-    });
+    setStored((current) => updater(current));
   };
 
   const favorites = useMemo(() => new Set(stored.favorites.map((card) => card.id)), [stored.favorites]);
@@ -783,6 +967,52 @@ export default function App() {
         .map(([gr, en]) => ({ category, gr, en })),
     );
   }, [categoryEntries, deferredVocabSearch]);
+
+  const handleAuthSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!supabase) {
+      setAuthError("Supabase is not configured yet.");
+      return;
+    }
+
+    setAuthLoading(true);
+    setAuthError("");
+    setAuthMessage("");
+
+    const credentials = {
+      email: authEmail.trim(),
+      password: authPassword,
+    };
+
+    const { error } =
+      authMode === "login"
+        ? await supabase.auth.signInWithPassword(credentials)
+        : await supabase.auth.signUp(credentials);
+
+    if (error) {
+      setAuthError(error.message);
+    } else if (authMode === "register") {
+      setAuthMessage("Account created. Check your email if your Supabase project requires confirmation.");
+      setAuthMode("login");
+    } else {
+      setAuthMessage("");
+    }
+
+    setAuthLoading(false);
+  };
+
+  const handleLogout = async () => {
+    if (!supabase) return;
+    setAuthLoading(true);
+    setAuthError("");
+    await supabase.auth.signOut();
+    setSession(null);
+    setView("dashboard");
+    setSelectedCategory(null);
+    setSelectedVerb(null);
+    setSelectedGrammar(null);
+    setAuthLoading(false);
+  };
 
   const familyStats = useMemo(() => {
     const grouped = new Map<string, DeckStats>();
@@ -1097,6 +1327,38 @@ export default function App() {
 
   const selectedVerbData = selectedVerb !== null ? verbs[selectedVerb] : null;
   const selectedGrammarData = selectedGrammar !== null ? grammar[selectedGrammar] : null;
+
+  if (!authReady) {
+    return (
+      <div className="app-shell">
+        <main className="content">
+          <section className="panel auth-panel">
+            <div className="empty-state">Loading your account...</div>
+          </section>
+        </main>
+      </div>
+    );
+  }
+
+  if (!authSession) {
+    return (
+      <AuthScreen
+        mode={authMode}
+        email={authEmail}
+        password={authPassword}
+        loading={authLoading}
+        error={authError}
+        message={authMessage}
+        configured={supabaseConfigured}
+        theme={theme}
+        onModeChange={setAuthMode}
+        onEmailChange={setAuthEmail}
+        onPasswordChange={setAuthPassword}
+        onSubmit={handleAuthSubmit}
+        onToggleTheme={() => setTheme((current) => (current === "dark" ? "light" : "dark"))}
+      />
+    );
+  }
 
   return (
     <div className="app-shell">
@@ -1545,9 +1807,7 @@ export default function App() {
                 <button
                   className="danger-button"
                   onClick={() => {
-                    const next: StoredState = { theme, deckStats: {}, favorites: [], mistakes: [] };
-                    setStored(next);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+                    setStored({ theme, deckStats: {}, favorites: [], mistakes: [] });
                   }}
                 >
                   Reset progress
@@ -1708,6 +1968,84 @@ export default function App() {
                   ))}
                   {!stored.mistakes.length && <div className="empty-state">Wrong quiz answers will automatically show up here.</div>}
                 </div>
+              </div>
+            </section>
+          </>
+        )}
+
+        {view === "profile" && (
+          <>
+            <section className="panel profile-shell">
+              <div className="profile-card">
+                <span className="mini-label">Account</span>
+                <h3>{authSession.user.email}</h3>
+                <div className="profile-status-row">
+                  <div className="pill">{theme === "dark" ? "Dark mode" : "Light mode"}</div>
+                  {isSyncing && <div className="pill">Syncing...</div>}
+                </div>
+                <div className="profile-actions">
+                  <button
+                    className="secondary-button"
+                    onClick={() => setTheme((current) => (current === "dark" ? "light" : "dark"))}
+                  >
+                    Toggle theme
+                  </button>
+                  <button className="ghost-button" onClick={handleLogout} disabled={authLoading}>
+                    Logout
+                  </button>
+                </div>
+              </div>
+
+              <div className="profile-summary">
+                <article className="stat-panel">
+                  <span className="mini-label">Sessions</span>
+                  <strong>{totalSessions}</strong>
+                  <p>Total completed quiz runs saved to your account.</p>
+                </article>
+                <article className="stat-panel">
+                  <span className="mini-label">Accuracy</span>
+                  <strong>{overallAccuracy}%</strong>
+                  <p>{totalCorrect} correct answers synced so far.</p>
+                </article>
+                <article className="stat-panel">
+                  <span className="mini-label">Saved cards</span>
+                  <strong>{stored.favorites.length}</strong>
+                  <p>Favorites plus mistake recovery are attached to this profile.</p>
+                </article>
+              </div>
+            </section>
+
+            <section className="panel">
+              <div className="split-header">
+                <div>
+                  <h3>Account actions</h3>
+                  <p>Quick controls for your synced study profile.</p>
+                </div>
+              </div>
+              <div className="dashboard-utility-grid">
+                <button className="mini-card utility-card" onClick={() => startTransition(() => setView("progress"))}>
+                  <span className="mini-label">Stats</span>
+                  <strong>{deckStatsEntries.length}</strong>
+                  <span>Open progress board</span>
+                </button>
+                <button className="mini-card utility-card" onClick={openFavoritesQuiz} disabled={!stored.favorites.length}>
+                  <span className="mini-label">Review</span>
+                  <strong>{stored.favorites.length}</strong>
+                  <span>Favorites deck</span>
+                </button>
+                <button className="mini-card utility-card" onClick={openMistakesQuiz} disabled={!stored.mistakes.length}>
+                  <span className="mini-label">Recover</span>
+                  <strong>{stored.mistakes.length}</strong>
+                  <span>Mistakes deck</span>
+                </button>
+                <button
+                  className="mini-card utility-card"
+                  onClick={() => setStored({ theme, deckStats: {}, favorites: [], mistakes: [] })}
+                >
+                  <span className="mini-label">Reset</span>
+                  <strong>0</strong>
+                  <span>Clear synced progress</span>
+                </button>
               </div>
             </section>
           </>

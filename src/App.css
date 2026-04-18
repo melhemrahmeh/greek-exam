@@ -233,6 +233,19 @@ button {
   font-weight: 800;
 }
 
+.profile-tab {
+  width: 48px;
+  min-width: 48px;
+  justify-self: end;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
 .tab.active,
 .switch.active,
 .primary-button {
@@ -275,6 +288,103 @@ button {
 
 .panel {
   padding: 20px;
+}
+
+.auth-panel,
+.auth-form,
+.auth-toggle,
+.auth-strip,
+.profile-shell,
+.profile-summary,
+.profile-actions {
+  display: grid;
+  gap: 14px;
+}
+
+.auth-panel {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.auth-form {
+  grid-template-columns: 1fr;
+}
+
+.auth-toggle {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.auth-strip {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.auth-strip strong {
+  display: block;
+}
+
+.auth-strip small {
+  color: var(--text-muted);
+}
+
+.auth-error {
+  border: 1px solid color-mix(in srgb, var(--danger) 55%, var(--border));
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  color: var(--text);
+}
+
+.auth-message {
+  border: 1px solid color-mix(in srgb, var(--success) 48%, var(--border));
+  background: color-mix(in srgb, var(--success) 12%, var(--surface));
+  color: var(--text);
+}
+
+.profile-shell {
+  grid-template-columns: 1.05fr 1fr;
+}
+
+.profile-card {
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(18, 107, 120, 0.1), transparent 28%),
+    linear-gradient(135deg, var(--surface), var(--surface-2));
+  box-shadow: var(--shadow-1);
+}
+
+.profile-card h3 {
+  margin: 12px 0 8px;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  line-height: 1;
+}
+
+.profile-card p {
+  margin: 0;
+  color: var(--text-muted);
+  max-width: 42ch;
+}
+
+.profile-status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.profile-actions {
+  grid-template-columns: auto auto;
+  justify-content: start;
+  margin-top: 10px;
+}
+
+.profile-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .hero-grid {
@@ -1496,6 +1606,9 @@ button {
   .hero-grid,
   .stats-grid,
   .dashboard-shell,
+  .profile-shell,
+  .profile-summary,
+  .auth-strip,
   .dashboard-mode-grid,
   .dashboard-utility-grid,
   .action-grid,
@@ -1539,6 +1652,11 @@ button {
 
   .hero-topline,
   .split-header,
+  .auth-toggle,
+  .auth-strip,
+  .profile-shell,
+  .profile-summary,
+  .profile-actions,
   .quiz-actions,
   .hero-grid,
   .stats-grid,
