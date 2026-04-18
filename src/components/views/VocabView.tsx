@@ -31,11 +31,11 @@ export function VocabView({
   const selectedCategoryBestScore = selectedCategory ? vocabCategoryBestScores[selectedCategory] ?? null : null;
 
   return (
-    <section className="panel">
+    <section className="panel vocab-shell">
       <div className="split-header">
         <div>
           <h3>Vocabulary decks</h3>
-          <p>Open a category, see your best historical score, and decide whether it needs another retake.</p>
+          <p>Open a category, check your best score, and jump back into the direction you want to improve.</p>
         </div>
       </div>
 
@@ -46,40 +46,66 @@ export function VocabView({
         placeholder="Search categories or words"
       />
 
-      <div className="two-column progress-layout">
-        <div className="list-stack">
-          {filteredCategories.map(([category, entries]) => (
-            <button key={category} className="list-button list-row" onClick={() => onSelectCategory(category)}>
-              <div>
-                <strong>{category}</strong>
-                <small>{entries.length} words</small>
-              </div>
-              <span>{vocabCategoryBestScores[category] !== null ? `best ${vocabCategoryBestScores[category]}%` : "no score yet"}</span>
-            </button>
-          ))}
-          {!filteredCategories.length && <div className="empty-state">No vocab matches that search yet.</div>}
-        </div>
+      <div className="vocab-layout">
+        <aside className="vocab-sidebar">
+          <div className="vocab-list">
+            {filteredCategories.map(([category, entries]) => {
+              const isActive = selectedCategory === category;
+              const bestScore = vocabCategoryBestScores[category];
 
-        <div className="list-stack">
+              return (
+                <button
+                  key={category}
+                  className={isActive ? "vocab-category-card active" : "vocab-category-card"}
+                  onClick={() => onSelectCategory(category)}
+                >
+                  <div className="vocab-category-main">
+                    <strong>{category}</strong>
+                    <small>{entries.length} words</small>
+                  </div>
+                  <div className="vocab-category-score">
+                    <span className="section-label">Best</span>
+                    <strong>{bestScore !== null ? `${bestScore}%` : "--"}</strong>
+                  </div>
+                </button>
+              );
+            })}
+            {!filteredCategories.length && <div className="empty-state">No vocab matches that search yet.</div>}
+          </div>
+        </aside>
+
+        <div className="vocab-detail">
           {selectedCategory ? (
             <>
-              <div className="split-header">
-                <div>
-                  <h3>{selectedCategory}</h3>
-                  <p>{selectedCategoryBestScore !== null ? `Best score: ${selectedCategoryBestScore}%` : "No saved score for this category yet."}</p>
+              <div className="vocab-detail-card">
+                <div className="vocab-detail-top">
+                  <div>
+                    <span className="mini-label">Selected deck</span>
+                    <h3>{selectedCategory}</h3>
+                    <p>
+                      {selectedWords.length} words
+                      {selectedCategoryBestScore !== null ? ` · best score ${selectedCategoryBestScore}%` : " · no saved score yet"}
+                    </p>
+                  </div>
+                  <div className="vocab-detail-score">
+                    <small>Best score</small>
+                    <strong>{selectedCategoryBestScore !== null ? `${selectedCategoryBestScore}%` : "--"}</strong>
+                  </div>
+                </div>
+
+                <div className="vocab-actions">
+                  <button className="primary-button" onClick={() => onStartQuiz(selectedCategory, "gr-en")}>
+                    Greek to English
+                  </button>
+                  <button className="secondary-button" onClick={() => onStartQuiz(selectedCategory, "en-gr")}>
+                    English to Greek
+                  </button>
                 </div>
               </div>
-              <div className="phrase-actions">
-                <button className="primary-button" onClick={() => onStartQuiz(selectedCategory, "gr-en")}>
-                  Greek to English
-                </button>
-                <button className="secondary-button" onClick={() => onStartQuiz(selectedCategory, "en-gr")}>
-                  English to Greek
-                </button>
-              </div>
-              <div className="list-stack compact">
+
+              <div className="vocab-preview">
                 {selectedWords.slice(0, 18).map(([gr, en]) => (
-                  <div key={`${selectedCategory}-${gr}`} className="list-row">
+                  <div key={`${selectedCategory}-${gr}`} className="vocab-word-row">
                     <div>
                       <strong>{gr}</strong>
                       <small>{selectedCategory}</small>
@@ -90,7 +116,7 @@ export function VocabView({
               </div>
             </>
           ) : (
-            <div className="empty-state">Pick a vocab category to see the word preview and launch drills.</div>
+            <div className="empty-state">Pick a vocab category to see its score, preview its words, and launch a quiz.</div>
           )}
         </div>
       </div>

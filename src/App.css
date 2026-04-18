@@ -1153,6 +1153,188 @@ button {
   line-height: 1.65;
 }
 
+.vocab-shell {
+  display: grid;
+  gap: 16px;
+}
+
+.vocab-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.95fr) minmax(0, 1.25fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.vocab-sidebar,
+.vocab-detail {
+  min-width: 0;
+}
+
+.vocab-list,
+.vocab-preview {
+  display: grid;
+  gap: 10px;
+}
+
+.vocab-category-card,
+.vocab-detail-card,
+.vocab-word-row {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.vocab-category-card,
+.vocab-detail-card {
+  border-radius: 22px;
+}
+
+.vocab-word-row {
+  border-radius: 18px;
+  background: var(--surface-2);
+}
+
+.vocab-category-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  padding: 16px 18px;
+  text-align: left;
+  color: var(--text);
+}
+
+.vocab-category-card.active {
+  border-color: var(--brand);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--brand) 10%, var(--surface)), var(--surface));
+  box-shadow: 0 16px 30px rgba(18, 107, 120, 0.14);
+}
+
+.vocab-category-main strong,
+.vocab-word-row strong,
+.vocab-detail-top h3 {
+  display: block;
+  margin: 0;
+}
+
+.vocab-category-main small,
+.vocab-category-score span,
+.vocab-detail-top p,
+.vocab-detail-score small,
+.vocab-word-row small {
+  color: var(--text-muted);
+}
+
+.vocab-category-score {
+  display: grid;
+  gap: 4px;
+  justify-items: end;
+  text-align: right;
+}
+
+.vocab-category-score strong,
+.vocab-detail-score strong {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.vocab-detail {
+  display: grid;
+  gap: 12px;
+}
+
+.vocab-detail-card {
+  padding: 20px;
+  background:
+    radial-gradient(circle at top right, rgba(18, 107, 120, 0.12), transparent 26%),
+    linear-gradient(180deg, var(--surface), var(--surface-2));
+}
+
+.vocab-detail-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+}
+
+.vocab-detail-top h3 {
+  margin-top: 10px;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  line-height: 0.98;
+}
+
+.vocab-detail-top p {
+  margin: 10px 0 0;
+}
+
+.vocab-detail-score {
+  min-width: 110px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  text-align: center;
+}
+
+.vocab-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.vocab-actions .primary-button,
+.vocab-actions .secondary-button {
+  min-height: 56px;
+}
+
+.vocab-word-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 15px 16px;
+}
+
+[data-theme="dark"] .vocab-category-card,
+[data-theme="dark"] .vocab-detail-card,
+[data-theme="dark"] .vocab-word-row,
+[data-theme="dark"] .vocab-detail-score {
+  color: var(--text);
+}
+
+[data-theme="dark"] .vocab-category-card {
+  background: linear-gradient(180deg, #152137, #10192b);
+  border-color: #31476b;
+}
+
+[data-theme="dark"] .vocab-category-card.active {
+  background: linear-gradient(180deg, rgba(34, 86, 118, 0.92), rgba(17, 30, 49, 0.96));
+  border-color: #67cde8;
+}
+
+[data-theme="dark"] .vocab-detail-card {
+  background:
+    radial-gradient(circle at top right, rgba(103, 205, 232, 0.18), transparent 26%),
+    linear-gradient(180deg, #152138, #101a2d);
+  border-color: #314668;
+}
+
+[data-theme="dark"] .vocab-word-row,
+[data-theme="dark"] .vocab-detail-score {
+  background: #172239;
+  border-color: #2c3d5c;
+}
+
+[data-theme="dark"] .vocab-category-main small,
+[data-theme="dark"] .vocab-category-score span,
+[data-theme="dark"] .vocab-detail-top p,
+[data-theme="dark"] .vocab-detail-score small,
+[data-theme="dark"] .vocab-word-row small {
+  color: #c6d2e4;
+}
+
 .conjugation-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 12px;
@@ -1732,6 +1914,7 @@ button {
   .stats-grid,
   .dashboard-shell,
   .profile-shell,
+  .vocab-layout,
   .profile-summary,
   .auth-strip,
   .dashboard-mode-grid,
@@ -1782,6 +1965,7 @@ button {
   .auth-strip,
   .profile-hero,
   .profile-shell,
+  .vocab-layout,
   .profile-summary,
   .profile-highlight-row,
   .profile-actions,
@@ -1804,6 +1988,7 @@ button {
   .conjugation-grid,
   .summary-metrics,
   .summary-actions,
+  .vocab-actions,
   .choice-grid,
   .match-layout,
   .form-grid,
@@ -1826,7 +2011,9 @@ button {
   }
 
   .list-row,
-  .phrase-row {
+  .phrase-row,
+  .vocab-word-row,
+  .vocab-detail-top {
     grid-template-columns: 1fr;
   }
 }
