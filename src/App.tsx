@@ -288,7 +288,7 @@ export default function App() {
   const handleAuthSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!supabase) {
-      setAuthError("Supabase is not configured yet.");
+      setAuthError("Sign-in is not available right now.");
       return;
     }
 
@@ -309,7 +309,7 @@ export default function App() {
     if (error) {
       setAuthError(error.message);
     } else if (authMode === "register") {
-      setAuthMessage("Account created. Check your email if your Supabase project requires confirmation.");
+      setAuthMessage("Profile created. Check your email if confirmation is required.");
       setAuthMode("login");
     }
 
@@ -357,7 +357,7 @@ export default function App() {
       <div className="app-shell">
         <main className="content">
           <section className="panel auth-panel">
-            <div className="empty-state">Loading your account...</div>
+            <div className="empty-state">Loading your study space...</div>
           </section>
         </main>
       </div>

@@ -37,8 +37,8 @@ export function AuthScreen({
     <div className="app-shell">
       <AppHeader
         title="Greek Exam Studio"
-        subtitle="Sign in to sync your quiz progress, saved cards, and study history with Supabase."
-        eyebrow="Cloud sync enabled"
+        subtitle="Sign in to keep your study progress, saved cards, and history available each time you come back."
+        eyebrow="Personal study space"
         onToggleTheme={onToggleTheme}
         theme={theme}
       />
@@ -47,7 +47,7 @@ export function AuthScreen({
           <div className="split-header">
             <div>
               <h3>{mode === "login" ? "Login" : "Register"}</h3>
-              <p>{configured ? "Your progress will save to your account instead of the browser." : "Add Supabase environment variables before signing in."}</p>
+              <p>{configured ? "Your progress and saved cards will be ready when you return." : "Sign-in is unavailable until the app setup is completed."}</p>
             </div>
             <div className="auth-toggle">
               <button className={mode === "login" ? "switch active" : "switch"} onClick={() => onModeChange("login")}>
@@ -61,7 +61,7 @@ export function AuthScreen({
 
           {!configured && (
             <div className="empty-state">
-              Supabase is not configured yet. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from `.env.example`, then run the SQL in `supabase/schema.sql`.
+              Sign-in is currently unavailable in this build.
             </div>
           )}
 

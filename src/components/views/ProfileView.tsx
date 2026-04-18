@@ -63,7 +63,7 @@ export function ProfileView({
               {profileInitials}
             </div>
             <div className="profile-copy">
-              <span className="mini-label">Account</span>
+              <span className="mini-label">Profile</span>
               <h3>{profileName}</h3>
               <p>{profileEmail}</p>
             </div>
@@ -71,7 +71,7 @@ export function ProfileView({
           <div className="profile-status-row">
             <div className="pill">{theme === "dark" ? "Dark mode" : "Light mode"}</div>
             <div className="pill">{trackedDecks} tracked decks</div>
-            {isSyncing && <div className="pill">Syncing...</div>}
+            {isSyncing && <div className="pill">Saving...</div>}
           </div>
           <div className="profile-highlight-row">
             <div className="profile-highlight">
@@ -99,12 +99,12 @@ export function ProfileView({
           <article className="stat-panel">
             <span className="mini-label">Sessions</span>
             <strong>{totalSessions}</strong>
-            <p>Total completed quiz runs saved to your account.</p>
+            <p>Total completed quiz runs saved for this profile.</p>
           </article>
           <article className="stat-panel">
             <span className="mini-label">Accuracy</span>
             <strong>{overallAccuracy}%</strong>
-            <p>{totalCorrect} correct answers synced so far.</p>
+            <p>{totalCorrect} correct answers recorded so far.</p>
           </article>
           <article className="stat-panel">
             <span className="mini-label">Saved cards</span>
@@ -117,8 +117,8 @@ export function ProfileView({
       <section className="panel">
         <div className="split-header">
           <div>
-            <h3>Account actions</h3>
-            <p>Quick controls for your synced study profile.</p>
+            <h3>Profile actions</h3>
+            <p>Quick controls for your study profile.</p>
           </div>
         </div>
         <div className="dashboard-utility-grid">
@@ -140,7 +140,7 @@ export function ProfileView({
           <button className="mini-card utility-card" onClick={onResetProgress}>
             <span className="mini-label">Reset</span>
             <strong>0</strong>
-            <span>Clear synced progress</span>
+            <span>Clear saved progress</span>
           </button>
         </div>
       </section>
