@@ -1832,6 +1832,11 @@ button {
   background: linear-gradient(135deg, rgba(201, 129, 47, 0.22), rgba(18, 107, 120, 0.14));
 }
 
+.flag.active {
+  background: linear-gradient(135deg, rgba(226, 111, 75, 0.28), rgba(201, 129, 47, 0.18));
+  border-color: rgba(226, 111, 75, 0.6);
+}
+
 .stats-inline {
   grid-auto-flow: column;
   justify-content: start;

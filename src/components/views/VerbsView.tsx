@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { tenseGreek, tenseLabels, typeDescriptions } from "../../features/study/constants";
 import { persons, verbs } from "../../features/study/data";
+import { formatPassFail } from "../../features/study/utils";
 
 const verbTypes = ["All", "A", "B1", "B2", "passive", "irregular"] as const;
 type VerbTypeFilter = (typeof verbTypes)[number];
@@ -11,6 +12,8 @@ type VerbsViewProps = {
   tense: keyof typeof tenseLabels;
   verbMeaningBestScore: number | null;
   verbConjugationBestScore: number | null;
+  verbMeaningPassFail: { passed: number; failed: number };
+  verbConjugationPassFail: { passed: number; failed: number };
   passedVerbDecks: number;
   verbsCompletionPercent: number;
   onSelectVerb: (index: number) => void;
@@ -32,6 +35,8 @@ export function VerbsView({
   tense,
   verbMeaningBestScore,
   verbConjugationBestScore,
+  verbMeaningPassFail,
+  verbConjugationPassFail,
   passedVerbDecks,
   verbsCompletionPercent,
   onSelectVerb,
@@ -42,6 +47,8 @@ export function VerbsView({
   onOpenMatch,
   onOpenTyping,
 }: VerbsViewProps) {
+  const meaningPassFailText = formatPassFail(verbMeaningPassFail.passed, verbMeaningPassFail.failed);
+  const conjugationPassFailText = formatPassFail(verbConjugationPassFail.passed, verbConjugationPassFail.failed);
   const [typeFilter, setTypeFilter] = useState<VerbTypeFilter>("All");
 
   const filteredVerbs = verbs.filter((verb) => {
@@ -108,12 +115,14 @@ export function VerbsView({
             <strong>Verb meanings</strong>
             <span>Match infinitives to English meanings.</span>
             <span>{verbMeaningBestScore !== null ? `Best: ${verbMeaningBestScore}%` : "No score yet"}</span>
+            {meaningPassFailText && <span>{meaningPassFailText}</span>}
           </button>
           <button className="verb-action-card action-conjugation" onClick={onConjugationQuiz}>
             <span className="mini-label">Quiz</span>
             <strong>Conjugation builder</strong>
             <span>Pick the exact form for person and tense.</span>
             <span>{verbConjugationBestScore !== null ? `Best: ${verbConjugationBestScore}%` : "No score yet"}</span>
+            {conjugationPassFailText && <span>{conjugationPassFailText}</span>}
           </button>
           <button className="verb-action-card action-match" onClick={onOpenMatch}>
             <span className="mini-label">Game</span>

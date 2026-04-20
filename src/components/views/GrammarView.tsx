@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { grammar } from "../../features/study/data";
-import { safeTopicTitle } from "../../features/study/utils";
+import { formatPassFail, safeTopicTitle } from "../../features/study/utils";
 
 type GrammarFilter = "all" | "passed" | "not-passed";
 
@@ -10,6 +10,7 @@ type GrammarViewProps = {
   totalGrammarTopics: number;
   grammarCompletionPercent: number;
   grammarTopicBestScores: Array<number | null>;
+  grammarTopicPassFail: Array<{ passed: number; failed: number }>;
   onSelectGrammar: (index: number) => void;
   onBuildGrammarQuiz: (topicIndex?: number) => void;
 };
@@ -20,6 +21,7 @@ export function GrammarView({
   totalGrammarTopics,
   grammarCompletionPercent,
   grammarTopicBestScores,
+  grammarTopicPassFail,
   onSelectGrammar,
   onBuildGrammarQuiz,
 }: GrammarViewProps) {
@@ -85,15 +87,25 @@ export function GrammarView({
         </div>
 
         <div className="list-stack">
-          {filteredTopics.map(({ topic, index }) => (
-            <button key={topic.t} className="list-button list-row" onClick={() => onSelectGrammar(index)}>
-              <div>
-                <strong>{safeTopicTitle(topic.t)}</strong>
-                <small>Topic {index + 1}{grammarTopicBestScores[index] !== null && grammarTopicBestScores[index]! >= 80 ? " \u2713" : ""}</small>
-              </div>
-              <span>{grammarTopicBestScores[index] !== null ? `best ${grammarTopicBestScores[index]}%` : selectedGrammar === index ? "open" : "view"}</span>
-            </button>
-          ))}
+          {filteredTopics.map(({ topic, index }) => {
+            const passFailText = formatPassFail(
+              grammarTopicPassFail[index]?.passed ?? 0,
+              grammarTopicPassFail[index]?.failed ?? 0,
+            );
+            return (
+              <button key={topic.t} className="list-button list-row" onClick={() => onSelectGrammar(index)}>
+                <div>
+                  <strong>{safeTopicTitle(topic.t)}</strong>
+                  <small>
+                    Topic {index + 1}
+                    {passFailText ? ` \u00b7 ${passFailText}` : ""}
+                    {grammarTopicBestScores[index] !== null && grammarTopicBestScores[index]! >= 80 ? " \u2713" : ""}
+                  </small>
+                </div>
+                <span>{grammarTopicBestScores[index] !== null ? `best ${grammarTopicBestScores[index]}%` : selectedGrammar === index ? "open" : "view"}</span>
+              </button>
+            );
+          })}
           {!filteredTopics.length && <div className="empty-state">No topics match your search or filter.</div>}
         </div>
       </section>

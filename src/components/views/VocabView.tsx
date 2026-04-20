@@ -1,11 +1,13 @@
 import { useState } from "react";
 import type { VocabEntry } from "../../features/study/types";
+import { formatPassFail } from "../../features/study/utils";
 
 type VocabSort = "default" | "az" | "score" | "words";
 
 type VocabViewProps = {
   categoryEntries: [string, VocabEntry[]][];
   vocabCategoryBestScores: Record<string, number | null>;
+  vocabCategoryPassFail: Record<string, { passed: number; failed: number }>;
   passedCategories: number;
   totalCategories: number;
   completionPercent: number;
@@ -26,6 +28,7 @@ const sortOptions: { key: VocabSort; label: string }[] = [
 export function VocabView({
   categoryEntries,
   vocabCategoryBestScores,
+  vocabCategoryPassFail,
   passedCategories,
   totalCategories,
   completionPercent,
@@ -110,6 +113,8 @@ export function VocabView({
             {sortedCategories.map(([category, entries]) => {
               const isActive = selectedCategory === category;
               const bestScore = vocabCategoryBestScores[category];
+              const passFail = vocabCategoryPassFail[category] ?? { passed: 0, failed: 0 };
+              const passFailText = formatPassFail(passFail.passed, passFail.failed);
 
               return (
                 <button
@@ -121,6 +126,7 @@ export function VocabView({
                     <strong>{category}</strong>
                     <small>
                       {entries.length} words
+                      {passFailText ? ` \u00b7 ${passFailText}` : ""}
                       {bestScore !== null && bestScore >= 80 ? " \u2713" : ""}
                     </small>
                   </div>

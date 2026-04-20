@@ -40,8 +40,16 @@ export function safeTopicTitle(raw: string) {
   return raw.replace(/^\d+\.\s*/, "");
 }
 
-export function toDeckStats(previous?: DeckStats): DeckStats {
-  return previous ?? { attempted: 0, correct: 0, sessions: 0, bestScore: 0, lastScore: 0 };
+export function toDeckStats(previous?: Partial<DeckStats>): DeckStats {
+  return {
+    attempted: previous?.attempted ?? 0,
+    correct: previous?.correct ?? 0,
+    sessions: previous?.sessions ?? 0,
+    bestScore: previous?.bestScore ?? 0,
+    lastScore: previous?.lastScore ?? 0,
+    passed: previous?.passed ?? 0,
+    failed: previous?.failed ?? 0,
+  };
 }
 
 export function dedupeCards(cards: ReviewCard[]) {
@@ -111,6 +119,13 @@ export function randomizeQuizSession(session: QuizSession): QuizSession {
       choices: shuffle(item.choices),
     })),
   };
+}
+
+export function formatPassFail(passed: number, failed: number) {
+  const parts: string[] = [];
+  if (passed > 0) parts.push(`${passed} passed`);
+  if (failed > 0) parts.push(`${failed} failed`);
+  return parts.join(" / ");
 }
 
 export function getBestScore(...scores: Array<number | undefined>) {

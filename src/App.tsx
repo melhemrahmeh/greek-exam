@@ -15,7 +15,7 @@ import { ProfileView } from "./components/views/ProfileView";
 import { ProgressView } from "./components/views/ProgressView";
 import { VerbsView } from "./components/views/VerbsView";
 import { VocabView } from "./components/views/VocabView";
-import { emptyStoredState, tenseLabels } from "./features/study/constants";
+import { emptyStoredState, PASS_THRESHOLD, tenseLabels } from "./features/study/constants";
 import { grammar, phraseSections, verbs, vocab } from "./features/study/data";
 import {
   buildGrammarQuizSession,
@@ -25,7 +25,7 @@ import {
   buildVerbMeaningQuizSession,
   buildVocabQuizSession,
 } from "./features/study/quizBuilders";
-import type { QuizAnswer, QuizItem, ReviewCard, StoredState, StudySession, Theme, View } from "./features/study/types";
+import type { DeckStats, QuizAnswer, QuizItem, ReviewCard, StoredState, StudySession, Theme, View } from "./features/study/types";
 import {
   daysUntilExam,
   dedupeCards,
@@ -185,6 +185,17 @@ export default function App() {
       ) as Record<string, number | null>,
     [categoryEntries, stored.deckStats],
   );
+  const vocabCategoryPassFail = useMemo(
+    () =>
+      Object.fromEntries(
+        categoryEntries.map(([category]) => {
+          const a = toDeckStats(stored.deckStats[`vocab:${category}:gr-en`]);
+          const b = toDeckStats(stored.deckStats[`vocab:${category}:en-gr`]);
+          return [category, { passed: a.passed + b.passed, failed: a.failed + b.failed }];
+        }),
+      ) as Record<string, { passed: number; failed: number }>,
+    [categoryEntries, stored.deckStats],
+  );
   const passedVocabCategories = useMemo(
     () => categoryEntries.filter(([category]) => (vocabCategoryBestScores[category] ?? 0) > 80).length,
     [categoryEntries, vocabCategoryBestScores],
@@ -192,9 +203,25 @@ export default function App() {
   const vocabCompletionPercent = categoryEntries.length ? Math.round((passedVocabCategories / categoryEntries.length) * 100) : 0;
   const verbMeaningBestScore = stored.deckStats["verbs:meaning"]?.bestScore ?? null;
   const verbConjugationBestScore = stored.deckStats["verbs:conjugation"]?.bestScore ?? null;
+  const verbMeaningPassFail = useMemo(() => {
+    const s = toDeckStats(stored.deckStats["verbs:meaning"]);
+    return { passed: s.passed, failed: s.failed };
+  }, [stored.deckStats]);
+  const verbConjugationPassFail = useMemo(() => {
+    const s = toDeckStats(stored.deckStats["verbs:conjugation"]);
+    return { passed: s.passed, failed: s.failed };
+  }, [stored.deckStats]);
   const grammarTopicBestScores = useMemo(
     () =>
       grammar.map((_, index) => stored.deckStats[`grammar:${index}`]?.bestScore ?? null),
+    [stored.deckStats],
+  );
+  const grammarTopicPassFail = useMemo(
+    () =>
+      grammar.map((_, index) => {
+        const s = toDeckStats(stored.deckStats[`grammar:${index}`]);
+        return { passed: s.passed, failed: s.failed };
+      }),
     [stored.deckStats],
   );
   const passedGrammarTopics = grammarTopicBestScores.filter((score) => (score ?? 0) > 80).length;
@@ -207,6 +234,17 @@ export default function App() {
           getBestScore(stored.deckStats[`phrases:${section.title}:gr-en`]?.bestScore, stored.deckStats[`phrases:${section.title}:en-gr`]?.bestScore),
         ]),
       ) as Record<string, number | null>,
+    [stored.deckStats],
+  );
+  const phraseSectionPassFail = useMemo(
+    () =>
+      Object.fromEntries(
+        phraseSections.map((section) => {
+          const a = toDeckStats(stored.deckStats[`phrases:${section.title}:gr-en`]);
+          const b = toDeckStats(stored.deckStats[`phrases:${section.title}:en-gr`]);
+          return [section.title, { passed: a.passed + b.passed, failed: a.failed + b.failed }];
+        }),
+      ) as Record<string, { passed: number; failed: number }>,
     [stored.deckStats],
   );
   const passedPhraseSections = useMemo(
@@ -226,17 +264,20 @@ export default function App() {
     { label: "Verbs", passed: passedVerbDecks, total: 2, percent: verbsCompletionPercent },
   ];
   const familyStats = useMemo(() => {
-    const grouped = new Map<string, { attempted: number; correct: number; sessions: number; bestScore: number; lastScore: number }>();
+    const grouped = new Map<string, DeckStats>();
 
-    for (const [deckId, stats] of deckStatsEntries) {
+    for (const [deckId, rawStats] of deckStatsEntries) {
+      const stats = toDeckStats(rawStats);
       const family = getDeckFamily(deckId);
-      const current = grouped.get(family) ?? { attempted: 0, correct: 0, sessions: 0, bestScore: 0, lastScore: 0 };
+      const current = grouped.get(family) ?? toDeckStats();
       grouped.set(family, {
         attempted: current.attempted + stats.attempted,
         correct: current.correct + stats.correct,
         sessions: current.sessions + stats.sessions,
         bestScore: Math.max(current.bestScore, stats.bestScore),
         lastScore: stats.lastScore,
+        passed: current.passed + stats.passed,
+        failed: current.failed + stats.failed,
       });
     }
 
@@ -288,6 +329,7 @@ export default function App() {
     saveState((current) => {
       const previous = toDeckStats(current.deckStats[deckId]);
       const lastScore = percent(correct, items.length);
+      const didPass = lastScore >= PASS_THRESHOLD;
       return {
         ...current,
         deckStats: {
@@ -298,6 +340,8 @@ export default function App() {
             sessions: previous.sessions + 1,
             bestScore: Math.max(previous.bestScore, lastScore),
             lastScore,
+            passed: previous.passed + (didPass ? 1 : 0),
+            failed: previous.failed + (didPass ? 0 : 1),
           },
         },
         mistakes: dedupeCards([...wrongCards, ...current.mistakes]).slice(0, 80),
@@ -463,6 +507,7 @@ export default function App() {
           <VocabView
             categoryEntries={categoryEntries}
             vocabCategoryBestScores={vocabCategoryBestScores}
+            vocabCategoryPassFail={vocabCategoryPassFail}
             passedCategories={passedVocabCategories}
             totalCategories={categoryEntries.length}
             completionPercent={vocabCompletionPercent}
@@ -481,6 +526,8 @@ export default function App() {
             tense={tense}
             verbMeaningBestScore={verbMeaningBestScore}
             verbConjugationBestScore={verbConjugationBestScore}
+            verbMeaningPassFail={verbMeaningPassFail}
+            verbConjugationPassFail={verbConjugationPassFail}
             passedVerbDecks={passedVerbDecks}
             verbsCompletionPercent={verbsCompletionPercent}
             onSelectVerb={setSelectedVerb}
@@ -500,6 +547,7 @@ export default function App() {
             totalGrammarTopics={grammar.length}
             grammarCompletionPercent={grammarCompletionPercent}
             grammarTopicBestScores={grammarTopicBestScores}
+            grammarTopicPassFail={grammarTopicPassFail}
             onSelectGrammar={setSelectedGrammar}
             onBuildGrammarQuiz={(topicIndex) => launchQuiz(buildGrammarQuizSession(topicIndex))}
           />
@@ -512,6 +560,7 @@ export default function App() {
             totalPhraseSections={phraseSections.length}
             phrasesCompletionPercent={phrasesCompletionPercent}
             phraseSectionBestScores={phraseSectionBestScores}
+            phraseSectionPassFail={phraseSectionPassFail}
             onTogglePhrase={(title) => setOpenPhrase((current) => (current === title ? null : title))}
             onBuildPhraseQuiz={(direction, sectionTitle) => launchQuiz(buildPhraseQuizSession(direction, sectionTitle))}
           />
@@ -551,7 +600,12 @@ export default function App() {
             onOpenProgress={() => startTransition(() => setView("progress"))}
             onOpenFavoritesQuiz={openFavoritesQuiz}
             onOpenMistakesQuiz={openMistakesQuiz}
-            onResetProgress={() => setStored({ theme, deckStats: {}, favorites: [], mistakes: [] })}
+            onResetProgress={() => {
+              const confirmed = window.confirm(
+                "Reset all progress? This clears every deck score, pass/fail count, favorite, and saved mistake. This cannot be undone.",
+              );
+              if (confirmed) setStored({ theme, deckStats: {}, favorites: [], mistakes: [] });
+            }}
           />
         )}
       </main>

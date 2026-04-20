@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { phraseSections } from "../../features/study/data";
+import { formatPassFail } from "../../features/study/utils";
 
 type PhrasesViewProps = {
   openPhrase: string | null;
@@ -7,6 +8,7 @@ type PhrasesViewProps = {
   totalPhraseSections: number;
   phrasesCompletionPercent: number;
   phraseSectionBestScores: Record<string, number | null>;
+  phraseSectionPassFail: Record<string, { passed: number; failed: number }>;
   onTogglePhrase: (title: string) => void;
   onBuildPhraseQuiz: (direction: "gr-en" | "en-gr", sectionTitle?: string) => void;
 };
@@ -17,6 +19,7 @@ export function PhrasesView({
   totalPhraseSections,
   phrasesCompletionPercent,
   phraseSectionBestScores,
+  phraseSectionPassFail,
   onTogglePhrase,
   onBuildPhraseQuiz,
 }: PhrasesViewProps) {
@@ -88,6 +91,8 @@ export function PhrasesView({
           {filteredSections.map((section) => {
             const isOpen = openPhrase === section.title || !!normalizedSearch;
             const bestScore = phraseSectionBestScores[section.title];
+            const passFail = phraseSectionPassFail[section.title] ?? { passed: 0, failed: 0 };
+            const passFailText = formatPassFail(passFail.passed, passFail.failed);
 
             return (
               <article key={section.title} className="accordion-card">
@@ -95,6 +100,9 @@ export function PhrasesView({
                   <span>
                     {section.icon} {section.title}
                     <span className="word-count-badge" style={{ marginLeft: 8 }}>{section.items.length}</span>
+                    {passFailText && (
+                      <span className="word-count-badge" style={{ marginLeft: 8 }}>{passFailText}</span>
+                    )}
                   </span>
                   <span>{bestScore !== null ? `best ${bestScore}%` : isOpen && !normalizedSearch ? "Hide" : "Show"}</span>
                 </button>

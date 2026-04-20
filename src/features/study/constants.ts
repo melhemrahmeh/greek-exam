@@ -1,5 +1,6 @@
 import type { StoredState } from "./types";
 
+export const PASS_THRESHOLD = 80;
 export const STANDARD_QUIZ_LENGTH = 24;
 export const LONG_QUIZ_LENGTH = 30;
 export const REVIEW_QUIZ_LENGTH = 24;

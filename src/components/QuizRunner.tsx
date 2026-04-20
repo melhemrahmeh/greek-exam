@@ -27,14 +27,19 @@ export function QuizRunner({
   const [answers, setAnswers] = useState<QuizAnswer[]>(() => new Array(session.items.length).fill(null));
   const [showSummary, setShowSummary] = useState(false);
   const [showMistakeReview, setShowMistakeReview] = useState(false);
+  const [flagged, setFlagged] = useState<Set<string>>(() => new Set());
+  const [showFlaggedReview, setShowFlaggedReview] = useState(false);
   const submittedRef = useRef(false);
   const mistakesRef = useRef<HTMLDivElement | null>(null);
+  const flaggedRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setIndex(0);
     setAnswers(new Array(session.items.length).fill(null));
     setShowSummary(false);
     setShowMistakeReview(false);
+    setShowFlaggedReview(false);
+    setFlagged(new Set());
     submittedRef.current = false;
   }, [session]);
 
@@ -44,6 +49,12 @@ export function QuizRunner({
     }
   }, [showMistakeReview]);
 
+  useEffect(() => {
+    if (showFlaggedReview) {
+      flaggedRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [showFlaggedReview]);
+
   const current = session.items[index];
   const currentAnswer = answers[index];
   const answeredCount = answers.filter(Boolean).length;
@@ -51,7 +62,19 @@ export function QuizRunner({
   const isDone = answeredCount === session.items.length;
   const wrongItems = session.items.filter((_, itemIndex) => !answers[itemIndex]?.correct);
   const wrongCount = wrongItems.length;
+  const flaggedItems = session.items.filter((item) => flagged.has(item.id));
+  const flaggedCount = flaggedItems.length;
   const scorePercent = percent(correctCount, session.items.length);
+  const isCurrentFlagged = flagged.has(current.id);
+
+  const toggleFlag = (id: string) => {
+    setFlagged((existing) => {
+      const next = new Set(existing);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (!isDone || submittedRef.current) return;
@@ -98,6 +121,9 @@ export function QuizRunner({
                 Missed <strong>{wrongCount}</strong>
               </div>
               <div className="quiz-stat">
+                Flagged <strong>{flaggedCount}</strong>
+              </div>
+              <div className="quiz-stat">
                 Accuracy <strong>{scorePercent}%</strong>
               </div>
             </div>
@@ -107,6 +133,7 @@ export function QuizRunner({
                 className="primary-button"
                 onClick={() => {
                   setShowMistakeReview(false);
+                  setShowFlaggedReview(false);
                   onRestart();
                 }}
               >
@@ -118,6 +145,13 @@ export function QuizRunner({
                 onClick={() => setShowMistakeReview(true)}
               >
                 Review mistakes
+              </button>
+              <button
+                className="secondary-button"
+                disabled={!flaggedCount}
+                onClick={() => setShowFlaggedReview(true)}
+              >
+                Review flagged
               </button>
               <button className="ghost-button" onClick={onClose}>
                 Back to app
@@ -141,6 +175,32 @@ export function QuizRunner({
                     <span>{item.answer}</span>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {showFlaggedReview && flaggedCount > 0 && (
+              <div ref={flaggedRef} className="summary-list">
+                <div className="split-header">
+                  <div>
+                    <h3>Flagged for review</h3>
+                    <p>The prompts you flagged during the run, with their correct answers.</p>
+                  </div>
+                </div>
+                {flaggedItems.map((item) => {
+                  const itemIndex = session.items.indexOf(item);
+                  const wasCorrect = answers[itemIndex]?.correct;
+                  return (
+                    <div key={item.id} className="list-row summary-row">
+                      <div>
+                        <strong>{item.prompt}</strong>
+                        <small>
+                          {item.detail ?? item.review.source} &middot; {wasCorrect ? "answered correctly" : "missed"}
+                        </small>
+                      </div>
+                      <span>{item.answer}</span>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
@@ -186,6 +246,13 @@ export function QuizRunner({
               onClick={() => onToggleFavorite(current.review)}
             >
               {favorites.has(current.review.id) ? "\u2605 Saved" : "\u2606 Save"}
+            </button>
+            <button
+              className={isCurrentFlagged ? "pill flag active" : "pill flag"}
+              onClick={() => toggleFlag(current.id)}
+              aria-pressed={isCurrentFlagged}
+            >
+              {isCurrentFlagged ? "\u2691 Flagged" : "\u2690 Flag"}
             </button>
           </div>
 

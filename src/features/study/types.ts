@@ -5,7 +5,15 @@ export type VocabData = Record<string, VocabEntry[]>;
 export type Verb = { inf: string; en: string; type: string; p: string[]; pa: string[]; f: string[] };
 export type GrammarTopic = { t: string; c: string };
 export type GrammarQuestion = { q: string; a: string; wrong: string[]; topic: number };
-export type DeckStats = { attempted: number; correct: number; sessions: number; bestScore: number; lastScore: number };
+export type DeckStats = {
+  attempted: number;
+  correct: number;
+  sessions: number;
+  bestScore: number;
+  lastScore: number;
+  passed: number;
+  failed: number;
+};
 export type ReviewCard = { id: string; front: string; back: string; source: string };
 export type QuizItem = {
   id: string;

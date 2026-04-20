@@ -137,7 +137,7 @@ export function ProgressView({
                 <div key={family.label} className="list-row">
                   <div>
                     <strong>{family.label}</strong>
-                    <small>{family.stats.sessions} sessions · best {family.stats.bestScore}%</small>
+                    <small>{family.stats.sessions} sessions &middot; best {family.stats.bestScore}%</small>
                   </div>
                   <span>{family.accuracy}% accuracy</span>
                 </div>
