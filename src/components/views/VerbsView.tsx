@@ -12,14 +12,17 @@ type VerbsViewProps = {
   tense: keyof typeof tenseLabels;
   verbMeaningBestScore: number | null;
   verbConjugationBestScore: number | null;
+  verbTranslationBestScore: number | null;
   verbMeaningPassFail: { passed: number; failed: number };
   verbConjugationPassFail: { passed: number; failed: number };
+  verbTranslationPassFail: { passed: number; failed: number };
   passedVerbDecks: number;
   verbsCompletionPercent: number;
   onSelectVerb: (index: number) => void;
   onVerbSearchChange: (value: string) => void;
   onTenseChange: (tense: keyof typeof tenseLabels) => void;
   onMeaningQuiz: () => void;
+  onTranslationQuiz: () => void;
   onConjugationQuiz: () => void;
   onOpenMatch: () => void;
   onOpenTyping: () => void;
@@ -35,20 +38,24 @@ export function VerbsView({
   tense,
   verbMeaningBestScore,
   verbConjugationBestScore,
+  verbTranslationBestScore,
   verbMeaningPassFail,
   verbConjugationPassFail,
+  verbTranslationPassFail,
   passedVerbDecks,
   verbsCompletionPercent,
   onSelectVerb,
   onVerbSearchChange,
   onTenseChange,
   onMeaningQuiz,
+  onTranslationQuiz,
   onConjugationQuiz,
   onOpenMatch,
   onOpenTyping,
 }: VerbsViewProps) {
   const meaningPassFailText = formatPassFail(verbMeaningPassFail.passed, verbMeaningPassFail.failed);
   const conjugationPassFailText = formatPassFail(verbConjugationPassFail.passed, verbConjugationPassFail.failed);
+  const translationPassFailText = formatPassFail(verbTranslationPassFail.passed, verbTranslationPassFail.failed);
   const [typeFilter, setTypeFilter] = useState<VerbTypeFilter>("All");
 
   const filteredVerbs = verbs.filter((verb) => {
@@ -116,6 +123,13 @@ export function VerbsView({
             <span>Match infinitives to English meanings.</span>
             <span>{verbMeaningBestScore !== null ? `Best: ${verbMeaningBestScore}%` : "No score yet"}</span>
             {meaningPassFailText && <span>{meaningPassFailText}</span>}
+          </button>
+          <button className="verb-action-card action-meaning" onClick={onTranslationQuiz}>
+            <span className="mini-label">Quiz</span>
+            <strong>All verb translations</strong>
+            <span>Translate every verb in the deck ({verbs.length} total).</span>
+            <span>{verbTranslationBestScore !== null ? `Best: ${verbTranslationBestScore}%` : "No score yet"}</span>
+            {translationPassFailText && <span>{translationPassFailText}</span>}
           </button>
           <button className="verb-action-card action-conjugation" onClick={onConjugationQuiz}>
             <span className="mini-label">Quiz</span>

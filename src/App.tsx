@@ -23,6 +23,7 @@ import {
   buildReviewQuizSession,
   buildVerbConjugationQuizSession,
   buildVerbMeaningQuizSession,
+  buildVerbTranslationQuizSession,
   buildVocabQuizSession,
 } from "./features/study/quizBuilders";
 import type { DeckStats, QuizAnswer, QuizItem, ReviewCard, StoredState, StudySession, Theme, View } from "./features/study/types";
@@ -203,12 +204,17 @@ export default function App() {
   const vocabCompletionPercent = categoryEntries.length ? Math.round((passedVocabCategories / categoryEntries.length) * 100) : 0;
   const verbMeaningBestScore = stored.deckStats["verbs:meaning"]?.bestScore ?? null;
   const verbConjugationBestScore = stored.deckStats["verbs:conjugation"]?.bestScore ?? null;
+  const verbTranslationBestScore = stored.deckStats["verbs:translation-all"]?.bestScore ?? null;
   const verbMeaningPassFail = useMemo(() => {
     const s = toDeckStats(stored.deckStats["verbs:meaning"]);
     return { passed: s.passed, failed: s.failed };
   }, [stored.deckStats]);
   const verbConjugationPassFail = useMemo(() => {
     const s = toDeckStats(stored.deckStats["verbs:conjugation"]);
+    return { passed: s.passed, failed: s.failed };
+  }, [stored.deckStats]);
+  const verbTranslationPassFail = useMemo(() => {
+    const s = toDeckStats(stored.deckStats["verbs:translation-all"]);
     return { passed: s.passed, failed: s.failed };
   }, [stored.deckStats]);
   const grammarTopicBestScores = useMemo(
@@ -526,14 +532,17 @@ export default function App() {
             tense={tense}
             verbMeaningBestScore={verbMeaningBestScore}
             verbConjugationBestScore={verbConjugationBestScore}
+            verbTranslationBestScore={verbTranslationBestScore}
             verbMeaningPassFail={verbMeaningPassFail}
             verbConjugationPassFail={verbConjugationPassFail}
+            verbTranslationPassFail={verbTranslationPassFail}
             passedVerbDecks={passedVerbDecks}
             verbsCompletionPercent={verbsCompletionPercent}
             onSelectVerb={setSelectedVerb}
             onVerbSearchChange={setVerbSearch}
             onTenseChange={setTense}
             onMeaningQuiz={() => launchQuiz(buildVerbMeaningQuizSession())}
+            onTranslationQuiz={() => launchQuiz(buildVerbTranslationQuizSession())}
             onConjugationQuiz={() => launchQuiz(buildVerbConjugationQuizSession())}
             onOpenMatch={() => setSession({ kind: "match" })}
             onOpenTyping={() => setSession({ kind: "typing" })}

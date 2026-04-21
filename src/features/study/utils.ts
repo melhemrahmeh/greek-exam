@@ -94,7 +94,9 @@ export function formatDeckLabel(deckId: string) {
     return `${parts[1]} \u00B7 ${direction}`;
   }
   if (parts[0] === "verbs") {
-    return parts[1] === "conjugation" ? "Verb Conjugation Builder" : "Verb Meanings";
+    if (parts[1] === "conjugation") return "Verb Conjugation Builder";
+    if (parts[1] === "translation-all") return "All Verb Translations";
+    return "Verb Meanings";
   }
   if (parts[0] === "grammar") {
     if (parts[1] === "all") return "Grammar Mixed Quiz";

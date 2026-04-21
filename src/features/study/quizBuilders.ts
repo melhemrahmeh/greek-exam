@@ -58,6 +58,32 @@ export function buildVerbMeaningQuizSession(): QuizSession {
   };
 }
 
+export function buildVerbTranslationQuizSession(): QuizSession {
+  const items = shuffle(verbs).map((verb, idx) => {
+    const wrong = sampleUnique(
+      verbs.filter((entry) => entry.en !== verb.en).map((entry) => entry.en),
+      3,
+    );
+
+    return {
+      id: `verb-translation-${idx}`,
+      prompt: verb.inf,
+      choices: buildChoices(verb.en, wrong),
+      answer: verb.en,
+      review: { id: `verb:${verb.inf}`, front: verb.inf, back: verb.en, source: "All verb translations" },
+      detail: verb.type.toUpperCase(),
+    };
+  });
+
+  return {
+    kind: "quiz",
+    deckId: "verbs:translation-all",
+    title: "All Verb Translations",
+    subtitle: `Translate every verb (${verbs.length} total).`,
+    items,
+  };
+}
+
 export function buildVerbConjugationQuizSession(): QuizSession {
   const items = shuffle(verbs)
     .slice(0, Math.min(STANDARD_QUIZ_LENGTH, verbs.length))
