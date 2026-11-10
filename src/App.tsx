@@ -1,9 +1,7 @@
-import { startTransition, useEffect, useMemo, useRef, useState } from "react";
-import type { FormEvent } from "react";
-import type { Session } from "@supabase/supabase-js";
+import { startTransition, useEffect, useMemo, useState } from "react";
 import "./App.css";
 import { AppHeader } from "./components/AppHeader";
-import { AuthScreen } from "./components/AuthScreen";
+import { LoginScreen } from "./components/LoginScreen";
 import { MatchGame } from "./components/MatchGame";
 import { QuizRunner } from "./components/QuizRunner";
 import { TabBar } from "./components/TabBar";
@@ -33,27 +31,18 @@ import {
   formatDeckLabel,
   getBestScore,
   getDeckFamily,
-  normalizeStoredState,
   percent,
   randomizeQuizSession,
   toDeckStats,
 } from "./features/study/utils";
-import { supabase, supabaseConfigured } from "./lib/supabase";
+import { loadCurrentUser, loadProgress, saveCurrentUser, saveProgress } from "./lib/storage";
 
 export default function App() {
   const [view, setView] = useState<View>("dashboard");
   const [session, setSession] = useState<StudySession | null>(null);
-  const [stored, setStored] = useState<StoredState>(emptyStoredState);
-  const [theme, setTheme] = useState<Theme>("light");
-  const [authSession, setAuthSession] = useState<Session | null>(null);
-  const [authReady, setAuthReady] = useState(!supabaseConfigured);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [authMode, setAuthMode] = useState<"login" | "register">("login");
-  const [authEmail, setAuthEmail] = useState("");
-  const [authPassword, setAuthPassword] = useState("");
-  const [authLoading, setAuthLoading] = useState(false);
-  const [authError, setAuthError] = useState("");
-  const [authMessage, setAuthMessage] = useState("");
+  const [userName, setUserName] = useState<string | null>(loadCurrentUser);
+  const [stored, setStored] = useState<StoredState>(() => (userName ? loadProgress(userName) : emptyStoredState));
+  const [theme, setTheme] = useState<Theme>(stored.theme);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedVerb, setSelectedVerb] = useState<number | null>(null);
   const [selectedGrammar, setSelectedGrammar] = useState<number | null>(null);
@@ -61,99 +50,15 @@ export default function App() {
   const [vocabSearch, setVocabSearch] = useState("");
   const [tense, setTense] = useState<keyof typeof tenseLabels>("p");
   const [openPhrase, setOpenPhrase] = useState<string | null>(phraseSections[0]?.title ?? null);
-  const hasHydratedProgress = useRef(false);
-  const lastSavedPayload = useRef("");
-  const authUserId = authSession?.user?.id ?? null;
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 
   useEffect(() => {
-    if (!supabase) return;
-
-    let active = true;
-
-    supabase.auth.getSession().then(({ data }) => {
-      if (!active) return;
-      setAuthSession(data.session);
-      setAuthReady(true);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setAuthSession(nextSession);
-      if (!nextSession) {
-        hasHydratedProgress.current = false;
-        lastSavedPayload.current = "";
-        setStored(emptyStoredState);
-        setSession(null);
-      }
-      setAuthReady(true);
-    });
-
-    return () => {
-      active = false;
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!authUserId || !supabase) return;
-
-    let active = true;
-    const client = supabase;
-
-    (async () => {
-      setIsSyncing(true);
-      const { data, error } = await client.from("user_progress").select("data").eq("user_id", authUserId).maybeSingle();
-      if (!active) return;
-
-      if (error) {
-        setAuthError(error.message);
-      } else {
-        const normalized = normalizeStoredState(data?.data as Partial<StoredState> | null);
-        setStored(normalized);
-        setTheme(normalized.theme);
-        lastSavedPayload.current = JSON.stringify(normalized);
-        hasHydratedProgress.current = true;
-      }
-
-      setIsSyncing(false);
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [authUserId]);
-
-  useEffect(() => {
-    if (!authReady || !authUserId || !supabase || !hasHydratedProgress.current) return;
-
-    const client = supabase;
-    const payload = { ...stored, theme };
-    const serialized = JSON.stringify(payload);
-    if (serialized === lastSavedPayload.current) return;
-
-    setIsSyncing(true);
-    lastSavedPayload.current = serialized;
-    const timeout = window.setTimeout(async () => {
-      const { error } = await client.from("user_progress").upsert({
-        user_id: authUserId,
-        data: payload,
-        updated_at: new Date().toISOString(),
-      });
-
-      if (error) {
-        setAuthError(error.message);
-      }
-
-      setIsSyncing(false);
-    }, 250);
-
-    return () => window.clearTimeout(timeout);
-  }, [authReady, authUserId, stored, theme]);
+    if (!userName) return;
+    saveProgress(userName, { ...stored, theme });
+  }, [userName, stored, theme]);
 
   const saveState = (updater: (current: StoredState) => StoredState) => {
     setStored((current) => updater(current));
@@ -312,7 +217,6 @@ export default function App() {
   const needsWorkDeck =
     [...rankedDecks].sort((left, right) => left.stats.lastScore - right.stats.lastScore || left.accuracy - right.accuracy)[0] ?? null;
   const fallbackAnswerPool = useMemo(() => categoryEntries.flatMap(([, entries]) => entries.map(([, en]) => en)), [categoryEntries]);
-  const profileEmail = authSession?.user?.email ?? "";
 
   const launchQuiz = (nextSession: StudySession | null) => {
     if (nextSession) setSession(nextSession);
@@ -373,48 +277,23 @@ export default function App() {
     );
   };
 
-  const handleAuthSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!supabase) {
-      setAuthError("Sign-in is not available right now.");
-      return;
-    }
-
-    setAuthLoading(true);
-    setAuthError("");
-    setAuthMessage("");
-
-    const credentials = {
-      email: authEmail.trim(),
-      password: authPassword,
-    };
-
-    const { error } =
-      authMode === "login"
-        ? await supabase.auth.signInWithPassword(credentials)
-        : await supabase.auth.signUp(credentials);
-
-    if (error) {
-      setAuthError(error.message);
-    } else if (authMode === "register") {
-      setAuthMessage("Profile created. Check your email if confirmation is required.");
-      setAuthMode("login");
-    }
-
-    setAuthLoading(false);
+  const handleLogin = (name: string) => {
+    const progress = loadProgress(name);
+    saveCurrentUser(name);
+    setUserName(name);
+    setStored(progress);
+    setTheme(progress.theme);
   };
 
-  const handleLogout = async () => {
-    if (!supabase) return;
-    setAuthLoading(true);
-    setAuthError("");
-    await supabase.auth.signOut();
+  const handleLogout = () => {
+    saveCurrentUser(null);
+    setUserName(null);
+    setStored(emptyStoredState);
     setSession(null);
     setView("dashboard");
     setSelectedCategory(null);
     setSelectedVerb(null);
     setSelectedGrammar(null);
-    setAuthLoading(false);
   };
 
   if (session?.kind === "quiz") {
@@ -440,36 +319,8 @@ export default function App() {
     return <TypingChallenge onClose={() => setSession(null)} onToggleTheme={handleToggleTheme} theme={theme} />;
   }
 
-  if (!authReady) {
-    return (
-      <div className="app-shell">
-        <main className="content">
-          <section className="panel auth-panel">
-            <div className="empty-state">Loading your study space...</div>
-          </section>
-        </main>
-      </div>
-    );
-  }
-
-  if (!authSession) {
-    return (
-      <AuthScreen
-        mode={authMode}
-        email={authEmail}
-        password={authPassword}
-        loading={authLoading}
-        error={authError}
-        message={authMessage}
-        configured={supabaseConfigured}
-        theme={theme}
-        onModeChange={setAuthMode}
-        onEmailChange={setAuthEmail}
-        onPasswordChange={setAuthPassword}
-        onSubmit={handleAuthSubmit}
-        onToggleTheme={handleToggleTheme}
-      />
-    );
+  if (!userName) {
+    return <LoginScreen theme={theme} onLogin={handleLogin} onToggleTheme={handleToggleTheme} />;
   }
 
   return (
@@ -479,7 +330,7 @@ export default function App() {
         subtitle="A cleaner A2 study app with vocab, conjugation, grammar, phrasebook, and progress."
         eyebrow={`${daysUntilExam()} days until the May 19, 2026 exam`}
         onOpenProfile={() => startTransition(() => setView("profile"))}
-        profileEmail={authSession.user.email}
+        profileName={userName}
         profileActive={view === "profile"}
         onToggleTheme={handleToggleTheme}
         theme={theme}
@@ -592,10 +443,9 @@ export default function App() {
 
         {view === "profile" && (
           <ProfileView
-            profileEmail={profileEmail}
+            profileName={userName}
             theme={theme}
             trackedDecks={deckStatsEntries.length}
-            isSyncing={isSyncing}
             strongestDeck={strongestDeck}
             needsWorkDeck={needsWorkDeck}
             totalSessions={totalSessions}
@@ -603,7 +453,6 @@ export default function App() {
             totalCorrect={totalCorrect}
             favorites={stored.favorites}
             mistakes={stored.mistakes}
-            authLoading={authLoading}
             onToggleTheme={handleToggleTheme}
             onLogout={handleLogout}
             onOpenProgress={() => startTransition(() => setView("progress"))}

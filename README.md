@@ -1,6 +1,6 @@
 # Greek Exam Studio
 
-A React + TypeScript study app for Greek A2 exam practice. The app combines vocabulary, verbs, grammar, phrasebook drills, review decks, progress tracking, and Supabase-backed account sync in one place.
+A React + TypeScript study app for Greek A2 exam practice. The app combines vocabulary, verbs, grammar, phrasebook drills, review decks, and progress tracking in one place, with progress saved locally in the browser.
 
 ## What This App Does
 
@@ -20,9 +20,9 @@ Main features:
 - `Phrases` phrasebook sections with section-specific or mixed quizzes
 - `Progress` board with overall and per-family stats
 - `Profile` access in the header, not the navbar
-- Generated avatar based on the signed-in email
+- Generated avatar based on the entered name
 - Saved `favorites` and `mistakes` decks
-- Automatic Supabase sync per user
+- Progress saved per name in `localStorage`
 - Light and dark theme support
 
 ## Tech Stack
@@ -30,7 +30,7 @@ Main features:
 - `React 19`
 - `TypeScript`
 - `Vite`
-- `Supabase` for auth + persisted progress
+- `localStorage` for persisted progress
 - Plain CSS in `src/App.css`
 
 ## Scripts
@@ -60,50 +60,22 @@ What they do:
 npm install
 ```
 
-### 2. Configure environment variables
-
-Copy `.env.example` to `.env` and fill in your Supabase project values:
-
-```env
-VITE_SUPABASE_URL=https://your-project-id.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
-
-If these variables are missing, the app still runs, but Supabase login and sync will not be available.
-
-### 3. Create the Supabase table
-
-Run the SQL in [supabase/schema.sql](/abs/path/c:/Users/es/Desktop/Greek/greek-exam/supabase/schema.sql:1) inside your Supabase SQL editor.
-
-This creates:
-
-- `public.user_progress`
-- row-level security
-- policies so users can only read/write their own progress
-
-### 4. Start the app
+### 2. Start the app
 
 ```bash
 npm run dev
 ```
 
-## How Progress Sync Works
+## How Progress Is Saved
 
-Supabase integration lives in [src/lib/supabase.ts](/abs/path/c:/Users/es/Desktop/Greek/greek-exam/src/lib/supabase.ts:1).
+There is no account or server. On first open the app asks for a name, and everything is kept in the browser's `localStorage` ([src/lib/storage.ts](src/lib/storage.ts)):
 
-The app:
+- `greek-exam:current-user` holds the active name
+- `greek-exam:progress:<name>` holds that name's progress (theme, deck stats, favorites, mistakes)
 
-- creates a Supabase client only if env vars exist
-- supports register/login via Supabase Auth
-- loads saved progress from `user_progress`
-- debounces writes before syncing back
-- stores:
-  - theme
-  - deck stats
-  - favorites
-  - mistakes
+`Switch user` on the profile page forgets the active name but keeps its progress, so entering the same name again picks up where it left off. Progress does not move between browsers or devices.
 
-The progress payload shape is defined by `StoredState` in [src/features/study/types.ts](/abs/path/c:/Users/es/Desktop/Greek/greek-exam/src/features/study/types.ts:16).
+The progress payload shape is defined by `StoredState` in [src/features/study/types.ts](src/features/study/types.ts).
 
 ## Project Structure
 
@@ -111,7 +83,7 @@ The progress payload shape is defined by `StoredState` in [src/features/study/ty
 src/
   components/
     AppHeader.tsx
-    AuthScreen.tsx
+    LoginScreen.tsx
     MatchGame.tsx
     QuizRunner.tsx
     TabBar.tsx
@@ -139,12 +111,10 @@ src/
       types.ts
       utils.ts
   lib/
-    supabase.ts
+    storage.ts
   App.tsx
   App.css
   main.tsx
-supabase/
-  schema.sql
 ```
 
 ## Architecture
@@ -155,8 +125,8 @@ The app was refactored so `App.tsx` acts mainly as the coordinator instead of ho
 
 [src/App.tsx](/abs/path/c:/Users/es/Desktop/Greek/greek-exam/src/App.tsx:1) is responsible for:
 
-- auth session handling
-- sync/hydration with Supabase
+- the active user name
+- loading/saving progress in `localStorage`
 - global app state
 - current tab/view selection
 - launching study sessions
@@ -168,7 +138,7 @@ Components in `src/components/` handle reusable screens and shell-level UI:
 
 - [AppHeader.tsx](/abs/path/c:/Users/es/Desktop/Greek/greek-exam/src/components/AppHeader.tsx:1): title bar, theme toggle, profile access
 - [TabBar.tsx](/abs/path/c:/Users/es/Desktop/Greek/greek-exam/src/components/TabBar.tsx:1): main section navigation
-- [AuthScreen.tsx](/abs/path/c:/Users/es/Desktop/Greek/greek-exam/src/components/AuthScreen.tsx:1): login/register screen
+- [LoginScreen.tsx](src/components/LoginScreen.tsx): name entry screen
 - [QuizRunner.tsx](/abs/path/c:/Users/es/Desktop/Greek/greek-exam/src/components/QuizRunner.tsx:1): multiple-choice quiz runtime
 - [MatchGame.tsx](/abs/path/c:/Users/es/Desktop/Greek/greek-exam/src/components/MatchGame.tsx:1): pronoun/form matching mini-game
 - [TypingChallenge.tsx](/abs/path/c:/Users/es/Desktop/Greek/greek-exam/src/components/TypingChallenge.tsx:1): typed recall drill
@@ -384,7 +354,7 @@ These are realistic next steps that fit the current codebase without requiring a
 - Add a `retake recommended` badge when a deck's best score is below a threshold.
 - Add a confirmation step before `Reset progress`.
 - Add keyboard shortcuts during quizzes such as `1-4` for answers and `Enter` for next.
-- Restore the last opened tab after login so users return to where they left off.
+- Restore the last opened tab on return so users return to where they left off.
 - Add a small `recent activity` section on the dashboard showing the latest completed decks.
 
 ### Learning improvements
@@ -397,10 +367,9 @@ These are realistic next steps that fit the current codebase without requiring a
 
 ### Code improvements
 
-- Extract Supabase hydration/save logic into a hook like `useProgressSync`.
+- Extract progress load/save logic into a hook like `useStoredProgress`.
 - Extract derived stats like `rankedDecks`, `familyStats`, and overall accuracy into a hook like `useProgressMetrics`.
 - Split `src/App.css` into smaller feature-based style files if it grows further.
-- Add a small `features/auth/` module if auth behavior expands beyond the current screen and sync flow.
 - Add unit tests for helpers like `getBestScore`, `formatDeckLabel`, `normalizeStoredState`, and quiz builders.
 
 ### Performance improvements
@@ -456,23 +425,12 @@ Typical path:
 
 ## Troubleshooting
 
-### Supabase login does not work
-
-Check:
-
-- `.env` exists
-- `VITE_SUPABASE_URL` is correct
-- `VITE_SUPABASE_ANON_KEY` is correct
-- the SQL schema has been applied
-
 ### Progress is not saving
 
 Check:
 
-- the user is logged in
-- `user_progress` exists
-- RLS policies were created successfully
-- your Supabase project allows the current auth flow
+- the browser is not in private/incognito mode and site data is not being cleared
+- you entered the same name as before (names are case-insensitive)
 
 ### Greek text looks corrupted
 

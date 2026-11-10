@@ -135,28 +135,16 @@ export function getBestScore(...scores: Array<number | undefined>) {
   return validScores.length ? Math.max(...validScores) : null;
 }
 
-export function getInitials(email: string) {
-  const localPart = email.split("@")[0] ?? "";
-  const parts = localPart.split(/[._-]+/).filter(Boolean);
+export function getInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length >= 2) {
     return `${parts[0][0] ?? ""}${parts[1][0] ?? ""}`.toUpperCase();
   }
-  return localPart.slice(0, 2).toUpperCase() || "GR";
+  return name.trim().slice(0, 2).toUpperCase() || "GR";
 }
 
-export function getProfileName(email: string) {
-  const localPart = email.split("@")[0] ?? "Greek learner";
-  const parts = localPart
-    .split(/[._-]+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1));
-
-  if (!parts.length) return "Greek learner";
-  return parts.join(" ");
-}
-
-export function getAvatarStyle(email: string): CSSProperties {
-  const seed = [...email].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+export function getAvatarStyle(name: string): CSSProperties {
+  const seed = [...name].reduce((sum, char) => sum + char.charCodeAt(0), 0);
   const [start, end] = avatarPalettes[seed % avatarPalettes.length];
   return {
     background: `linear-gradient(135deg, ${start}, ${end})`,

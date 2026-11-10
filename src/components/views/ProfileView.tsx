@@ -1,5 +1,5 @@
 import type { DeckStats, ReviewCard, Theme } from "../../features/study/types";
-import { getAvatarStyle, getInitials, getProfileName } from "../../features/study/utils";
+import { getAvatarStyle, getInitials } from "../../features/study/utils";
 
 type RankedDeck = {
   deckId: string;
@@ -10,10 +10,9 @@ type RankedDeck = {
 };
 
 type ProfileViewProps = {
-  profileEmail: string;
+  profileName: string;
   theme: Theme;
   trackedDecks: number;
-  isSyncing: boolean;
   strongestDeck: RankedDeck | null;
   needsWorkDeck: RankedDeck | null;
   totalSessions: number;
@@ -21,7 +20,6 @@ type ProfileViewProps = {
   totalCorrect: number;
   favorites: ReviewCard[];
   mistakes: ReviewCard[];
-  authLoading: boolean;
   onToggleTheme: () => void;
   onLogout: () => void;
   onOpenProgress: () => void;
@@ -31,10 +29,9 @@ type ProfileViewProps = {
 };
 
 export function ProfileView({
-  profileEmail,
+  profileName,
   theme,
   trackedDecks,
-  isSyncing,
   strongestDeck,
   needsWorkDeck,
   totalSessions,
@@ -42,7 +39,6 @@ export function ProfileView({
   totalCorrect,
   favorites,
   mistakes,
-  authLoading,
   onToggleTheme,
   onLogout,
   onOpenProgress,
@@ -50,9 +46,8 @@ export function ProfileView({
   onOpenMistakesQuiz,
   onResetProgress,
 }: ProfileViewProps) {
-  const profileName = getProfileName(profileEmail);
-  const profileInitials = getInitials(profileEmail);
-  const profileAvatarStyle = getAvatarStyle(profileEmail);
+  const profileInitials = getInitials(profileName);
+  const profileAvatarStyle = getAvatarStyle(profileName);
 
   return (
     <>
@@ -65,13 +60,12 @@ export function ProfileView({
             <div className="profile-copy">
               <span className="mini-label">Profile</span>
               <h3>{profileName}</h3>
-              <p>{profileEmail}</p>
+              <p>Progress saved on this device</p>
             </div>
           </div>
           <div className="profile-status-row">
             <div className="pill">{theme === "dark" ? "Dark mode" : "Light mode"}</div>
             <div className="pill">{trackedDecks} tracked decks</div>
-            {isSyncing && <div className="pill">Saving...</div>}
           </div>
           <div className="profile-highlight-row">
             <div className="profile-highlight">
@@ -89,8 +83,8 @@ export function ProfileView({
             <button className="secondary-button" onClick={onToggleTheme}>
               Toggle theme
             </button>
-            <button className="ghost-button" onClick={onLogout} disabled={authLoading}>
-              Logout
+            <button className="ghost-button" onClick={onLogout}>
+              Switch user
             </button>
           </div>
         </div>

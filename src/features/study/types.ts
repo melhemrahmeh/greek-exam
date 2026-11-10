@@ -40,4 +40,3 @@ export type QuizSession = {
 export type MatchSession = { kind: "match" };
 export type TypingSession = { kind: "typing" };
 export type StudySession = QuizSession | MatchSession | TypingSession;
-export type AuthMode = "login" | "register";

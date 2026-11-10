@@ -8,7 +8,7 @@ type AppHeaderProps = {
   onBack?: () => void;
   onToggleTheme: () => void;
   onOpenProfile?: () => void;
-  profileEmail?: string;
+  profileName?: string;
   profileActive?: boolean;
   theme: Theme;
 };
@@ -20,7 +20,7 @@ export function AppHeader({
   onBack,
   onToggleTheme,
   onOpenProfile,
-  profileEmail,
+  profileName,
   profileActive,
   theme,
 }: AppHeaderProps) {
@@ -35,19 +35,19 @@ export function AppHeader({
           <span className="brand-chip">Greek A2 Builder</span>
         )}
         <div className="hero-actions">
-          {profileEmail && onOpenProfile && (
+          {profileName && onOpenProfile && (
             <button
               className={profileActive ? "header-profile-button active" : "header-profile-button"}
               onClick={onOpenProfile}
               aria-label="Open profile"
-              title={profileEmail}
+              title={profileName}
             >
-              <span className="header-profile-avatar" style={getAvatarStyle(profileEmail)} aria-hidden="true">
-                {getInitials(profileEmail)}
+              <span className="header-profile-avatar" style={getAvatarStyle(profileName)} aria-hidden="true">
+                {getInitials(profileName)}
               </span>
               <span className="header-profile-copy">
                 <strong>Profile</strong>
-                <small>{profileEmail}</small>
+                <small>{profileName}</small>
               </span>
             </button>
           )}
