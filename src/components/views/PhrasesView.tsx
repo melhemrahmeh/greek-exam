@@ -72,11 +72,16 @@ export function PhrasesView({
             <div className="rows">
               {filteredSections.map((section) => {
                 const matchCount = normalizedSearch ? section.items.filter(matchesSearch).length : 0;
+                const newCount = section.items.filter((item) => item.isNew).length;
                 return (
                   <DeckRow
                     key={section.title}
                     title={`${section.icon} ${section.title}`}
-                    meta={normalizedSearch ? `${matchCount} matching` : `${section.items.length} phrases`}
+                    meta={
+                      normalizedSearch
+                        ? `${matchCount} matching`
+                        : `${section.items.length} phrases${newCount ? ` · ${newCount} new` : ""}`
+                    }
                     score={phraseSectionBestScores[section.title] ?? null}
                     passFail={phraseSectionPassFail[section.title]}
                     active={openPhrase === section.title}
@@ -116,6 +121,11 @@ export function PhrasesView({
                     <div className="row-main">
                       <strong className="greek" lang="el">
                         {item.gr}
+                        {item.isNew && (
+                          <span className="badge badge-brand phrase-new" lang="en">
+                            New
+                          </span>
+                        )}
                       </strong>
                       {item.note && <small>{item.note}</small>}
                     </div>

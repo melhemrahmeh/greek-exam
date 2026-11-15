@@ -298,6 +298,11 @@
   white-space: nowrap;
 }
 
+.badge-brand {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
 .badge-success {
   background: var(--success-soft);
   color: var(--success);

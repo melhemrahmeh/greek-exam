@@ -93,7 +93,7 @@ export function ScoreBadge({ score, title }: { score: number | null | undefined;
   if (state === "new") {
     return (
       <span className="badge" title={title}>
-        New
+        Not started
       </span>
     );
   }

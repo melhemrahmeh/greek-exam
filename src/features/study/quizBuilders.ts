@@ -180,7 +180,7 @@ export function buildPhraseQuizSession(direction: "gr-en" | "en-gr", sectionTitl
         back: item.en,
         source: `Phrasebook: ${item.section}`,
       },
-      detail: item.note ? `${item.section} · ${item.note}` : item.section,
+      detail: [item.section, item.note, item.isNew ? "New phrase" : null].filter(Boolean).join(" · "),
     };
   });
 
