@@ -67,7 +67,8 @@
   --space-8: 40px;
 
   /* Type */
-  --font-sans: "Inter", "Noto Sans", "Segoe UI", system-ui, sans-serif;
+  /* Noto Sans is loaded as a web font (index.html) so Greek accents render the same on every machine. */
+  --font-sans: "Noto Sans", "Segoe UI", system-ui, sans-serif;
   --fs-xs: 0.8rem;
   --fs-sm: 0.9rem;
   --fs-md: 1rem;
