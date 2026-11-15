@@ -6,6 +6,38 @@
   font-weight: 600;
 }
 
+.meanings-total {
+  font-size: var(--fs-sm);
+}
+
+.meanings-total strong {
+  color: var(--text);
+}
+
+.level-main {
+  flex: 1;
+  gap: 2px;
+}
+
+.level-main .progress {
+  margin-top: var(--space-2);
+}
+
+.level-end {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+  min-width: 110px;
+  flex-shrink: 0;
+}
+
+.level-left {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .mode-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

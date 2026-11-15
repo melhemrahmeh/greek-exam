@@ -2,6 +2,7 @@ import { LONG_QUIZ_LENGTH, REVIEW_QUIZ_LENGTH, STANDARD_QUIZ_LENGTH, tenseGreek,
 import { grammar, grammarQuiz, persons, phraseSections, verbs, vocab } from "./data";
 import type { QuizSession, ReviewCard } from "./types";
 import { buildChoices, safeTopicTitle, sampleUnique, shuffle } from "./utils";
+import { getVerbLevel, verbLevels, verbReviewId } from "./verbLevels";
 
 export function buildVocabQuizSession(category: string, direction: "gr-en" | "en-gr"): QuizSession {
   const words = shuffle(vocab[category]).slice(0, Math.min(LONG_QUIZ_LENGTH, vocab[category].length));
@@ -30,9 +31,18 @@ export function buildVocabQuizSession(category: string, direction: "gr-en" | "en
   };
 }
 
-export function buildVerbMeaningQuizSession(): QuizSession {
-  const items = shuffle(verbs)
-    .slice(0, Math.min(STANDARD_QUIZ_LENGTH, verbs.length))
+/**
+ * Verb meanings quiz for one difficulty level (or all levels when `levelId` is omitted).
+ * Verbs not yet learned are asked first; learned ones fill the rest of the quiz as review.
+ */
+export function buildVerbMeaningQuizSession(levelId?: number, learned: ReadonlySet<string> = new Set()): QuizSession {
+  const level = levelId ? verbLevels.find((entry) => entry.id === levelId) : undefined;
+  const pool = level?.verbs ?? verbs;
+  const unlearned = shuffle(pool.filter((verb) => !learned.has(verb.inf)));
+  const review = shuffle(pool.filter((verb) => learned.has(verb.inf)));
+  const picked = [...unlearned, ...review].slice(0, Math.min(STANDARD_QUIZ_LENGTH, pool.length));
+
+  const items = shuffle(picked)
     .map((verb, idx) => {
       const wrong = sampleUnique(
         verbs.filter((entry) => entry.en !== verb.en).map((entry) => entry.en),
@@ -44,15 +54,15 @@ export function buildVerbMeaningQuizSession(): QuizSession {
         prompt: verb.inf,
         choices: buildChoices(verb.en, wrong),
         answer: verb.en,
-        review: { id: `verb:${verb.inf}`, front: verb.inf, back: verb.en, source: "Verb meanings" },
-        detail: verb.type.toUpperCase(),
+        review: { id: verbReviewId(verb.inf), front: verb.inf, back: verb.en, source: "Verb meanings" },
+        detail: `Level ${getVerbLevel(verb.inf)?.id ?? "?"}${learned.has(verb.inf) ? " · review" : ""}`,
       };
     });
 
   return {
     kind: "quiz",
-    deckId: "verbs:meaning",
-    title: "Verb Meanings",
+    deckId: level ? `verbs:meaning:${level.id}` : "verbs:meaning",
+    title: level ? `Verb Meanings · Level ${level.id}` : "Verb Meanings · All levels",
     subtitle: "Match the verb to its meaning.",
     items,
   };

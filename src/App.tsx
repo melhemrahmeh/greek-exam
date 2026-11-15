@@ -36,6 +36,7 @@ import {
   randomizeQuizSession,
   toDeckStats,
 } from "./features/study/utils";
+import { infFromReviewId, verbLevels } from "./features/study/verbLevels";
 import { loadCurrentUser, loadProgress, saveCurrentUser, saveProgress } from "./lib/storage";
 
 export default function App() {
@@ -111,13 +112,32 @@ export default function App() {
     [categoryEntries, vocabCategoryBestScores],
   );
   const vocabCompletionPercent = categoryEntries.length ? Math.round((passedVocabCategories / categoryEntries.length) * 100) : 0;
-  const verbMeaningBestScore = stored.deckStats["verbs:meaning"]?.bestScore ?? null;
+  const learnedVerbs = useMemo(() => new Set(stored.learnedVerbs), [stored.learnedVerbs]);
+  const meaningLevels = useMemo(
+    () =>
+      verbLevels.map((level) => {
+        const stats = stored.deckStats[`verbs:meaning:${level.id}`];
+        const deck = toDeckStats(stats);
+        return {
+          id: level.id,
+          name: level.name,
+          total: level.verbs.length,
+          left: level.verbs.filter((verb) => !learnedVerbs.has(verb.inf)).length,
+          sample: level.verbs.slice(0, 3).map((verb) => verb.inf),
+          bestScore: stats ? deck.bestScore : null,
+          passFail: { passed: deck.passed, failed: deck.failed },
+        };
+      }),
+    [learnedVerbs, stored.deckStats],
+  );
+  // Meanings count as passed via the all-levels quiz, or once every level quiz is passed.
+  const allLevelsBest = stored.deckStats["verbs:meaning"]?.bestScore ?? null;
+  const weakestLevelBest = meaningLevels.every((level) => level.bestScore !== null)
+    ? Math.min(...meaningLevels.map((level) => level.bestScore ?? 0))
+    : null;
+  const verbMeaningBestScore = getBestScore(allLevelsBest ?? undefined, weakestLevelBest ?? undefined);
   const verbConjugationBestScore = stored.deckStats["verbs:conjugation"]?.bestScore ?? null;
   const verbTranslationBestScore = stored.deckStats["verbs:translation-all"]?.bestScore ?? null;
-  const verbMeaningPassFail = useMemo(() => {
-    const s = toDeckStats(stored.deckStats["verbs:meaning"]);
-    return { passed: s.passed, failed: s.failed };
-  }, [stored.deckStats]);
   const verbConjugationPassFail = useMemo(() => {
     const s = toDeckStats(stored.deckStats["verbs:conjugation"]);
     return { passed: s.passed, failed: s.failed };
@@ -247,7 +267,7 @@ export default function App() {
       return {
         title: weakest.label,
         detail: `${weakest.family} · last score ${weakest.stats.lastScore}%, pass at ${PASS_THRESHOLD}%`,
-        build: () => buildSessionForDeck(weakest.deckId),
+        build: () => buildSessionForDeck(weakest.deckId, learnedVerbs),
       };
     }
 
@@ -284,7 +304,7 @@ export default function App() {
       detail: "Everything is passed. Keep it fresh with a mixed quiz.",
       build: () => buildGrammarQuizSession(),
     };
-  }, [rankedDecks, categoryEntries, vocabCategoryBestScores, grammarTopicBestScores, phraseSectionBestScores]);
+  }, [rankedDecks, categoryEntries, vocabCategoryBestScores, grammarTopicBestScores, phraseSectionBestScores, learnedVerbs]);
 
   const dashboardContinue: ContinueTarget = {
     title: continueTarget.title,
@@ -305,6 +325,10 @@ export default function App() {
   const recordQuizOutcome = (deckId: string, answers: QuizAnswer[], items: QuizItem[]) => {
     const correct = answers.filter((entry) => entry?.correct).length;
     const wrongCards = items.filter((_, idx) => !answers[idx]?.correct).map((item) => item.review);
+    // Any question on a verb's meaning (level quizzes, all translations, review decks) updates "learned".
+    const verbResults = items
+      .map((item, idx) => ({ inf: infFromReviewId(item.review.id), correct: Boolean(answers[idx]?.correct) }))
+      .filter((entry): entry is { inf: string; correct: boolean } => entry.inf !== null);
 
     saveState((current) => {
       const previous = toDeckStats(current.deckStats[deckId]);
@@ -325,6 +349,7 @@ export default function App() {
           },
         },
         mistakes: dedupeCards([...wrongCards, ...current.mistakes]).slice(0, 80),
+        learnedVerbs: verbResults.length ? updateLearned(current.learnedVerbs, verbResults) : current.learnedVerbs,
       };
     });
   };
@@ -444,7 +469,6 @@ export default function App() {
             verbMeaningBestScore={verbMeaningBestScore}
             verbConjugationBestScore={verbConjugationBestScore}
             verbTranslationBestScore={verbTranslationBestScore}
-            verbMeaningPassFail={verbMeaningPassFail}
             verbConjugationPassFail={verbConjugationPassFail}
             verbTranslationPassFail={verbTranslationPassFail}
             passedVerbDecks={passedVerbDecks}
@@ -452,7 +476,8 @@ export default function App() {
             onSelectVerb={setSelectedVerb}
             onVerbSearchChange={setVerbSearch}
             onTenseChange={setTense}
-            onMeaningQuiz={() => launchQuiz(buildVerbMeaningQuizSession())}
+            meaningLevels={meaningLevels}
+            onMeaningQuiz={(levelId) => launchQuiz(buildVerbMeaningQuizSession(levelId, learnedVerbs))}
             onTranslationQuiz={() => launchQuiz(buildVerbTranslationQuizSession())}
             onConjugationQuiz={() => launchQuiz(buildVerbConjugationQuizSession())}
             onOpenMatch={() => setSession({ kind: "match" })}
@@ -520,7 +545,7 @@ export default function App() {
               const confirmed = window.confirm(
                 "Reset all progress? This clears every deck score, pass/fail count, favorite, and saved mistake. This cannot be undone.",
               );
-              if (confirmed) setStored({ theme, deckStats: {}, favorites: [], mistakes: [] });
+              if (confirmed) setStored({ ...emptyStoredState, theme });
             }}
           />
         )}
@@ -530,7 +555,7 @@ export default function App() {
 }
 
 /** Rebuild a quiz session from a stored deck id (used by the dashboard "Continue" card). */
-function buildSessionForDeck(deckId: string): QuizSession | null {
+function buildSessionForDeck(deckId: string, learned: ReadonlySet<string>): QuizSession | null {
   const parts = deckId.split(":");
   const kind = parts[0];
   if (kind === "vocab" || kind === "phrases") {
@@ -541,7 +566,7 @@ function buildSessionForDeck(deckId: string): QuizSession | null {
     return phraseSections.some((section) => section.title === name) ? buildPhraseQuizSession(direction, name) : null;
   }
   if (kind === "verbs") {
-    if (parts[1] === "meaning") return buildVerbMeaningQuizSession();
+    if (parts[1] === "meaning") return buildVerbMeaningQuizSession(parts[2] ? Number(parts[2]) : undefined, learned);
     if (parts[1] === "conjugation") return buildVerbConjugationQuizSession();
     if (parts[1] === "translation-all") return buildVerbTranslationQuizSession();
     return null;
@@ -552,4 +577,13 @@ function buildSessionForDeck(deckId: string): QuizSession | null {
     return Number.isInteger(topic) && grammar[topic] ? buildGrammarQuizSession(topic) : null;
   }
   return null;
+}
+
+function updateLearned(current: string[], results: Array<{ inf: string; correct: boolean }>) {
+  const next = new Set(current);
+  for (const { inf, correct } of results) {
+    if (correct) next.add(inf);
+    else next.delete(inf);
+  }
+  return [...next];
 }

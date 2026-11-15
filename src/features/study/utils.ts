@@ -66,6 +66,7 @@ export function normalizeStoredState(value?: Partial<StoredState> | null): Store
     deckStats: value?.deckStats ?? {},
     favorites: dedupeCards(value?.favorites ?? []),
     mistakes: dedupeCards(value?.mistakes ?? []),
+    learnedVerbs: Array.isArray(value?.learnedVerbs) ? [...new Set(value.learnedVerbs)] : [],
   };
 }
 
@@ -95,7 +96,7 @@ export function formatDeckLabel(deckId: string) {
   if (parts[0] === "verbs") {
     if (parts[1] === "conjugation") return "Verb Conjugation Builder";
     if (parts[1] === "translation-all") return "All Verb Translations";
-    return "Verb Meanings";
+    return parts[2] ? `Verb Meanings · Level ${parts[2]}` : "Verb Meanings · All levels";
   }
   if (parts[0] === "grammar") {
     if (parts[1] === "all") return "Grammar Mixed Quiz";

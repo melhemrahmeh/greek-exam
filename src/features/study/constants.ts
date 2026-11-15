@@ -26,4 +26,5 @@ export const emptyStoredState: StoredState = {
   deckStats: {},
   favorites: [],
   mistakes: [],
+  learnedVerbs: [],
 };

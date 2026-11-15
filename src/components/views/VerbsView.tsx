@@ -11,14 +11,24 @@ type TenseKey = keyof typeof tenseLabels;
 
 type PassFail = { passed: number; failed: number };
 
+export type MeaningLevel = {
+  id: number;
+  name: string;
+  total: number;
+  left: number;
+  sample: string[];
+  bestScore: number | null;
+  passFail: PassFail;
+};
+
 type VerbsViewProps = {
   selectedVerb: number | null;
   verbSearch: string;
   tense: TenseKey;
   verbMeaningBestScore: number | null;
+  meaningLevels: MeaningLevel[];
   verbConjugationBestScore: number | null;
   verbTranslationBestScore: number | null;
-  verbMeaningPassFail: PassFail;
   verbConjugationPassFail: PassFail;
   verbTranslationPassFail: PassFail;
   passedVerbDecks: number;
@@ -26,7 +36,7 @@ type VerbsViewProps = {
   onSelectVerb: (index: number | null) => void;
   onVerbSearchChange: (value: string) => void;
   onTenseChange: (tense: TenseKey) => void;
-  onMeaningQuiz: () => void;
+  onMeaningQuiz: (levelId?: number) => void;
   onTranslationQuiz: () => void;
   onConjugationQuiz: () => void;
   onOpenMatch: () => void;
@@ -40,9 +50,9 @@ export function VerbsView({
   verbSearch,
   tense,
   verbMeaningBestScore,
+  meaningLevels,
   verbConjugationBestScore,
   verbTranslationBestScore,
-  verbMeaningPassFail,
   verbConjugationPassFail,
   verbTranslationPassFail,
   passedVerbDecks,
@@ -82,18 +92,13 @@ export function VerbsView({
       </div>
       <ProgressBar value={verbsCompletionPercent} label="Verbs completion" />
 
+      <MeaningLevels levels={meaningLevels} allLevelsScore={verbMeaningBestScore} onStart={onMeaningQuiz} />
+
       <section className="section" aria-labelledby="quizzes-title">
         <h2 id="quizzes-title" className="group-title">
-          Quizzes
+          More quizzes
         </h2>
         <div className="mode-grid">
-          <ModeCard
-            title="Meanings"
-            description="Match infinitives to their English meaning."
-            score={verbMeaningBestScore}
-            passFail={verbMeaningPassFail}
-            onStart={onMeaningQuiz}
-          />
           <ModeCard
             title="All translations"
             description={`Translate every verb in the deck (${verbs.length}).`}
@@ -204,6 +209,69 @@ export function VerbsView({
         />
       </section>
     </>
+  );
+}
+
+function MeaningLevels({
+  levels,
+  allLevelsScore,
+  onStart,
+}: {
+  levels: MeaningLevel[];
+  allLevelsScore: number | null;
+  onStart: (levelId?: number) => void;
+}) {
+  const total = levels.reduce((sum, level) => sum + level.total, 0);
+  const left = levels.reduce((sum, level) => sum + level.left, 0);
+
+  return (
+    <section className="section" aria-labelledby="meanings-title">
+      <div className="section-head">
+        <h2 id="meanings-title" className="group-title">
+          Meanings · easiest to hardest
+        </h2>
+        <span className="muted meanings-total">
+          <strong>{left}</strong> of {total} verbs left to learn
+        </span>
+      </div>
+      <div className="panel panel-flush">
+        <div className="rows">
+          {levels.map((level) => {
+            const learned = level.total - level.left;
+            const passFailText = formatPassFail(level.passFail.passed, level.passFail.failed);
+            return (
+              <button key={level.id} className="row level-row" onClick={() => onStart(level.id)}>
+                <div className="row-main level-main">
+                  <strong>
+                    Level {level.id} · {level.name}
+                  </strong>
+                  <small lang="el">{level.sample.join(", ")}…</small>
+                  <ProgressBar value={(learned / level.total) * 100} label={`Level ${level.id} learned`} success={level.left === 0} />
+                </div>
+                <div className="level-end">
+                  <span className={level.left ? "level-left" : "level-left score-success"}>
+                    {level.left ? `${level.left} of ${level.total} left` : "All learned"}
+                  </span>
+                  <ScoreBadge score={level.bestScore} title={passFailText ? `Best score · ${passFailText}` : "Best score"} />
+                </div>
+              </button>
+            );
+          })}
+          <button className="row level-row" onClick={() => onStart()}>
+            <div className="row-main">
+              <strong>All levels</strong>
+              <small>Mixed from every level, unlearned verbs first</small>
+            </div>
+            <div className="level-end">
+              <span className="level-left">
+                {left} of {total} left
+              </span>
+              <ScoreBadge score={allLevelsScore} />
+            </div>
+          </button>
+        </div>
+      </div>
+    </section>
   );
 }
 

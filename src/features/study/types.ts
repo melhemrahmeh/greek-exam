@@ -29,6 +29,8 @@ export type StoredState = {
   deckStats: Record<string, DeckStats>;
   favorites: ReviewCard[];
   mistakes: ReviewCard[];
+  /** Verbs (infinitives) whose meaning was last answered correctly. */
+  learnedVerbs: string[];
 };
 export type QuizSession = {
   kind: "quiz";
