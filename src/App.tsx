@@ -22,6 +22,7 @@ import {
   buildVerbConjugationQuizSession,
   buildVerbMeaningQuizSession,
   buildVerbTranslationQuizSession,
+  buildMixedVocabQuizSession,
   buildVocabQuizSession,
 } from "./features/study/quizBuilders";
 import type { DeckStats, QuizAnswer, QuizItem, QuizSession, ReviewCard, StoredState, StudySession, Theme, View } from "./features/study/types";
@@ -458,6 +459,7 @@ export default function App() {
             onSelectCategory={setSelectedCategory}
             onVocabSearchChange={setVocabSearch}
             onStartQuiz={(category, direction) => launchQuiz(buildVocabQuizSession(category, direction))}
+            onStartMixedQuiz={(direction) => launchQuiz(buildMixedVocabQuizSession(direction))}
           />
         )}
 
@@ -561,7 +563,10 @@ function buildSessionForDeck(deckId: string, learned: ReadonlySet<string>): Quiz
   if (kind === "vocab" || kind === "phrases") {
     const direction = parts[parts.length - 1] === "en-gr" ? "en-gr" : "gr-en";
     const name = parts.slice(1, -1).join(":");
-    if (kind === "vocab") return vocab[name] ? buildVocabQuizSession(name, direction) : null;
+    if (kind === "vocab") {
+      if (name === "all") return buildMixedVocabQuizSession(direction);
+      return vocab[name] ? buildVocabQuizSession(name, direction) : null;
+    }
     if (name === "all") return buildPhraseQuizSession(direction);
     return phraseSections.some((section) => section.title === name) ? buildPhraseQuizSession(direction, name) : null;
   }

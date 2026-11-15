@@ -35,6 +35,34 @@ export function buildVocabQuizSession(category: string, direction: "gr-en" | "en
  * Verb meanings quiz for one difficulty level (or all levels when `levelId` is omitted).
  * Verbs not yet learned are asked first; learned ones fill the rest of the quiz as review.
  */
+/** Random words from every vocab category. Distractors come from the word's own category so they stay plausible. */
+export function buildMixedVocabQuizSession(direction: "gr-en" | "en-gr"): QuizSession {
+  const allWords = Object.entries(vocab).flatMap(([category, entries]) => entries.map((entry) => ({ category, entry })));
+  const picked = shuffle(allWords).slice(0, Math.min(LONG_QUIZ_LENGTH, allWords.length));
+  const items = picked.map(({ category, entry: [gr, en] }, idx) => {
+    const prompt = direction === "gr-en" ? gr : en;
+    const answer = direction === "gr-en" ? en : gr;
+    const pool = vocab[category].map((entry) => (direction === "gr-en" ? entry[1] : entry[0])).filter((entry) => entry !== answer);
+
+    return {
+      id: `all-${direction}-${idx}`,
+      prompt,
+      choices: buildChoices(answer, pool),
+      answer,
+      review: { id: `vocab:${category}:${gr}`, front: gr, back: en, source: category },
+      detail: category,
+    };
+  });
+
+  return {
+    kind: "quiz",
+    deckId: `vocab:all:${direction}`,
+    title: "All vocabulary",
+    subtitle: direction === "gr-en" ? "Greek to English" : "English to Greek",
+    items,
+  };
+}
+
 export function buildVerbMeaningQuizSession(levelId?: number, learned: ReadonlySet<string> = new Set()): QuizSession {
   const level = levelId ? verbLevels.find((entry) => entry.id === levelId) : undefined;
   const pool = level?.verbs ?? verbs;

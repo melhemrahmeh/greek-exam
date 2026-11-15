@@ -91,7 +91,7 @@ export function formatDeckLabel(deckId: string) {
   const parts = deckId.split(":");
   if (parts[0] === "vocab") {
     const direction = parts[2] === "en-gr" ? "English to Greek" : "Greek to English";
-    return `${parts[1]} \u00B7 ${direction}`;
+    return `${parts[1] === "all" ? "All vocabulary" : parts[1]} \u00B7 ${direction}`;
   }
   if (parts[0] === "verbs") {
     if (parts[1] === "conjugation") return "Verb Conjugation Builder";

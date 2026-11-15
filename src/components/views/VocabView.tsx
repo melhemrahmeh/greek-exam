@@ -17,6 +17,7 @@ type VocabViewProps = {
   onSelectCategory: (category: string | null) => void;
   onVocabSearchChange: (value: string) => void;
   onStartQuiz: (category: string, direction: "gr-en" | "en-gr") => void;
+  onStartMixedQuiz: (direction: "gr-en" | "en-gr") => void;
 };
 
 const sortOptions = [
@@ -40,6 +41,7 @@ export function VocabView({
   onSelectCategory,
   onVocabSearchChange,
   onStartQuiz,
+  onStartMixedQuiz,
 }: VocabViewProps) {
   const [sort, setSort] = useState<VocabSort>("default");
   const [showAll, setShowAll] = useState(false);
@@ -70,6 +72,14 @@ export function VocabView({
           <p>
             {passedCategories} / {totalCategories} categories passed
           </p>
+        </div>
+        <div className="btn-row">
+          <button className="btn btn-secondary" onClick={() => onStartMixedQuiz("gr-en")} title="30 random words from all categories">
+            Random GR → EN
+          </button>
+          <button className="btn btn-secondary" onClick={() => onStartMixedQuiz("en-gr")} title="30 random words from all categories">
+            Random EN → GR
+          </button>
         </div>
       </div>
       <ProgressBar value={completionPercent} label="Vocabulary completion" />
