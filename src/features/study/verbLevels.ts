@@ -7,7 +7,7 @@ export type VerbLevel = {
   verbs: Verb[];
 };
 
-const levelNames = ["Starter", "Basics", "Everyday", "Intermediate", "Upper intermediate", "Advanced"];
+const levelNames = ["Starter", "Basics", "Everyday", "Intermediate", "Upper intermediate", "Advanced", "Expert", "Master"];
 
 /**
  * verbs.json is ordered roughly by frequency (έχω, κάνω, πάω… first), so splitting it into
