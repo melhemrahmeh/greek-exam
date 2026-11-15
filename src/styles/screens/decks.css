@@ -1,0 +1,144 @@
+/* Deck lists (Vocab, Grammar, Phrases, Verb browser) */
+
+.deck-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 360px) 1fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.deck-list {
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  position: sticky;
+  top: 64px;
+}
+
+.deck-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.deck-back {
+  display: none;
+  align-self: flex-start;
+}
+
+.deck-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.deck-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.deck-panel-head h2 {
+  word-break: break-word;
+}
+
+.direction-buttons .btn {
+  flex: 1 1 180px;
+}
+
+.word-table,
+.conj-table {
+  width: 100%;
+}
+
+.word-table td,
+.conj-table td,
+.conj-table th {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.word-table tr:nth-child(odd),
+.conj-table tbody tr:nth-child(odd) {
+  background: var(--surface-muted);
+}
+
+.word-table td:last-child {
+  color: var(--text-muted);
+}
+
+.word-table .greek {
+  font-size: var(--fs-md);
+  width: 50%;
+}
+
+.grammar-notes {
+  white-space: pre-wrap;
+  line-height: 1.7;
+}
+
+.phrase-rows {
+  margin: 0 calc(var(--space-5) * -1) calc(var(--space-5) * -1);
+  border-top: 1px solid var(--border);
+}
+
+.phrase-row {
+  align-items: flex-start;
+}
+
+.phrase-row .greek {
+  font-size: var(--fs-md);
+}
+
+.phrase-en {
+  color: var(--text-muted);
+  text-align: right;
+  max-width: 45%;
+}
+
+@media (max-width: 860px) {
+  .deck-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .deck-list {
+    position: static;
+    max-height: none;
+  }
+
+  .deck-layout .deck-detail {
+    display: none;
+  }
+
+  .deck-layout.has-selection .deck-list {
+    display: none;
+  }
+
+  .deck-layout.has-selection .deck-detail {
+    display: flex;
+  }
+
+  .deck-back {
+    display: inline-flex;
+    margin-left: calc(var(--space-4) * -1);
+  }
+}
+
+@media (max-width: 680px) {
+  .phrase-rows {
+    margin: 0 calc(var(--space-4) * -1) calc(var(--space-4) * -1);
+  }
+
+  .phrase-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-1);
+  }
+
+  .phrase-en {
+    text-align: left;
+    max-width: none;
+  }
+}

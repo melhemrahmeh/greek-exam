@@ -1,0 +1,85 @@
+/* Design tokens: the only place color literals are allowed. */
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --surface-muted: #f1efea;
+  --border: #e4e1da;
+  --text: #1f2328;
+  --text-muted: #5f6670;
+  --on-brand: #ffffff;
+
+  --brand: #2f6f8f;
+  --brand-soft: #e6f0f5;
+
+  --success: #2e7d5b;
+  --success-soft: #e5f3ec;
+  --warning: #b7791f;
+  --warning-soft: #fbf1df;
+  --danger: #b4473c;
+  --danger-soft: #f9e8e6;
+
+  --shadow-float: 0 8px 24px rgb(0 0 0 / 0.08);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #14171c;
+  --surface: #1b1f26;
+  --surface-muted: #232831;
+  --border: #2e343e;
+  --text: #e8eaed;
+  --text-muted: #a3aab5;
+  --on-brand: #14171c;
+
+  --brand: #7fb6d3;
+  --brand-soft: #1f3340;
+
+  --success: #6cc49a;
+  --success-soft: color-mix(in srgb, var(--success) 15%, var(--surface));
+  --warning: #e0b25c;
+  --warning-soft: color-mix(in srgb, var(--warning) 15%, var(--surface));
+  --danger: #ec8a7f;
+  --danger-soft: color-mix(in srgb, var(--danger) 15%, var(--surface));
+
+  --shadow-float: 0 8px 24px rgb(0 0 0 / 0.35);
+}
+
+:root {
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  /* Spacing (4px grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+
+  /* Type */
+  --font-sans: "Inter", "Noto Sans", "Segoe UI", system-ui, sans-serif;
+  --fs-xs: 0.8rem;
+  --fs-sm: 0.9rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.6rem;
+  --fs-2xl: 2rem;
+
+  /* Layout */
+  --content-max: 1120px;
+  --header-h: 56px;
+  --bottom-nav-h: 64px;
+
+  /* Motion */
+  --transition: 150ms ease;
+}

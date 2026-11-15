@@ -1,17 +1,17 @@
-import { useMemo, useState } from "react";
-import { AppHeader } from "./AppHeader";
+import { useEffect, useMemo, useState } from "react";
+import type { FormEvent } from "react";
+import { FocusBar } from "./FocusBar";
 import { TYPING_DRILL_LENGTH } from "../features/study/constants";
 import { verbs } from "../features/study/data";
 import { shuffle } from "../features/study/utils";
-import type { Theme } from "../features/study/types";
 
 type TypingChallengeProps = {
   onClose: () => void;
-  onToggleTheme: () => void;
-  theme: Theme;
 };
 
-export function TypingChallenge({ onClose, onToggleTheme, theme }: TypingChallengeProps) {
+const fieldLabels = { present: "Present", past: "Past", future: "Future" } as const;
+
+export function TypingChallenge({ onClose }: TypingChallengeProps) {
   const [queue, setQueue] = useState(() => shuffle(verbs).slice(0, TYPING_DRILL_LENGTH));
   const [index, setIndex] = useState(0);
   const [inputs, setInputs] = useState({ present: "", past: "", future: "" });
@@ -36,73 +36,90 @@ export function TypingChallenge({ onClose, onToggleTheme, theme }: TypingChallen
       }
     : null;
 
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const check = () => {
+    const nextCorrect = Object.entries(answers).every(([key, value]) => inputs[key as keyof typeof inputs].trim() === value);
+    setChecked(true);
+    setScore((value) => ({
+      perfect: value.perfect + (nextCorrect ? 1 : 0),
+      attempted: value.attempted + 1,
+    }));
+  };
+
+  const next = () => {
+    setChecked(false);
+    setInputs({ present: "", past: "", future: "" });
+    if (index < queue.length - 1) {
+      setIndex((value) => value + 1);
+    } else {
+      setQueue(shuffle(verbs).slice(0, TYPING_DRILL_LENGTH));
+      setIndex(0);
+      setScore({ perfect: 0, attempted: 0 });
+    }
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (checked) next();
+    else check();
+  };
+
   return (
     <div className="app-shell">
-      <AppHeader
-        title="Verb Form Drill"
-        subtitle="Type the 1st-person singular forms from memory."
-        eyebrow={`${index + 1} of ${queue.length}`}
-        onBack={onClose}
-        onToggleTheme={onToggleTheme}
-        theme={theme}
+      <FocusBar
+        onClose={onClose}
+        closeLabel="Close drill"
+        progress={{ current: index + 1, total: queue.length }}
+        actions={
+          <span className="badge" title="Perfect answers so far">
+            {score.perfect}/{score.attempted}
+          </span>
+        }
       />
-      <main className="content">
-        <section className="panel">
-          <div className="split-header">
-            <div>
-              <h3>{current.en}</h3>
-              <p>{current.inf}</p>
-            </div>
-            <div className="pill">{score.perfect}/{score.attempted}</div>
+      <main className="container content focus-content">
+        <div className="quiz-prompt">
+          <span className="muted">Type the 1st-person singular forms</span>
+          <h1>{current.en}</h1>
+          <span className="greek" lang="el">
+            {current.inf}
+          </span>
+        </div>
+        <form className="typing-form" onSubmit={handleSubmit}>
+          {(["present", "past", "future"] as const).map((key, i) => (
+            <label key={`${index}-${key}`} className="field">
+              <span className="field-label">{fieldLabels[key]}</span>
+              <input
+                className={!checked ? "input" : correctness?.[key] ? "input is-correct" : "input is-wrong"}
+                value={inputs[key]}
+                lang="el"
+                autoComplete="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                autoFocus={i === 0}
+                readOnly={checked}
+                onChange={(event) => setInputs((value) => ({ ...value, [key]: event.target.value }))}
+              />
+              {checked && (
+                <small className={correctness?.[key] ? "score-success" : "score-danger"}>
+                  {correctness?.[key] ? "✓ Correct" : `✕ Answer: ${answers[key]}`}
+                </small>
+              )}
+            </label>
+          ))}
+          <div className="quiz-footer">
+            <span />
+            <button className="btn btn-primary quiz-next" type="submit">
+              {!checked ? "Check" : index < queue.length - 1 ? "Next verb" : "Restart drill"}
+            </button>
           </div>
-          <div className="form-grid">
-            {(["present", "past", "future"] as const).map((key) => (
-              <label key={key} className="field">
-                <span>{key}</span>
-                <input
-                  value={inputs[key]}
-                  onChange={(event) => setInputs((value) => ({ ...value, [key]: event.target.value }))}
-                  className={!checked ? "" : correctness?.[key] ? "ok" : "bad"}
-                />
-                {checked && <small>Answer: {answers[key]}</small>}
-              </label>
-            ))}
-          </div>
-          <div className="quiz-actions">
-            {!checked ? (
-              <button
-                className="primary-button"
-                onClick={() => {
-                  const nextCorrect = Object.entries(answers).every(([key, value]) => inputs[key as keyof typeof inputs].trim() === value);
-                  setChecked(true);
-                  setScore((value) => ({
-                    perfect: value.perfect + (nextCorrect ? 1 : 0),
-                    attempted: value.attempted + 1,
-                  }));
-                }}
-              >
-                Check answers
-              </button>
-            ) : (
-              <button
-                className="primary-button"
-                onClick={() => {
-                  setChecked(false);
-                  setInputs({ present: "", past: "", future: "" });
-                  if (index < queue.length - 1) {
-                    setIndex((value) => value + 1);
-                  } else {
-                    setQueue(shuffle(verbs).slice(0, TYPING_DRILL_LENGTH));
-                    setIndex(0);
-                    setScore({ perfect: 0, attempted: 0 });
-                  }
-                }}
-              >
-                {index < queue.length - 1 ? "Next verb" : "Restart drill"}
-              </button>
-            )}
-          </div>
-        </section>
+        </form>
       </main>
     </div>
   );

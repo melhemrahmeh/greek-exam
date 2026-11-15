@@ -1,185 +1,176 @@
-import type { DeckStats, ReviewCard } from "../../features/study/types";
+import { useState } from "react";
+import type { ReviewCard } from "../../features/study/types";
+import { Icon, ProgressBar } from "../ui";
 
-type RankedDeck = {
-  deckId: string;
+export type ContinueTarget = {
+  title: string;
+  detail: string;
+  onStart: () => void;
+};
+
+export type AreaProgress = {
   label: string;
-  family: string;
-  accuracy: number;
-  stats: DeckStats;
+  passed: number;
+  total: number;
+  percent: number;
+  onOpen: () => void;
 };
 
 type DashboardViewProps = {
+  profileName: string;
+  continueTarget: ContinueTarget;
   overallAccuracy: number;
   totalSessions: number;
   mistakesCount: number;
-  overallCompletionPercent: number;
-  overallPassedUnits: number;
-  overallTotalUnits: number;
-  totalWords: number;
-  categoryCount: number;
-  phraseSectionCount: number;
-  verbsCount: number;
-  totalVerbForms: number;
-  rankedDecks: RankedDeck[];
+  areas: AreaProgress[];
   favorites: ReviewCard[];
   mistakes: ReviewCard[];
-  onStartMixedGrammar: () => void;
-  onOpenVerbs: () => void;
   onOpenFavoritesQuiz: () => void;
   onOpenMistakesQuiz: () => void;
+  onOpenProgress: () => void;
 };
 
 export function DashboardView({
+  profileName,
+  continueTarget,
   overallAccuracy,
   totalSessions,
   mistakesCount,
-  overallCompletionPercent,
-  overallPassedUnits,
-  overallTotalUnits,
-  totalWords,
-  categoryCount,
-  phraseSectionCount,
-  verbsCount,
-  totalVerbForms,
-  rankedDecks,
+  areas,
   favorites,
   mistakes,
-  onStartMixedGrammar,
-  onOpenVerbs,
   onOpenFavoritesQuiz,
   onOpenMistakesQuiz,
+  onOpenProgress,
 }: DashboardViewProps) {
   return (
     <>
-      <section className="dashboard-shell">
-        <article className="dashboard-lead">
-          <span className="mini-label">Study dashboard</span>
-          <h2>Train the exam the way you actually revise</h2>
-          <p>Mix grammar, verbs, vocabulary, phrases, and recovery decks from one place instead of bouncing around disconnected screens.</p>
-          <div className="dashboard-kpis">
-            <div className="dashboard-kpi">
-              <strong>{overallAccuracy}%</strong>
-              <span>overall accuracy</span>
-            </div>
-            <div className="dashboard-kpi">
-              <strong>{totalSessions}</strong>
-              <span>quiz sessions</span>
-            </div>
-            <div className="dashboard-kpi">
-              <strong>{mistakesCount}</strong>
-              <span>cards to recover</span>
-            </div>
-          </div>
-          <div className="completion-card dashboard-completion-card">
-            <div className="completion-head">
-              <div>
-                <span className="mini-label">Overall completion</span>
-                <strong>{overallPassedUnits} / {overallTotalUnits} passed</strong>
-                <p>Study areas count as passed once their best score is above 80%.</p>
-              </div>
-              <div className="completion-percent">{overallCompletionPercent}%</div>
-            </div>
-            <div className="progress-track completion-track">
-              <div className="progress-fill" style={{ width: `${overallCompletionPercent}%` }} />
-            </div>
-          </div>
-          <div className="dashboard-cta-row">
-            <button className="primary-button" onClick={onStartMixedGrammar}>
-              Start mixed quiz
-            </button>
-            <button className="secondary-button" onClick={onOpenVerbs}>
-              Open verb studio
-            </button>
-          </div>
-        </article>
+      <h1 className="visually-hidden">Home</h1>
 
-        <div className="dashboard-side">
-          <article className="stat-panel standout">
-            <span className="mini-label">Coverage</span>
-            <strong>{totalWords}</strong>
-            <p>{categoryCount} vocab categories and {phraseSectionCount} phrase sections ready.</p>
-          </article>
-          <article className="stat-panel">
-            <span className="mini-label">Verb engine</span>
-            <strong>{verbsCount}</strong>
-            <p>{totalVerbForms} forms across present, past, and future drills.</p>
-          </article>
+      <section className="panel continue-card" aria-labelledby="continue-title">
+        <div className="continue-copy">
+          <span className="muted">Hi {profileName.split(" ")[0]}, up next</span>
+          <h2 id="continue-title">{continueTarget.title}</h2>
+          <p className="muted">{continueTarget.detail}</p>
+        </div>
+        <button className="btn btn-primary continue-button" onClick={continueTarget.onStart}>
+          Continue
+        </button>
+      </section>
+
+      <section className="stat-strip" aria-label="Summary">
+        <div className="stat">
+          <strong>{totalSessions ? `${overallAccuracy}%` : "–"}</strong>
+          <span>accuracy</span>
+        </div>
+        <div className="stat">
+          <strong>{totalSessions}</strong>
+          <span>sessions</span>
+        </div>
+        <div className="stat">
+          <strong>{mistakesCount}</strong>
+          <span>cards to review</span>
         </div>
       </section>
 
-      <section className="panel">
-        <div className="split-header">
-          <div>
-            <h3>Deck performance</h3>
-            <p>Every quiz deck, ordered by latest score so it is easy to spot what is strong and what still needs work.</p>
-          </div>
+      <section className="section" aria-labelledby="areas-title">
+        <div className="section-head">
+          <h2 id="areas-title">Your areas</h2>
+          <button className="btn btn-ghost" onClick={onOpenProgress}>
+            <Icon name="chart" width={18} height={18} />
+            All progress
+          </button>
         </div>
-        <div className="list-stack">
-          {rankedDecks.length ? (
-            rankedDecks.map((deck) => (
-              <div key={deck.deckId} className="list-row">
-                <div>
-                  <strong>{deck.label}</strong>
-                  <small>{deck.family} · {deck.stats.sessions} sessions · best {deck.stats.bestScore}%</small>
+        <div className="panel panel-flush">
+          <div className="rows">
+            {areas.map((area) => (
+              <button key={area.label} className="row area-row" onClick={area.onOpen}>
+                <div className="row-main area-main">
+                  <strong>{area.label}</strong>
+                  <ProgressBar value={area.percent} label={`${area.label} progress`} success={area.passed === area.total && area.total > 0} />
                 </div>
-                <span>last {deck.stats.lastScore}% · accuracy {deck.accuracy}%</span>
-              </div>
-            ))
-          ) : (
-            <div className="empty-state">No deck history yet. Once you finish quizzes, they will show up here automatically.</div>
-          )}
+                <span className="row-meta">
+                  {area.passed} / {area.total} passed
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="panel two-column">
-        <div>
-          <div className="split-header">
-            <div>
-              <h3>Favorites</h3>
-              <p>{favorites.length} saved review cards</p>
-            </div>
-            <button className="secondary-button" disabled={!favorites.length} onClick={onOpenFavoritesQuiz}>
-              Study
-            </button>
-          </div>
-          <div className="list-stack compact">
-            {favorites.slice(0, 12).map((card) => (
-              <div key={card.id} className="list-row">
-                <div>
-                  <strong>{card.front}</strong>
-                  <small>{card.source}</small>
-                </div>
-                <span>{card.back}</span>
-              </div>
-            ))}
-            {!favorites.length && <div className="empty-state">Save cards from any quiz to build a custom review deck.</div>}
-          </div>
+      <section className="section" aria-labelledby="review-title">
+        <div className="section-head">
+          <h2 id="review-title">Review</h2>
         </div>
-
-        <div>
-          <div className="split-header">
-            <div>
-              <h3>Mistakes</h3>
-              <p>{mistakes.length} cards to revisit</p>
-            </div>
-            <button className="secondary-button" disabled={!mistakes.length} onClick={onOpenMistakesQuiz}>
-              Recover
-            </button>
-          </div>
-          <div className="list-stack compact">
-            {mistakes.slice(0, 12).map((card) => (
-              <div key={card.id} className="list-row">
-                <div>
-                  <strong>{card.front}</strong>
-                  <small>{card.source}</small>
-                </div>
-                <span>{card.back}</span>
-              </div>
-            ))}
-            {!mistakes.length && <div className="empty-state">Wrong quiz answers will automatically show up here.</div>}
-          </div>
+        <div className="review-grid">
+          <ReviewCardBox
+            title="Favorites"
+            cards={favorites}
+            emptyText="Star a card during any quiz to save it here."
+            onStudy={onOpenFavoritesQuiz}
+          />
+          <ReviewCardBox
+            title="Mistakes"
+            cards={mistakes}
+            emptyText="No mistakes yet. Wrong answers from quizzes land here."
+            onStudy={onOpenMistakesQuiz}
+          />
         </div>
       </section>
     </>
+  );
+}
+
+function ReviewCardBox({
+  title,
+  cards,
+  emptyText,
+  onStudy,
+}: {
+  title: string;
+  cards: ReviewCard[];
+  emptyText: string;
+  onStudy: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const listId = `review-${title.toLowerCase()}`;
+
+  return (
+    <article className="panel review-card">
+      <div className="review-card-head">
+        <div>
+          <h3>{title}</h3>
+          <span className="muted">
+            {cards.length} {cards.length === 1 ? "card" : "cards"}
+          </span>
+        </div>
+        <button className="btn btn-secondary" disabled={!cards.length} onClick={onStudy}>
+          Study
+        </button>
+      </div>
+      {cards.length ? (
+        <>
+          <button className="btn btn-ghost review-toggle" aria-expanded={open} aria-controls={listId} onClick={() => setOpen((v) => !v)}>
+            {open ? "Hide cards" : "Show cards"}
+          </button>
+          {open && (
+            <div id={listId} className="rows review-rows">
+              {cards.slice(0, 12).map((card) => (
+                <div key={card.id} className="row">
+                  <div className="row-main">
+                    <strong>{card.front}</strong>
+                    <small>{card.source}</small>
+                  </div>
+                  <span className="row-end">{card.back}</span>
+                </div>
+              ))}
+              {cards.length > 12 && <p className="muted review-more">+{cards.length - 12} more</p>}
+            </div>
+          )}
+        </>
+      ) : (
+        <p className="muted">{emptyText}</p>
+      )}
+    </article>
   );
 }

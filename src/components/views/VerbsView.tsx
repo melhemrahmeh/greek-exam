@@ -1,26 +1,31 @@
-import { useState } from "react";
 import { tenseGreek, tenseLabels, typeDescriptions } from "../../features/study/constants";
 import { persons, verbs } from "../../features/study/data";
 import { formatPassFail } from "../../features/study/utils";
+import { useState } from "react";
+import { DeckLayout } from "../DeckLayout";
+import { EmptyState, ProgressBar, ScoreBadge, SearchField, Segmented } from "../ui";
 
 const verbTypes = ["All", "A", "B1", "B2", "passive", "irregular"] as const;
 type VerbTypeFilter = (typeof verbTypes)[number];
+type TenseKey = keyof typeof tenseLabels;
+
+type PassFail = { passed: number; failed: number };
 
 type VerbsViewProps = {
   selectedVerb: number | null;
   verbSearch: string;
-  tense: keyof typeof tenseLabels;
+  tense: TenseKey;
   verbMeaningBestScore: number | null;
   verbConjugationBestScore: number | null;
   verbTranslationBestScore: number | null;
-  verbMeaningPassFail: { passed: number; failed: number };
-  verbConjugationPassFail: { passed: number; failed: number };
-  verbTranslationPassFail: { passed: number; failed: number };
+  verbMeaningPassFail: PassFail;
+  verbConjugationPassFail: PassFail;
+  verbTranslationPassFail: PassFail;
   passedVerbDecks: number;
   verbsCompletionPercent: number;
-  onSelectVerb: (index: number) => void;
+  onSelectVerb: (index: number | null) => void;
   onVerbSearchChange: (value: string) => void;
-  onTenseChange: (tense: keyof typeof tenseLabels) => void;
+  onTenseChange: (tense: TenseKey) => void;
   onMeaningQuiz: () => void;
   onTranslationQuiz: () => void;
   onConjugationQuiz: () => void;
@@ -28,9 +33,7 @@ type VerbsViewProps = {
   onOpenTyping: () => void;
 };
 
-function getTypeClassName(type: string) {
-  return `verb-type-badge type-${type.toLowerCase()}`;
-}
+const tenseOptions = (Object.keys(tenseLabels) as TenseKey[]).map((key) => ({ value: key, label: tenseLabels[key] }));
 
 export function VerbsView({
   selectedVerb,
@@ -53,213 +56,178 @@ export function VerbsView({
   onOpenMatch,
   onOpenTyping,
 }: VerbsViewProps) {
-  const meaningPassFailText = formatPassFail(verbMeaningPassFail.passed, verbMeaningPassFail.failed);
-  const conjugationPassFailText = formatPassFail(verbConjugationPassFail.passed, verbConjugationPassFail.failed);
-  const translationPassFailText = formatPassFail(verbTranslationPassFail.passed, verbTranslationPassFail.failed);
   const [typeFilter, setTypeFilter] = useState<VerbTypeFilter>("All");
 
-  const filteredVerbs = verbs.filter((verb) => {
-    if (typeFilter !== "All" && verb.type.toLowerCase() !== typeFilter.toLowerCase()) return false;
-    const query = verbSearch.trim().toLowerCase();
-    if (!query) return true;
-    return verb.inf.toLowerCase().includes(query) || verb.en.toLowerCase().includes(query) || verb.type.toLowerCase().includes(query);
-  });
+  const query = verbSearch.trim().toLowerCase();
+  const filteredVerbs = verbs
+    .map((verb, index) => ({ verb, index }))
+    .filter(({ verb }) => {
+      if (typeFilter !== "All" && verb.type.toLowerCase() !== typeFilter.toLowerCase()) return false;
+      if (!query) return true;
+      return verb.inf.toLowerCase().includes(query) || verb.en.toLowerCase().includes(query) || verb.type.toLowerCase().includes(query);
+    });
 
-  const typeCounts = verbs.reduce<Record<string, number>>((acc, v) => {
-    const key = v.type.toLowerCase();
-    acc[key] = (acc[key] ?? 0) + 1;
-    return acc;
-  }, {});
-
+  const typeOptions = verbTypes.map((type) => ({ value: type, label: type }));
   const selectedVerbData = selectedVerb !== null ? verbs[selectedVerb] : null;
 
   return (
     <>
-      <section className="verb-studio">
-        <div className="completion-card">
-          <div className="completion-head">
-            <div>
-              <span className="mini-label">Verb completion</span>
-              <strong>{passedVerbDecks} / 2 passed</strong>
-              <p>The two quiz decks count as passed once their best score is above 80%.</p>
-            </div>
-            <div className="completion-percent">{verbsCompletionPercent}%</div>
-          </div>
-          <div className="progress-track completion-track">
-            <div className="progress-fill" style={{ width: `${verbsCompletionPercent}%` }} />
-          </div>
+      <div className="page-head">
+        <div>
+          <h1>Verbs</h1>
+          <p>
+            {passedVerbDecks} / 2 core quizzes passed · {verbs.length} verbs
+          </p>
         </div>
+      </div>
+      <ProgressBar value={verbsCompletionPercent} label="Verbs completion" />
 
-        <div className="verb-studio-head">
-          <div>
-            <span className="mini-label">Verb studio</span>
-            <h3>Meanings, conjugation, matching, and quick recall in one place.</h3>
-            <p>Use the best scores to judge whether the deck deserves a retake, then inspect a verb in detail below.</p>
-          </div>
-          <div className="verb-studio-stats">
-            <div className="verb-studio-pill">
-              <strong>{verbs.length}</strong>
-              <span>verbs</span>
-            </div>
-            <div className="verb-studio-pill">
-              <strong>{persons.length}</strong>
-              <span>persons</span>
-            </div>
-            <div className="verb-studio-pill">
-              <strong>{verbMeaningBestScore !== null ? `${verbMeaningBestScore}%` : "--"}</strong>
-              <span>best meaning score</span>
-            </div>
-            <div className="verb-studio-pill">
-              <strong>{verbConjugationBestScore !== null ? `${verbConjugationBestScore}%` : "--"}</strong>
-              <span>best conjugation score</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="verb-action-grid">
-          <button className="verb-action-card action-meaning" onClick={onMeaningQuiz}>
-            <span className="mini-label">Quiz</span>
-            <strong>Verb meanings</strong>
-            <span>Match infinitives to English meanings.</span>
-            <span>{verbMeaningBestScore !== null ? `Best: ${verbMeaningBestScore}%` : "No score yet"}</span>
-            {meaningPassFailText && <span>{meaningPassFailText}</span>}
-          </button>
-          <button className="verb-action-card action-meaning" onClick={onTranslationQuiz}>
-            <span className="mini-label">Quiz</span>
-            <strong>All verb translations</strong>
-            <span>Translate every verb in the deck ({verbs.length} total).</span>
-            <span>{verbTranslationBestScore !== null ? `Best: ${verbTranslationBestScore}%` : "No score yet"}</span>
-            {translationPassFailText && <span>{translationPassFailText}</span>}
-          </button>
-          <button className="verb-action-card action-conjugation" onClick={onConjugationQuiz}>
-            <span className="mini-label">Quiz</span>
-            <strong>Conjugation builder</strong>
-            <span>Pick the exact form for person and tense.</span>
-            <span>{verbConjugationBestScore !== null ? `Best: ${verbConjugationBestScore}%` : "No score yet"}</span>
-            {conjugationPassFailText && <span>{conjugationPassFailText}</span>}
-          </button>
-          <button className="verb-action-card action-match" onClick={onOpenMatch}>
-            <span className="mini-label">Game</span>
-            <strong>Verb matching</strong>
-            <span>Fast pairing drill for pronouns and forms.</span>
-            <span>Pattern recognition</span>
-          </button>
-          <button className="verb-action-card action-typing" onClick={onOpenTyping}>
-            <span className="mini-label">Drill</span>
-            <strong>Typing challenge</strong>
-            <span>Recall first-person forms from memory.</span>
-            <span>Speed + recall</span>
-          </button>
+      <section className="section" aria-labelledby="quizzes-title">
+        <h2 id="quizzes-title" className="group-title">
+          Quizzes
+        </h2>
+        <div className="mode-grid">
+          <ModeCard
+            title="Meanings"
+            description="Match infinitives to their English meaning."
+            score={verbMeaningBestScore}
+            passFail={verbMeaningPassFail}
+            onStart={onMeaningQuiz}
+          />
+          <ModeCard
+            title="All translations"
+            description={`Translate every verb in the deck (${verbs.length}).`}
+            score={verbTranslationBestScore}
+            passFail={verbTranslationPassFail}
+            onStart={onTranslationQuiz}
+          />
+          <ModeCard
+            title="Conjugation"
+            description="Pick the right form for person and tense."
+            score={verbConjugationBestScore}
+            passFail={verbConjugationPassFail}
+            onStart={onConjugationQuiz}
+          />
         </div>
       </section>
 
-      <section className="panel">
-        <div className="split-header">
-          <div>
-            <h3>Verb browser</h3>
-            <p>Search by infinitive, meaning, or type and open any verb for its full forms.</p>
-          </div>
-        </div>
-
-        <input className="search-input" value={verbSearch} onChange={(event) => onVerbSearchChange(event.target.value)} placeholder="Search verbs" />
-
-        <div className="filter-bar">
-          {verbTypes.map((t) => {
-            const count = t === "All" ? verbs.length : (typeCounts[t.toLowerCase()] ?? 0);
-            return (
-              <button
-                key={t}
-                className={typeFilter === t ? "filter-chip active" : "filter-chip"}
-                onClick={() => setTypeFilter(t)}
-              >
-                {t === "All" ? "All" : t}
-                <span className="chip-count">{count}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="verb-results-head">
-          <span className="verb-results-count">{filteredVerbs.length} result(s)</span>
-        </div>
-
-        <div className="verb-browser-grid">
-          {filteredVerbs.map((verb) => {
-            const actualIndex = verbs.findIndex((entry) => entry.inf === verb.inf);
-            return (
-              <button key={verb.inf} className="verb-browser-card" onClick={() => onSelectVerb(actualIndex)}>
-                <div className="verb-browser-top">
-                  <span className={getTypeClassName(verb.type)}>{verb.type}</span>
-                  <span className="verb-browser-link">{selectedVerb === actualIndex ? "Open" : "Inspect"}</span>
-                </div>
-                <strong>{verb.inf}</strong>
-                <small>{verb.en}</small>
-                <div className="verb-browser-preview">
-                  <span>{verb.p[0]}</span>
-                  <span>{verb.pa[0]}</span>
-                  <span>{verb.f[0]}</span>
-                </div>
-              </button>
-            );
-          })}
+      <section className="section" aria-labelledby="games-title">
+        <h2 id="games-title" className="group-title">
+          Games
+        </h2>
+        <div className="mode-grid">
+          <ModeCard title="Matching" description="Pair each pronoun with its verb form." onStart={onOpenMatch} />
+          <ModeCard title="Typing" description="Type present, past and future from memory." onStart={onOpenTyping} />
         </div>
       </section>
 
-      {selectedVerbData && (
-        <section className="panel">
-          <div className="verb-detail-hero">
-            <div className="verb-detail-copy">
-              <span className="mini-label">Selected verb</span>
-              <h3>{selectedVerbData.inf}</h3>
-              <p>{selectedVerbData.en}</p>
-              <div className="verb-detail-glance">
-                <div className="verb-glance-card">
-                  <small>Type</small>
-                  <strong>{selectedVerbData.type}</strong>
-                </div>
-                <div className="verb-glance-card">
-                  <small>Current tense</small>
-                  <strong>{tenseLabels[tense]}</strong>
-                </div>
-                <div className="verb-glance-card">
-                  <small>Greek label</small>
-                  <strong>{tenseGreek[tense]}</strong>
-                </div>
+      <section className="section" aria-labelledby="browser-title">
+        <h2 id="browser-title" className="group-title">
+          Verb browser
+        </h2>
+        <div className="toolbar">
+          <SearchField label="Search" value={verbSearch} placeholder="Infinitive, meaning or type" onChange={onVerbSearchChange} />
+          <Segmented label="Verb type" value={typeFilter} options={typeOptions} onChange={setTypeFilter} />
+        </div>
+
+        <DeckLayout
+          backLabel="All verbs"
+          onBack={() => onSelectVerb(null)}
+          list={
+            filteredVerbs.length ? (
+              <div className="rows">
+                {filteredVerbs.map(({ verb, index }) => (
+                  <button
+                    key={verb.inf}
+                    className="row deck-row"
+                    aria-current={selectedVerb === index ? "true" : undefined}
+                    onClick={() => onSelectVerb(index)}
+                  >
+                    <div className="row-main">
+                      <strong lang="el">{verb.inf}</strong>
+                      <small>{verb.en}</small>
+                    </div>
+                    <span className="badge">{verb.type}</span>
+                  </button>
+                ))}
               </div>
-            </div>
+            ) : (
+              <EmptyState>No verbs match your search.</EmptyState>
+            )
+          }
+          emptyDetail={<EmptyState icon="verb">Pick a verb to see its conjugation.</EmptyState>}
+          detail={
+            selectedVerbData && (
+              <section className="panel deck-panel" aria-labelledby="verb-title">
+                <div className="deck-panel-head">
+                  <div>
+                    <h2 id="verb-title" lang="el">
+                      {selectedVerbData.inf}
+                    </h2>
+                    <span className="muted">{selectedVerbData.en}</span>
+                  </div>
+                  <span className="badge">Type {selectedVerbData.type}</span>
+                </div>
+                <p className="muted prose">{typeDescriptions[selectedVerbData.type] ?? "Use the table below to learn this pattern."}</p>
 
-            <aside className="verb-detail-note">
-              <span className="mini-label">Type note</span>
-              <p>{typeDescriptions[selectedVerbData.type] ?? "Use the conjugation table below to memorize this pattern."}</p>
-            </aside>
-          </div>
+                <div className="tense-row">
+                  <Segmented label="Tense" value={tense} options={tenseOptions} onChange={onTenseChange} />
+                  <span className="muted" lang="el">
+                    {tenseGreek[tense]}
+                  </span>
+                </div>
 
-          <div className="tense-switcher">
-            {(Object.keys(tenseLabels) as Array<keyof typeof tenseLabels>).map((tenseKey) => (
-              <button key={tenseKey} className={tense === tenseKey ? "switch active" : "switch"} onClick={() => onTenseChange(tenseKey)}>
-                {tenseLabels[tenseKey]}
-              </button>
-            ))}
-          </div>
-
-          <table className="verb-table">
-            <thead>
-              <tr>
-                <th>Person</th>
-                <th>{tenseLabels[tense]}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {persons.map((person, index) => (
-                <tr key={`${selectedVerbData.inf}-${person}`}>
-                  <td>{person}</td>
-                  <td>{selectedVerbData[tense][index]}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      )}
+                <table className="conj-table">
+                  <caption className="visually-hidden">
+                    {selectedVerbData.inf}, {tenseLabels[tense]}
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Person</th>
+                      <th scope="col">{tenseLabels[tense]}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {persons.map((person, index) => (
+                      <tr key={`${selectedVerbData.inf}-${person}`}>
+                        <td lang="el">{person}</td>
+                        <td className="greek" lang="el">
+                          {selectedVerbData[tense][index]}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </section>
+            )
+          }
+        />
+      </section>
     </>
+  );
+}
+
+function ModeCard({
+  title,
+  description,
+  score,
+  passFail,
+  onStart,
+}: {
+  title: string;
+  description: string;
+  score?: number | null;
+  passFail?: PassFail;
+  onStart: () => void;
+}) {
+  const passFailText = passFail ? formatPassFail(passFail.passed, passFail.failed) : "";
+  return (
+    <button className="panel mode-card" onClick={onStart}>
+      <span className="mode-card-head">
+        <strong>{title}</strong>
+        {score !== undefined && <ScoreBadge score={score} title={passFailText || undefined} />}
+      </span>
+      <span className="muted">{description}</span>
+    </button>
   );
 }

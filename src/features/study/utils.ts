@@ -1,5 +1,4 @@
-import type { CSSProperties } from "react";
-import { avatarPalettes, examDate } from "./constants";
+import { examDate, PASS_THRESHOLD } from "./constants";
 import { grammar } from "./data";
 import type { DeckStats, QuizSession, ReviewCard, StoredState } from "./types";
 
@@ -143,10 +142,21 @@ export function getInitials(name: string) {
   return name.trim().slice(0, 2).toUpperCase() || "GR";
 }
 
-export function getAvatarStyle(name: string): CSSProperties {
-  const seed = [...name].reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  const [start, end] = avatarPalettes[seed % avatarPalettes.length];
-  return {
-    background: `linear-gradient(135deg, ${start}, ${end})`,
-  };
+export type ScoreState = "new" | "danger" | "warning" | "success";
+
+/** A deck counts as passed once its best score reaches PASS_THRESHOLD (inclusive). */
+export function isPassed(score: number | null | undefined) {
+  return typeof score === "number" && score >= PASS_THRESHOLD;
+}
+
+/** Shared score rule: no attempts → new; < 50 → danger; 50–(threshold-1) → warning; ≥ threshold → success. */
+export function getScoreState(score: number | null | undefined): ScoreState {
+  if (typeof score !== "number") return "new";
+  if (score >= PASS_THRESHOLD) return "success";
+  if (score >= 50) return "warning";
+  return "danger";
+}
+
+export function getScoreClass(score: number | null | undefined) {
+  return `score-${getScoreState(score)}`;
 }

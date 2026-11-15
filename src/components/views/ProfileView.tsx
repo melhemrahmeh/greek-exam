@@ -1,5 +1,6 @@
 import type { DeckStats, ReviewCard, Theme } from "../../features/study/types";
-import { getAvatarStyle, getInitials } from "../../features/study/utils";
+import { getInitials } from "../../features/study/utils";
+import { Icon } from "../ui";
 
 type RankedDeck = {
   deckId: string;
@@ -17,14 +18,11 @@ type ProfileViewProps = {
   needsWorkDeck: RankedDeck | null;
   totalSessions: number;
   overallAccuracy: number;
-  totalCorrect: number;
   favorites: ReviewCard[];
   mistakes: ReviewCard[];
   onToggleTheme: () => void;
   onLogout: () => void;
   onOpenProgress: () => void;
-  onOpenFavoritesQuiz: () => void;
-  onOpenMistakesQuiz: () => void;
   onResetProgress: () => void;
 };
 
@@ -36,107 +34,89 @@ export function ProfileView({
   needsWorkDeck,
   totalSessions,
   overallAccuracy,
-  totalCorrect,
   favorites,
   mistakes,
   onToggleTheme,
   onLogout,
   onOpenProgress,
-  onOpenFavoritesQuiz,
-  onOpenMistakesQuiz,
   onResetProgress,
 }: ProfileViewProps) {
-  const profileInitials = getInitials(profileName);
-  const profileAvatarStyle = getAvatarStyle(profileName);
-
   return (
     <>
-      <section className="panel profile-shell">
-        <div className="profile-card">
-          <div className="profile-hero">
-            <div className="profile-avatar" style={profileAvatarStyle} aria-hidden="true">
-              {profileInitials}
-            </div>
-            <div className="profile-copy">
-              <span className="mini-label">Profile</span>
-              <h3>{profileName}</h3>
-              <p>Progress saved on this device</p>
-            </div>
-          </div>
-          <div className="profile-status-row">
-            <div className="pill">{theme === "dark" ? "Dark mode" : "Light mode"}</div>
-            <div className="pill">{trackedDecks} tracked decks</div>
-          </div>
-          <div className="profile-highlight-row">
-            <div className="profile-highlight">
-              <small>Best deck</small>
-              <strong>{strongestDeck ? `${strongestDeck.stats.bestScore}%` : "--"}</strong>
-              <span>{strongestDeck?.label ?? "Finish a quiz to set your first benchmark."}</span>
-            </div>
-            <div className="profile-highlight">
-              <small>Retake target</small>
-              <strong>{needsWorkDeck ? `${needsWorkDeck.stats.lastScore}%` : "--"}</strong>
-              <span>{needsWorkDeck?.label ?? "Your next weak spot will show up here."}</span>
-            </div>
-          </div>
-          <div className="profile-actions">
-            <button className="secondary-button" onClick={onToggleTheme}>
-              Toggle theme
-            </button>
-            <button className="ghost-button" onClick={onLogout}>
-              Switch user
-            </button>
-          </div>
+      <section className="profile-head">
+        <span className="avatar avatar-lg" aria-hidden="true">
+          {getInitials(profileName)}
+        </span>
+        <div>
+          <h1>{profileName}</h1>
+          <p className="muted">Progress is saved on this device.</p>
         </div>
+        <button className="btn btn-ghost profile-switch" onClick={onLogout}>
+          Switch user
+        </button>
+      </section>
 
-        <div className="profile-summary">
-          <article className="stat-panel">
-            <span className="mini-label">Sessions</span>
-            <strong>{totalSessions}</strong>
-            <p>Total completed quiz runs saved for this profile.</p>
-          </article>
-          <article className="stat-panel">
-            <span className="mini-label">Accuracy</span>
-            <strong>{overallAccuracy}%</strong>
-            <p>{totalCorrect} correct answers recorded so far.</p>
-          </article>
-          <article className="stat-panel">
-            <span className="mini-label">Saved cards</span>
-            <strong>{favorites.length}</strong>
-            <p>Favorites plus mistake recovery are attached to this profile.</p>
-          </article>
+      <section className="stat-strip" aria-label="Your stats">
+        <div className="stat">
+          <strong>{totalSessions}</strong>
+          <span>sessions</span>
+        </div>
+        <div className="stat">
+          <strong>{totalSessions ? `${overallAccuracy}%` : "–"}</strong>
+          <span>accuracy</span>
+        </div>
+        <div className="stat">
+          <strong>{favorites.length}</strong>
+          <span>favorites</span>
+        </div>
+        <div className="stat">
+          <strong>{mistakes.length}</strong>
+          <span>mistakes saved</span>
         </div>
       </section>
 
-      <section className="panel">
-        <div className="split-header">
-          <div>
-            <h3>Profile actions</h3>
-            <p>Quick controls for your study profile.</p>
+      <section className="panel panel-flush" aria-label="Profile">
+        <div className="rows">
+          <div className="row">
+            <div className="row-main">
+              <strong>Best deck</strong>
+              <small>{strongestDeck?.label ?? "Finish a quiz to set a benchmark."}</small>
+            </div>
+            <span className="row-end">{strongestDeck ? `${strongestDeck.stats.bestScore}%` : "–"}</span>
           </div>
+          <div className="row">
+            <div className="row-main">
+              <strong>Retake target</strong>
+              <small>{needsWorkDeck?.label ?? "Your weakest deck will show here."}</small>
+            </div>
+            <span className="row-end">{needsWorkDeck ? `${needsWorkDeck.stats.lastScore}%` : "–"}</span>
+          </div>
+          <button className="row" onClick={onOpenProgress}>
+            <div className="row-main">
+              <strong>Progress</strong>
+              <small>{trackedDecks} tracked decks</small>
+            </div>
+            <span className="row-end">
+              <Icon name="chart" width={18} height={18} />
+            </span>
+          </button>
+          <button className="row" onClick={onToggleTheme}>
+            <div className="row-main">
+              <strong>Theme</strong>
+              <small>{theme === "dark" ? "Dark" : "Light"}</small>
+            </div>
+            <span className="row-end">
+              <Icon name={theme === "dark" ? "sun" : "moon"} width={18} height={18} />
+            </span>
+          </button>
         </div>
-        <div className="dashboard-utility-grid">
-          <button className="mini-card utility-card" onClick={onOpenProgress}>
-            <span className="mini-label">Stats</span>
-            <strong>{trackedDecks}</strong>
-            <span>Open progress board</span>
-          </button>
-          <button className="mini-card utility-card" onClick={onOpenFavoritesQuiz} disabled={!favorites.length}>
-            <span className="mini-label">Review</span>
-            <strong>{favorites.length}</strong>
-            <span>Favorites deck</span>
-          </button>
-          <button className="mini-card utility-card" onClick={onOpenMistakesQuiz} disabled={!mistakes.length}>
-            <span className="mini-label">Recover</span>
-            <strong>{mistakes.length}</strong>
-            <span>Mistakes deck</span>
-          </button>
-          <button className="mini-card utility-card" onClick={onResetProgress}>
-            <span className="mini-label">Reset</span>
-            <strong>0</strong>
-            <span>Clear saved progress</span>
-          </button>
-        </div>
+      </section>
+
+      <section className="danger-zone" aria-label="Danger zone">
+        <button className="btn btn-danger-text" onClick={onResetProgress}>
+          Reset progress
+        </button>
+        <p className="muted">Clears every score, favorite and saved mistake for {profileName}. This can't be undone.</p>
       </section>
     </>
   );

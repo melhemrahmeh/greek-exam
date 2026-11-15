@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import type { QuizAnswer, QuizItem, QuizSession, ReviewCard, Theme } from "../features/study/types";
-import { percent } from "../features/study/utils";
+import type { QuizAnswer, QuizItem, QuizSession, ReviewCard } from "../features/study/types";
+import { getScoreClass, getScoreState, percent } from "../features/study/utils";
+import { FocusBar } from "./FocusBar";
+import { Icon } from "./ui";
 
 type QuizRunnerProps = {
   session: QuizSession;
@@ -9,72 +11,41 @@ type QuizRunnerProps = {
   onClose: () => void;
   onComplete: (deckId: string, answers: QuizAnswer[], items: QuizItem[]) => void;
   onRestart: () => void;
-  onToggleTheme: () => void;
-  theme: Theme;
 };
 
-export function QuizRunner({
-  session,
-  favorites,
-  onToggleFavorite,
-  onClose,
-  onComplete,
-  onRestart,
-  onToggleTheme,
-  theme,
-}: QuizRunnerProps) {
+const summaryLine = {
+  success: "Passed. Nicely done.",
+  warning: "Getting there. One more run should do it.",
+  danger: "Worth another pass. Review the misses first.",
+  new: "",
+};
+
+export function QuizRunner({ session, favorites, onToggleFavorite, onClose, onComplete, onRestart }: QuizRunnerProps) {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswer[]>(() => new Array(session.items.length).fill(null));
   const [showSummary, setShowSummary] = useState(false);
-  const [showMistakeReview, setShowMistakeReview] = useState(false);
+  const [reviewList, setReviewList] = useState<"mistakes" | "flagged" | null>(null);
   const [flagged, setFlagged] = useState<Set<string>>(() => new Set());
-  const [showFlaggedReview, setShowFlaggedReview] = useState(false);
   const submittedRef = useRef(false);
-  const mistakesRef = useRef<HTMLDivElement | null>(null);
-  const flaggedRef = useRef<HTMLDivElement | null>(null);
+  const reviewRef = useRef<HTMLDivElement | null>(null);
+  const nextRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
-    setIndex(0);
-    setAnswers(new Array(session.items.length).fill(null));
-    setShowSummary(false);
-    setShowMistakeReview(false);
-    setShowFlaggedReview(false);
-    setFlagged(new Set());
-    submittedRef.current = false;
-  }, [session]);
+    if (reviewList) reviewRef.current?.scrollIntoView({ block: "start" });
+  }, [reviewList]);
 
-  useEffect(() => {
-    if (showMistakeReview) {
-      mistakesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [showMistakeReview]);
-
-  useEffect(() => {
-    if (showFlaggedReview) {
-      flaggedRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [showFlaggedReview]);
-
+  const total = session.items.length;
   const current = session.items[index];
   const currentAnswer = answers[index];
   const answeredCount = answers.filter(Boolean).length;
   const correctCount = answers.filter((entry) => entry?.correct).length;
-  const isDone = answeredCount === session.items.length;
+  const isDone = answeredCount === total;
+  const isLast = index === total - 1;
   const wrongItems = session.items.filter((_, itemIndex) => !answers[itemIndex]?.correct);
-  const wrongCount = wrongItems.length;
   const flaggedItems = session.items.filter((item) => flagged.has(item.id));
-  const flaggedCount = flaggedItems.length;
-  const scorePercent = percent(correctCount, session.items.length);
-  const isCurrentFlagged = flagged.has(current.id);
-
-  const toggleFlag = (id: string) => {
-    setFlagged((existing) => {
-      const next = new Set(existing);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+  const scorePercent = percent(correctCount, total);
+  const isFavorite = favorites.has(current.review.id);
+  const isFlagged = flagged.has(current.id);
 
   useEffect(() => {
     if (!isDone || submittedRef.current) return;
@@ -82,132 +53,126 @@ export function QuizRunner({
     onComplete(session.deckId, answers, session.items);
   }, [answers, isDone, onComplete, session.deckId, session.items]);
 
-  const selected = currentAnswer?.selected;
+  const answer = (choice: string) => {
+    if (currentAnswer) return;
+    setAnswers((existing) => {
+      const next = [...existing];
+      next[index] = { selected: choice, correct: choice === current.answer };
+      return next;
+    });
+  };
+
+  const goNext = () => {
+    if (!currentAnswer) return;
+    if (isLast) {
+      if (isDone) setShowSummary(true);
+      return;
+    }
+    setIndex((value) => value + 1);
+  };
+
+  const toggleFlag = () => {
+    setFlagged((existing) => {
+      const next = new Set(existing);
+      if (next.has(current.id)) next.delete(current.id);
+      else next.add(current.id);
+      return next;
+    });
+  };
+
+  // Move focus to Next once answered, so Enter / Space continue naturally.
+  useEffect(() => {
+    if (currentAnswer && !showSummary) nextRef.current?.focus();
+  }, [currentAnswer, showSummary]);
+
+  // Keyboard: 1–4 answer, Enter next, Esc close.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+      if (showSummary) return;
+      const number = Number(event.key);
+      if (Number.isInteger(number) && number >= 1 && number <= current.choices.length) {
+        event.preventDefault();
+        answer(current.choices[number - 1]);
+        return;
+      }
+      if (event.key === "Enter" && currentAnswer && document.activeElement !== nextRef.current) {
+        event.preventDefault();
+        goNext();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
 
   if (isDone && showSummary) {
+    const state = getScoreState(scorePercent);
+    const reviewItems = reviewList === "flagged" ? flaggedItems : wrongItems;
+
     return (
       <div className="app-shell">
-        <section className="quiz-header">
-          <div className="quiz-header-top">
-            <button className="ghost-button" onClick={onClose}>
-              {"\u2190"} Back
-            </button>
-            <button className="theme-button" onClick={onToggleTheme} aria-label="Toggle theme">
-              {theme === "dark" ? "\u2600" : "\u263E"}
-            </button>
-          </div>
-          <div className="quiz-head-meta">
-            <span className="eyebrow">Quiz completed</span>
-            {session.subtitle && <span className="quiz-subline">{session.subtitle}</span>}
-          </div>
-          <h1 className="quiz-title">{session.title}</h1>
-        </section>
-        <main className="content">
-          <section className="panel quiz-summary">
-            <div className="summary-hero">
-              <span className="mini-label">Final result</span>
-              <h2>{scorePercent}% score</h2>
-              <p>
-                {correctCount} correct out of {session.items.length}.{" "}
-                {wrongCount ? "You have a few useful review targets below." : "Clean run. Nicely done."}
-              </p>
-            </div>
-
-            <div className="summary-metrics">
-              <div className="quiz-stat">
-                Correct <strong>{correctCount}</strong>
-              </div>
-              <div className="quiz-stat">
-                Missed <strong>{wrongCount}</strong>
-              </div>
-              <div className="quiz-stat">
-                Flagged <strong>{flaggedCount}</strong>
-              </div>
-              <div className="quiz-stat">
-                Accuracy <strong>{scorePercent}%</strong>
-              </div>
-            </div>
-
+        <FocusBar onClose={onClose} title={session.title} />
+        <main className="container content focus-content">
+          <section className="panel summary" aria-labelledby="summary-title">
+            <span className="muted">{session.title}</span>
+            <h1 id="summary-title" className={`summary-score ${getScoreClass(scorePercent)}`}>
+              {scorePercent}%
+            </h1>
+            <p>
+              {correctCount} of {total} correct. {summaryLine[state]}
+            </p>
             <div className="summary-actions">
+              {wrongItems.length > 0 && (
+                <button className="btn btn-primary" onClick={() => setReviewList("mistakes")}>
+                  Review mistakes ({wrongItems.length})
+                </button>
+              )}
               <button
-                className="primary-button"
+                className={wrongItems.length ? "btn btn-secondary" : "btn btn-primary"}
                 onClick={() => {
-                  setShowMistakeReview(false);
-                  setShowFlaggedReview(false);
+                  setReviewList(null);
                   onRestart();
                 }}
               >
-                Retry quiz
+                Retry
               </button>
-              <button
-                className="secondary-button"
-                disabled={!wrongCount}
-                onClick={() => setShowMistakeReview(true)}
-              >
-                Review mistakes
-              </button>
-              <button
-                className="secondary-button"
-                disabled={!flaggedCount}
-                onClick={() => setShowFlaggedReview(true)}
-              >
-                Review flagged
-              </button>
-              <button className="ghost-button" onClick={onClose}>
-                Back to app
+              {flaggedItems.length > 0 && (
+                <button className="btn btn-secondary" onClick={() => setReviewList("flagged")}>
+                  Flagged ({flaggedItems.length})
+                </button>
+              )}
+              <button className="btn btn-ghost" onClick={onClose}>
+                Done
               </button>
             </div>
+          </section>
 
-            {showMistakeReview && (
-              <div ref={mistakesRef} className="summary-list">
-                <div className="split-header">
-                  <div>
-                    <h3>Mistakes list</h3>
-                    <p>Your missed prompts are listed here with the correct answers.</p>
-                  </div>
-                </div>
-                {wrongItems.map((item) => (
-                  <div key={item.id} className="list-row summary-row">
-                    <div>
-                      <strong>{item.prompt}</strong>
-                      <small>{item.detail ?? item.review.source}</small>
-                    </div>
-                    <span>{item.answer}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {showFlaggedReview && flaggedCount > 0 && (
-              <div ref={flaggedRef} className="summary-list">
-                <div className="split-header">
-                  <div>
-                    <h3>Flagged for review</h3>
-                    <p>The prompts you flagged during the run, with their correct answers.</p>
-                  </div>
-                </div>
-                {flaggedItems.map((item) => {
-                  const itemIndex = session.items.indexOf(item);
-                  const wasCorrect = answers[itemIndex]?.correct;
+          {reviewList && (
+            <section ref={reviewRef} className="panel panel-flush" aria-label={reviewList === "flagged" ? "Flagged cards" : "Mistakes"}>
+              <div className="rows">
+                {reviewItems.map((item) => {
+                  const wasCorrect = answers[session.items.indexOf(item)]?.correct;
                   return (
-                    <div key={item.id} className="list-row summary-row">
-                      <div>
+                    <div key={item.id} className="row">
+                      <div className="row-main">
                         <strong>{item.prompt}</strong>
                         <small>
-                          {item.detail ?? item.review.source} &middot; {wasCorrect ? "answered correctly" : "missed"}
+                          {item.detail ?? item.review.source}
+                          {reviewList === "flagged" && (wasCorrect ? " · correct" : " · missed")}
                         </small>
                       </div>
-                      <span>{item.answer}</span>
+                      <span className="row-end">{item.answer}</span>
                     </div>
                   );
                 })}
               </div>
-            )}
-
-            {!wrongCount && (
-              <div className="empty-state">No mistakes in this run. Try another deck or increase the challenge.</div>
-            )}
-          </section>
+            </section>
+          )}
         </main>
       </div>
     );
@@ -215,113 +180,90 @@ export function QuizRunner({
 
   return (
     <div className="app-shell">
-      <section className="quiz-header">
-        <div className="quiz-header-top">
-          <button className="ghost-button" onClick={onClose}>
-            {"\u2190"} Back
-          </button>
-          <button className="theme-button" onClick={onToggleTheme} aria-label="Toggle theme">
-            {theme === "dark" ? "\u2600" : "\u263E"}
-          </button>
-        </div>
-        <div className="quiz-head-meta">
-          <span className="eyebrow">
-            {index + 1} of {session.items.length}
-          </span>
-          {session.subtitle && <span className="quiz-subline">{session.subtitle}</span>}
-        </div>
-        <h1 className="quiz-title">{session.title}</h1>
-      </section>
-      <main className="content">
-        <section className="panel quiz-panel">
-          <div className="quiz-toolbar quiz-toolbar-top">
-            <div className="quiz-stat">
-              Correct <strong>{correctCount}</strong>
-            </div>
-            <div className="quiz-stat">
-              Answered <strong>{answeredCount}</strong>
-            </div>
+      <FocusBar
+        onClose={onClose}
+        closeLabel="Close quiz"
+        progress={{ current: index + 1, total }}
+        actions={
+          <>
             <button
-              className={favorites.has(current.review.id) ? "pill favorite active" : "pill favorite"}
+              className="icon-button"
+              aria-pressed={isFlagged}
+              aria-label={isFlagged ? "Unflag question" : "Flag question for review"}
+              title={isFlagged ? "Flagged" : "Flag for review"}
+              onClick={toggleFlag}
+            >
+              <Icon name={isFlagged ? "flag-filled" : "flag"} />
+            </button>
+            <button
+              className="icon-button"
+              aria-pressed={isFavorite}
+              aria-label={isFavorite ? "Remove from favorites" : "Save to favorites"}
+              title={isFavorite ? "Saved to favorites" : "Save to favorites"}
               onClick={() => onToggleFavorite(current.review)}
             >
-              {favorites.has(current.review.id) ? "\u2605 Saved" : "\u2606 Save"}
+              <Icon name={isFavorite ? "star-filled" : "star"} />
             </button>
-            <button
-              className={isCurrentFlagged ? "pill flag active" : "pill flag"}
-              onClick={() => toggleFlag(current.id)}
-              aria-pressed={isCurrentFlagged}
-            >
-              {isCurrentFlagged ? "\u2691 Flagged" : "\u2690 Flag"}
-            </button>
-          </div>
+          </>
+        }
+      />
+      <main className="container content focus-content quiz">
+        <div key={current.id} className="quiz-prompt">
+          {current.detail && <span className="muted">{current.detail}</span>}
+          <h1>{current.prompt}</h1>
+        </div>
 
-          <div className="progress-track">
-            <div className="progress-fill" style={{ width: `${((index + 1) / session.items.length) * 100}%` }} />
-          </div>
+        <div className="choices" role="group" aria-label="Answer choices">
+          {current.choices.map((choice, choiceIndex) => {
+            const revealed = Boolean(currentAnswer);
+            const isCorrect = choice === current.answer;
+            const isSelected = currentAnswer?.selected === choice;
+            const state = revealed && isCorrect ? "correct" : revealed && isSelected ? "wrong" : "";
+            return (
+              <button
+                key={choice}
+                className={state ? `choice ${state}` : "choice"}
+                disabled={revealed && !state}
+                aria-disabled={revealed}
+                onClick={() => answer(choice)}
+              >
+                <span className="choice-key" aria-hidden="true">
+                  {choiceIndex + 1}
+                </span>
+                <span className="choice-text">{choice}</span>
+                {state === "correct" && (
+                  <span className="choice-mark">
+                    <Icon name="check" />
+                    <span className="visually-hidden">Correct answer</span>
+                  </span>
+                )}
+                {state === "wrong" && (
+                  <span className="choice-mark">
+                    <Icon name="x" />
+                    <span className="visually-hidden">Your answer, wrong</span>
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
 
-          <div key={current.id} className="question-stage">
-            <div className="prompt-card">
-              <div className="prompt-label-row">
-                <span className="mini-label">Prompt</span>
-                {current.detail && <span className="prompt-detail">{current.detail}</span>}
-              </div>
-              <h2>{current.prompt}</h2>
-            </div>
+        <p className="quiz-feedback" aria-live="polite">
+          {currentAnswer
+            ? currentAnswer.correct
+              ? "Correct."
+              : `Not quite. The answer is “${current.answer}”.`
+            : <span className="muted">Press 1–{current.choices.length} to answer</span>}
+        </p>
 
-            <div className="choice-grid">
-              {current.choices.map((choice, choiceIndex) => {
-                const revealed = Boolean(currentAnswer);
-                const isCorrect = choice === current.answer;
-                const isSelected = selected === choice;
-                const className = [
-                  "choice-card",
-                  revealed && isCorrect ? "correct" : "",
-                  revealed && isSelected && !isCorrect ? "wrong" : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ");
-
-                return (
-                  <button
-                    key={choice}
-                    className={className}
-                    onClick={() => {
-                      if (currentAnswer) return;
-                      const nextAnsweredCount = answeredCount + 1;
-                      if (nextAnsweredCount === session.items.length) {
-                        setShowSummary(true);
-                      }
-                      setAnswers((existing) => {
-                        const next = [...existing];
-                        next[index] = { selected: choice, correct: isCorrect };
-                        return next;
-                      });
-                    }}
-                  >
-                    <span className="choice-index">{String.fromCharCode(65 + choiceIndex)}</span>
-                    <span className="choice-text">{choice}</span>
-                    {revealed && isCorrect && <strong>{"\u2713"}</strong>}
-                    {revealed && isSelected && !isCorrect && <strong>{"\u2715"}</strong>}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="quiz-actions">
-            <button className="secondary-button" disabled={index === 0} onClick={() => setIndex((value) => value - 1)}>
-              Previous
-            </button>
-            <button
-              className="primary-button"
-              disabled={!currentAnswer}
-              onClick={() => setIndex((value) => Math.min(session.items.length - 1, value + 1))}
-            >
-              {index === session.items.length - 1 ? "Finish quiz" : "Next"}
-            </button>
-          </div>
-        </section>
+        <div className="quiz-footer">
+          <button className="btn btn-ghost" disabled={index === 0} onClick={() => setIndex((value) => value - 1)}>
+            Previous
+          </button>
+          <button ref={nextRef} className="btn btn-primary quiz-next" disabled={!currentAnswer} onClick={goNext}>
+            {isLast ? "See results" : "Next"}
+          </button>
+        </div>
       </main>
     </div>
   );

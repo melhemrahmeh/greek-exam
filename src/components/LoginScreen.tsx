@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { AppHeader } from "./AppHeader";
 import type { Theme } from "../features/study/types";
+import { ThemeToggle } from "./AppHeader";
 
 type LoginScreenProps = {
   theme: Theme;
@@ -19,31 +19,23 @@ export function LoginScreen({ theme, onLogin, onToggleTheme }: LoginScreenProps)
   };
 
   return (
-    <div className="app-shell">
-      <AppHeader
-        title="Greek Exam Studio"
-        subtitle="Enter your name to keep your study progress, saved cards, and history on this device."
-        eyebrow="Personal study space"
-        onToggleTheme={onToggleTheme}
-        theme={theme}
-      />
-      <main className="content">
-        <section className="panel auth-panel">
-          <div>
-            <h3>Who's studying?</h3>
-            <p>Progress is saved in this browser under your name. Use the same name to pick up where you left off.</p>
-          </div>
-
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <label className="field">
-              <span>Name</span>
-              <input type="text" value={name} onChange={(event) => setName(event.target.value)} placeholder="Your name" autoFocus />
-            </label>
-            <button className="primary-button" type="submit" disabled={!trimmed}>
-              Start studying
-            </button>
-          </form>
-        </section>
+    <div className="login-shell">
+      <div className="login-theme">
+        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+      </div>
+      <main className="panel login-card">
+        <span className="app-name">Greek Exam Studio</span>
+        <h1>Who's studying?</h1>
+        <form className="login-form" onSubmit={handleSubmit}>
+          <label className="field">
+            <span className="field-label">Your name</span>
+            <input className="input" type="text" value={name} onChange={(event) => setName(event.target.value)} autoComplete="given-name" autoFocus />
+          </label>
+          <button className="btn btn-primary btn-block" type="submit" disabled={!trimmed}>
+            Start studying
+          </button>
+        </form>
+        <p className="muted login-note">Progress stays on this device. Use the same name to pick up where you left off.</p>
       </main>
     </div>
   );

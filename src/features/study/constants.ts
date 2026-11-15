@@ -27,11 +27,3 @@ export const emptyStoredState: StoredState = {
   favorites: [],
   mistakes: [],
 };
-
-export const avatarPalettes = [
-  ["#126b78", "#2f92a0"],
-  ["#c9812f", "#e0a14a"],
-  ["#1f7a58", "#3fa67f"],
-  ["#8a4138", "#c5665b"],
-  ["#4450b8", "#6777db"],
-] as const;

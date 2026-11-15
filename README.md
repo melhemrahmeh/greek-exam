@@ -8,7 +8,7 @@ The app is designed around actual exam revision rather than isolated flashcards.
 
 Main features:
 
-- `Dashboard` with quick stats, review shortcuts, and deck performance
+- `Home` with a "Continue" recommendation, quick stats, area progress, and review shortcuts
 - `Vocab` categories such as family, numbers, food, etc.
 - Best score shown for each vocab category so you can decide whether to retake it
 - `Verbs` studio with:
@@ -18,7 +18,7 @@ Main features:
   - typing challenge
 - `Grammar` topic browser plus mixed grammar quizzes
 - `Phrases` phrasebook sections with section-specific or mixed quizzes
-- `Progress` board with overall and per-family stats
+- `Progress` page (from Home or Profile) with overall stats and deck performance grouped by area
 - `Profile` access in the header, not the navbar
 - Generated avatar based on the entered name
 - Saved `favorites` and `mistakes` decks
@@ -31,7 +31,7 @@ Main features:
 - `TypeScript`
 - `Vite`
 - `localStorage` for persisted progress
-- Plain CSS in `src/App.css`
+- Plain CSS in `src/styles/` (tokens, base, components, one file per screen)
 
 ## Scripts
 
@@ -112,8 +112,13 @@ src/
       utils.ts
   lib/
     storage.ts
+  styles/
+    index.css
+    tokens.css
+    base.css
+    components.css
+    screens/
   App.tsx
-  App.css
   main.tsx
 ```
 
@@ -325,14 +330,16 @@ type StoredState = {
 
 ## Styling
 
-Most styling is in [src/App.css](/abs/path/c:/Users/es/Desktop/Greek/greek-exam/src/App.css:1).
+Styles live in [src/styles/](src/styles/), loaded through `src/styles/index.css`.
 
 The styling approach is:
 
-- CSS custom properties for theme colors
-- one shared file for layout and component styling
-- responsive grid-based layouts
+- all colors are tokens in `tokens.css` (no color literals elsewhere)
+- flat surfaces: borders for structure, a shadow only for floating UI
+- color carries meaning: brand for interactive, green / amber / red only for score state
 - light and dark theme variants via `data-theme`
+- fixed bottom navigation on screens of 680px or narrower
+- `prefers-reduced-motion` turns off transitions
 
 ## Build Notes
 
@@ -369,7 +376,6 @@ These are realistic next steps that fit the current codebase without requiring a
 
 - Extract progress load/save logic into a hook like `useStoredProgress`.
 - Extract derived stats like `rankedDecks`, `familyStats`, and overall accuracy into a hook like `useProgressMetrics`.
-- Split `src/App.css` into smaller feature-based style files if it grows further.
 - Add unit tests for helpers like `getBestScore`, `formatDeckLabel`, `normalizeStoredState`, and quiz builders.
 
 ### Performance improvements

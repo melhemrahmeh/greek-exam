@@ -1,0 +1,63 @@
+/* Games */
+
+.match-score {
+  display: flex;
+  gap: var(--space-4);
+  font-weight: 600;
+}
+
+.match-score span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.match-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.match-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.match-chip {
+  min-height: 48px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: var(--fs-md);
+  transition: border-color var(--transition), background-color var(--transition);
+}
+
+.match-chip:hover:not(:disabled) {
+  border-color: var(--brand);
+}
+
+.match-chip.selected {
+  border: 2px solid var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.match-chip.resolved {
+  border-color: var(--success);
+  background: var(--success-soft);
+  color: var(--success);
+  cursor: default;
+}
+
+.typing-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.typing-form .input {
+  font-size: var(--fs-lg);
+  min-height: 52px;
+}

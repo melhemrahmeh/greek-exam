@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { phraseSections } from "../../features/study/data";
-import { formatPassFail } from "../../features/study/utils";
+import { DeckLayout, DeckRow } from "../DeckLayout";
+import { EmptyState, ProgressBar, ScoreBadge, SearchField } from "../ui";
 
 type PhrasesViewProps = {
   openPhrase: string | null;
@@ -9,7 +10,7 @@ type PhrasesViewProps = {
   phrasesCompletionPercent: number;
   phraseSectionBestScores: Record<string, number | null>;
   phraseSectionPassFail: Record<string, { passed: number; failed: number }>;
-  onTogglePhrase: (title: string) => void;
+  onSelectPhrase: (title: string | null) => void;
   onBuildPhraseQuiz: (direction: "gr-en" | "en-gr", sectionTitle?: string) => void;
 };
 
@@ -20,124 +21,112 @@ export function PhrasesView({
   phrasesCompletionPercent,
   phraseSectionBestScores,
   phraseSectionPassFail,
-  onTogglePhrase,
+  onSelectPhrase,
   onBuildPhraseQuiz,
 }: PhrasesViewProps) {
   const [search, setSearch] = useState("");
 
   const normalizedSearch = search.trim().toLowerCase();
+  const matchesSearch = (item: { gr: string; en: string }) =>
+    item.gr.toLowerCase().includes(normalizedSearch) || item.en.toLowerCase().includes(normalizedSearch);
+
   const filteredSections = normalizedSearch
-    ? phraseSections
-        .map((section) => ({
-          ...section,
-          items: section.items.filter(
-            (item) =>
-              item.gr.toLowerCase().includes(normalizedSearch) ||
-              item.en.toLowerCase().includes(normalizedSearch)
-          ),
-        }))
-        .filter((section) => section.items.length > 0 || section.title.toLowerCase().includes(normalizedSearch))
+    ? phraseSections.filter((section) => section.title.toLowerCase().includes(normalizedSearch) || section.items.some(matchesSearch))
     : phraseSections;
 
-  const totalPhrases = phraseSections.reduce((sum, s) => sum + s.items.length, 0);
+  const selected = openPhrase ? phraseSections.find((section) => section.title === openPhrase) ?? null : null;
+  const selectedItems =
+    selected && normalizedSearch && !selected.title.toLowerCase().includes(normalizedSearch)
+      ? selected.items.filter(matchesSearch)
+      : (selected?.items ?? []);
 
   return (
     <>
-      <section className="panel">
-        <div className="split-header">
-          <div>
-            <h3>Phrasebook</h3>
-            <p>Practice a section on its own or launch a mixed phrase quiz across the whole phrasebook.</p>
-          </div>
-          <div className="phrase-actions">
-            <button className="primary-button" onClick={() => onBuildPhraseQuiz("gr-en")}>
-              Mixed Greek to English
-            </button>
-            <button className="secondary-button" onClick={() => onBuildPhraseQuiz("en-gr")}>
-              Mixed English to Greek
-            </button>
-          </div>
+      <div className="page-head">
+        <div>
+          <h1>Phrases</h1>
+          <p>
+            {passedPhraseSections} / {totalPhraseSections} sections passed
+          </p>
         </div>
+        <div className="btn-row">
+          <button className="btn btn-secondary" onClick={() => onBuildPhraseQuiz("gr-en")}>
+            Mixed GR → EN
+          </button>
+          <button className="btn btn-secondary" onClick={() => onBuildPhraseQuiz("en-gr")}>
+            Mixed EN → GR
+          </button>
+        </div>
+      </div>
+      <ProgressBar value={phrasesCompletionPercent} label="Phrases completion" />
 
-        <div className="completion-card">
-          <div className="completion-head">
-            <div>
-              <span className="mini-label">Phrase completion</span>
-              <strong>{passedPhraseSections} / {totalPhraseSections} passed</strong>
-              <p>A phrase section counts as passed once your best section score is above 80%.</p>
+      <div className="toolbar">
+        <SearchField label="Search" value={search} placeholder="Phrases in Greek or English" onChange={setSearch} />
+      </div>
+
+      <DeckLayout
+        backLabel="All sections"
+        onBack={() => onSelectPhrase(null)}
+        list={
+          filteredSections.length ? (
+            <div className="rows">
+              {filteredSections.map((section) => {
+                const matchCount = normalizedSearch ? section.items.filter(matchesSearch).length : 0;
+                return (
+                  <DeckRow
+                    key={section.title}
+                    title={`${section.icon} ${section.title}`}
+                    meta={normalizedSearch ? `${matchCount} matching` : `${section.items.length} phrases`}
+                    score={phraseSectionBestScores[section.title] ?? null}
+                    passFail={phraseSectionPassFail[section.title]}
+                    active={openPhrase === section.title}
+                    onSelect={() => onSelectPhrase(section.title)}
+                  />
+                );
+              })}
             </div>
-            <div className="completion-percent">{phrasesCompletionPercent}%</div>
-          </div>
-          <div className="progress-track completion-track">
-            <div className="progress-fill" style={{ width: `${phrasesCompletionPercent}%` }} />
-          </div>
-        </div>
-      </section>
-
-      <section className="panel">
-        <input
-          className="search-input"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search phrases in Greek or English"
-        />
-        <div style={{ display: "flex", gap: 12, marginTop: 10, color: "var(--text-muted)", fontSize: "0.86rem", fontWeight: 700 }}>
-          <span>{phraseSections.length} sections</span>
-          <span>{totalPhrases} phrases</span>
-          {normalizedSearch && <span>{filteredSections.reduce((s, sec) => s + sec.items.length, 0)} matches</span>}
-        </div>
-
-        <div className="accordion-list">
-          {filteredSections.map((section) => {
-            const isOpen = openPhrase === section.title || !!normalizedSearch;
-            const bestScore = phraseSectionBestScores[section.title];
-            const passFail = phraseSectionPassFail[section.title] ?? { passed: 0, failed: 0 };
-            const passFailText = formatPassFail(passFail.passed, passFail.failed);
-
-            return (
-              <article key={section.title} className="accordion-card">
-                <button className="accordion-toggle" onClick={() => onTogglePhrase(section.title)}>
-                  <span>
-                    {section.icon} {section.title}
-                    <span className="word-count-badge" style={{ marginLeft: 8 }}>{section.items.length}</span>
-                    {passFailText && (
-                      <span className="word-count-badge" style={{ marginLeft: 8 }}>{passFailText}</span>
-                    )}
-                  </span>
-                  <span>{bestScore !== null ? `best ${bestScore}%` : isOpen && !normalizedSearch ? "Hide" : "Show"}</span>
+          ) : (
+            <EmptyState>No phrases match “{search}”.</EmptyState>
+          )
+        }
+        emptyDetail={<EmptyState icon="chat">Pick a section to see its phrases and start a quiz.</EmptyState>}
+        detail={
+          selected && (
+            <section className="panel deck-panel" aria-labelledby="deck-title">
+              <div className="deck-panel-head">
+                <div>
+                  <h2 id="deck-title">
+                    {selected.icon} {selected.title}
+                  </h2>
+                  <span className="muted">{selected.items.length} phrases</span>
+                </div>
+                <ScoreBadge score={phraseSectionBestScores[selected.title] ?? null} />
+              </div>
+              <div className="btn-row direction-buttons">
+                <button className="btn btn-primary" onClick={() => onBuildPhraseQuiz("gr-en", selected.title)}>
+                  Greek → English
                 </button>
-                {isOpen && (
-                  <div className="phrase-list">
-                    {!normalizedSearch && (
-                      <div className="phrase-actions">
-                        <button className="primary-button" onClick={() => onBuildPhraseQuiz("gr-en", section.title)}>
-                          Greek to English
-                        </button>
-                        <button className="secondary-button" onClick={() => onBuildPhraseQuiz("en-gr", section.title)}>
-                          English to Greek
-                        </button>
-                      </div>
-                    )}
-                    {section.items.map((item, i) => (
-                      <div key={`${section.title}-${item.gr}`} className="phrase-row">
-                        <div style={{ display: "flex", alignItems: "center" }}>
-                          <span className="phrase-row-index">{i + 1}</span>
-                          <div>
-                            <strong>{item.gr}</strong>
-                            <small>{item.note ?? section.title}</small>
-                          </div>
-                        </div>
-                        <span>{item.en}</span>
-                      </div>
-                    ))}
+                <button className="btn btn-secondary" onClick={() => onBuildPhraseQuiz("en-gr", selected.title)}>
+                  English → Greek
+                </button>
+              </div>
+              <div className="rows phrase-rows">
+                {selectedItems.map((item) => (
+                  <div key={`${selected.title}-${item.gr}`} className="row phrase-row">
+                    <div className="row-main">
+                      <strong className="greek" lang="el">
+                        {item.gr}
+                      </strong>
+                      {item.note && <small>{item.note}</small>}
+                    </div>
+                    <span className="phrase-en">{item.en}</span>
                   </div>
-                )}
-              </article>
-            );
-          })}
-          {!filteredSections.length && <div className="empty-state">No phrases match your search.</div>}
-        </div>
-      </section>
+                ))}
+              </div>
+            </section>
+          )
+        }
+      />
     </>
   );
 }

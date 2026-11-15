@@ -1,11 +1,9 @@
-import { getAvatarStyle, getInitials } from "../features/study/utils";
+import { getInitials } from "../features/study/utils";
 import type { Theme } from "../features/study/types";
+import { Icon } from "./ui";
 
 type AppHeaderProps = {
-  title: string;
-  subtitle?: string;
-  eyebrow?: string;
-  onBack?: () => void;
+  daysToExam?: number;
   onToggleTheme: () => void;
   onOpenProfile?: () => void;
   profileName?: string;
@@ -13,52 +11,42 @@ type AppHeaderProps = {
   theme: Theme;
 };
 
-export function AppHeader({
-  title,
-  subtitle,
-  eyebrow,
-  onBack,
-  onToggleTheme,
-  onOpenProfile,
-  profileName,
-  profileActive,
-  theme,
-}: AppHeaderProps) {
+export function AppHeader({ daysToExam, onToggleTheme, onOpenProfile, profileName, profileActive, theme }: AppHeaderProps) {
   return (
-    <header className="hero">
-      <div className="hero-topline">
-        {onBack ? (
-          <button className="ghost-button" onClick={onBack}>
-            {"\u2190"} Back
-          </button>
-        ) : (
-          <span className="brand-chip">Greek A2 Builder</span>
-        )}
-        <div className="hero-actions">
+    <header className="app-header">
+      <div className="container">
+        <span className="app-name">Greek Exam Studio</span>
+        <div className="header-actions">
+          {typeof daysToExam === "number" && daysToExam > 0 && (
+            <span className="countdown-chip">
+              {daysToExam} {daysToExam === 1 ? "day" : "days"} to exam
+            </span>
+          )}
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
           {profileName && onOpenProfile && (
             <button
-              className={profileActive ? "header-profile-button active" : "header-profile-button"}
+              className="avatar-button"
               onClick={onOpenProfile}
-              aria-label="Open profile"
+              aria-label={`Profile: ${profileName}`}
+              aria-current={profileActive ? "page" : undefined}
               title={profileName}
             >
-              <span className="header-profile-avatar" style={getAvatarStyle(profileName)} aria-hidden="true">
+              <span className="avatar" aria-hidden="true">
                 {getInitials(profileName)}
-              </span>
-              <span className="header-profile-copy">
-                <strong>Profile</strong>
-                <small>{profileName}</small>
               </span>
             </button>
           )}
-          <button className="theme-button" onClick={onToggleTheme} aria-label="Toggle theme">
-            {theme === "dark" ? "\u2600" : "\u263E"}
-          </button>
         </div>
       </div>
-      {eyebrow && <div className="eyebrow">{eyebrow}</div>}
-      <h1>{title}</h1>
-      {subtitle && <p>{subtitle}</p>}
     </header>
+  );
+}
+
+export function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
+  const next = theme === "dark" ? "light" : "dark";
+  return (
+    <button className="icon-button" onClick={onToggle} aria-label={`Switch to ${next} theme`} title={`Switch to ${next} theme`}>
+      <Icon name={theme === "dark" ? "sun" : "moon"} />
+    </button>
   );
 }

@@ -1,0 +1,34 @@
+/* Profile */
+
+.profile-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.profile-head h1 {
+  font-size: var(--fs-xl);
+}
+
+.profile-switch {
+  margin-left: auto;
+}
+
+.danger-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border);
+}
+
+.danger-zone .btn {
+  margin-left: calc(var(--space-4) * -1);
+}
+
+.danger-zone p {
+  font-size: var(--fs-sm);
+}

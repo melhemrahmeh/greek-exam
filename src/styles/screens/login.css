@@ -1,0 +1,42 @@
+/* Login */
+
+.login-shell {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: var(--space-4);
+}
+
+.login-theme {
+  position: fixed;
+  top: var(--space-2);
+  right: var(--space-2);
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 400px;
+  padding: var(--space-7) var(--space-6);
+}
+
+.login-card .app-name {
+  color: var(--brand);
+  font-size: var(--fs-sm);
+}
+
+.login-card h1 {
+  font-size: var(--fs-xl);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.login-note {
+  font-size: var(--fs-sm);
+}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { VocabEntry } from "../../features/study/types";
-import { formatPassFail } from "../../features/study/utils";
+import { DeckLayout, DeckRow } from "../DeckLayout";
+import { EmptyState, ProgressBar, ScoreBadge, SearchField, Segmented } from "../ui";
 
 type VocabSort = "default" | "az" | "score" | "words";
 
@@ -13,17 +14,19 @@ type VocabViewProps = {
   completionPercent: number;
   selectedCategory: string | null;
   vocabSearch: string;
-  onSelectCategory: (category: string) => void;
+  onSelectCategory: (category: string | null) => void;
   onVocabSearchChange: (value: string) => void;
   onStartQuiz: (category: string, direction: "gr-en" | "en-gr") => void;
 };
 
-const sortOptions: { key: VocabSort; label: string }[] = [
-  { key: "default", label: "Default" },
-  { key: "az", label: "A \u2013 Z" },
-  { key: "score", label: "By score" },
-  { key: "words", label: "Most words" },
-];
+const sortOptions = [
+  { value: "default", label: "Default" },
+  { value: "az", label: "A–Z" },
+  { value: "score", label: "Score" },
+  { value: "words", label: "Size" },
+] as const;
+
+const PREVIEW_COUNT = 18;
 
 export function VocabView({
   categoryEntries,
@@ -52,160 +55,97 @@ export function VocabView({
   const sortedCategories = [...filteredCategories].sort((a, b) => {
     if (sort === "az") return a[0].localeCompare(b[0]);
     if (sort === "words") return b[1].length - a[1].length;
-    if (sort === "score") {
-      const sa = vocabCategoryBestScores[a[0]] ?? -1;
-      const sb = vocabCategoryBestScores[b[0]] ?? -1;
-      return sb - sa;
-    }
+    if (sort === "score") return (vocabCategoryBestScores[b[0]] ?? -1) - (vocabCategoryBestScores[a[0]] ?? -1);
     return 0;
   });
 
-  const selectedWords = selectedCategory ? categoryEntries.find(([category]) => category === selectedCategory)?.[1] ?? [] : [];
-  const selectedCategoryBestScore = selectedCategory ? vocabCategoryBestScores[selectedCategory] ?? null : null;
+  const selectedWords = selectedCategory ? (categoryEntries.find(([category]) => category === selectedCategory)?.[1] ?? []) : [];
+  const visibleWords = showAll ? selectedWords : selectedWords.slice(0, PREVIEW_COUNT);
 
   return (
-    <section className="panel vocab-shell">
-      <div className="split-header">
+    <>
+      <div className="page-head">
         <div>
-          <h3>Vocabulary decks</h3>
-          <p>Open a category, check your best score, and jump back into the direction you want to improve.</p>
+          <h1>Vocabulary</h1>
+          <p>
+            {passedCategories} / {totalCategories} categories passed
+          </p>
         </div>
       </div>
+      <ProgressBar value={completionPercent} label="Vocabulary completion" />
 
-      <div className="vocab-progress-card">
-        <div className="vocab-progress-head">
-          <div>
-            <span className="mini-label">Category completion</span>
-            <strong>
-              {passedCategories} / {totalCategories} passed
-            </strong>
-            <p>Categories count as passed once your best score is above 80%.</p>
-          </div>
-          <div className="vocab-progress-percent">{completionPercent}%</div>
-        </div>
-        <div className="progress-track vocab-progress-track">
-          <div className="progress-fill" style={{ width: `${completionPercent}%` }} />
-        </div>
+      <div className="toolbar">
+        <SearchField label="Search" value={vocabSearch} placeholder="Categories or words" onChange={onVocabSearchChange} />
+        <Segmented label="Sort categories" value={sort} options={sortOptions} onChange={setSort} />
       </div>
 
-      <input
-        className="search-input"
-        value={vocabSearch}
-        onChange={(event) => onVocabSearchChange(event.target.value)}
-        placeholder="Search categories or words"
-      />
-
-      <div className="filter-bar">
-        {sortOptions.map((opt) => (
-          <button
-            key={opt.key}
-            className={sort === opt.key ? "filter-chip active" : "filter-chip"}
-            onClick={() => setSort(opt.key)}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="vocab-layout">
-        <aside className="vocab-sidebar">
-          <div className="vocab-list">
-            {sortedCategories.map(([category, entries]) => {
-              const isActive = selectedCategory === category;
-              const bestScore = vocabCategoryBestScores[category];
-              const passFail = vocabCategoryPassFail[category] ?? { passed: 0, failed: 0 };
-              const passFailText = formatPassFail(passFail.passed, passFail.failed);
-
-              return (
-                <button
+      <DeckLayout
+        backLabel="All categories"
+        onBack={() => onSelectCategory(null)}
+        list={
+          sortedCategories.length ? (
+            <div className="rows">
+              {sortedCategories.map(([category, entries]) => (
+                <DeckRow
                   key={category}
-                  className={isActive ? "vocab-category-card active" : "vocab-category-card"}
-                  onClick={() => onSelectCategory(category)}
-                >
-                  <div className="vocab-category-main">
-                    <strong>{category}</strong>
-                    <small>
-                      {entries.length} words
-                      {passFailText ? ` \u00b7 ${passFailText}` : ""}
-                      {bestScore !== null && bestScore >= 80 ? " \u2713" : ""}
-                    </small>
-                  </div>
-                  <div className="vocab-category-score">
-                    <span className="section-label">Best</span>
-                    <strong>{bestScore !== null ? `${bestScore}%` : "--"}</strong>
-                    {bestScore !== null && (
-                      <span className="score-bar-mini">
-                        <span className="score-bar-mini-fill" style={{ width: `${bestScore}%` }} />
-                      </span>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-            {!sortedCategories.length && <div className="empty-state">No vocab matches that search yet.</div>}
-          </div>
-        </aside>
-
-        <div className="vocab-detail">
-          {selectedCategory ? (
-            <>
-              <div className="vocab-detail-card">
-                <div className="vocab-detail-top">
-                  <div>
-                    <span className="mini-label">Selected deck</span>
-                    <h3>{selectedCategory}</h3>
-                    <p>
-                      {selectedWords.length} words
-                      {selectedCategoryBestScore !== null ? ` \u00b7 best score ${selectedCategoryBestScore}%` : " \u00b7 no saved score yet"}
-                    </p>
-                  </div>
-                  <div className="vocab-detail-score">
-                    <small>Best score</small>
-                    <strong>{selectedCategoryBestScore !== null ? `${selectedCategoryBestScore}%` : "--"}</strong>
-                  </div>
-                </div>
-
-                <div className="vocab-actions">
-                  <button className="primary-button" onClick={() => onStartQuiz(selectedCategory, "gr-en")}>
-                    Greek to English
-                  </button>
-                  <button className="secondary-button" onClick={() => onStartQuiz(selectedCategory, "en-gr")}>
-                    English to Greek
-                  </button>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
-                <span style={{ color: "var(--text-muted)", fontSize: "0.88rem", fontWeight: 700 }}>
-                  {showAll ? selectedWords.length : Math.min(selectedWords.length, 18)} / {selectedWords.length} words
-                </span>
-                {selectedWords.length > 18 && (
-                  <button className="filter-chip" onClick={() => setShowAll(!showAll)}>
-                    {showAll ? "Show less" : `Show all ${selectedWords.length}`}
-                  </button>
-                )}
-              </div>
-
-              <div className="vocab-preview">
-                {(showAll ? selectedWords : selectedWords.slice(0, 18)).map(([gr, en], i) => (
-                  <div key={`${selectedCategory}-${gr}`} className="vocab-word-row">
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span className="vocab-word-index">{i + 1}</span>
-                      <div>
-                        <strong>{gr}</strong>
-                        <small>{selectedCategory}</small>
-                      </div>
-                    </div>
-                    <span>{en}</span>
-                  </div>
-                ))}
-              </div>
-            </>
+                  title={category}
+                  meta={`${entries.length} words`}
+                  score={vocabCategoryBestScores[category] ?? null}
+                  passFail={vocabCategoryPassFail[category]}
+                  active={selectedCategory === category}
+                  onSelect={() => {
+                    setShowAll(false);
+                    onSelectCategory(category);
+                  }}
+                />
+              ))}
+            </div>
           ) : (
-            <div className="empty-state">Pick a vocab category to see its score, preview its words, and launch a quiz.</div>
-          )}
-        </div>
-      </div>
-    </section>
+            <EmptyState>No categories match “{vocabSearch}”.</EmptyState>
+          )
+        }
+        emptyDetail={<EmptyState icon="book">Pick a category to see its words and start a quiz.</EmptyState>}
+        detail={
+          selectedCategory && (
+            <section className="panel deck-panel" aria-labelledby="deck-title">
+              <div className="deck-panel-head">
+                <div>
+                  <h2 id="deck-title">{selectedCategory}</h2>
+                  <span className="muted">{selectedWords.length} words</span>
+                </div>
+                <ScoreBadge score={vocabCategoryBestScores[selectedCategory] ?? null} />
+              </div>
+              <div className="btn-row direction-buttons">
+                <button className="btn btn-primary" onClick={() => onStartQuiz(selectedCategory, "gr-en")}>
+                  Greek → English
+                </button>
+                <button className="btn btn-secondary" onClick={() => onStartQuiz(selectedCategory, "en-gr")}>
+                  English → Greek
+                </button>
+              </div>
+
+              <table className="word-table">
+                <caption className="visually-hidden">Words in {selectedCategory}</caption>
+                <tbody>
+                  {visibleWords.map(([gr, en]) => (
+                    <tr key={`${selectedCategory}-${gr}`}>
+                      <td className="greek" lang="el">
+                        {gr}
+                      </td>
+                      <td>{en}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {selectedWords.length > PREVIEW_COUNT && (
+                <button className="btn btn-ghost" onClick={() => setShowAll((v) => !v)}>
+                  {showAll ? "Show fewer" : `Show all ${selectedWords.length} words`}
+                </button>
+              )}
+            </section>
+          )
+        }
+      />
+    </>
   );
 }

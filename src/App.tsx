@@ -1,5 +1,4 @@
 import { startTransition, useEffect, useMemo, useState } from "react";
-import "./App.css";
 import { AppHeader } from "./components/AppHeader";
 import { LoginScreen } from "./components/LoginScreen";
 import { MatchGame } from "./components/MatchGame";
@@ -7,6 +6,7 @@ import { QuizRunner } from "./components/QuizRunner";
 import { TabBar } from "./components/TabBar";
 import { TypingChallenge } from "./components/TypingChallenge";
 import { DashboardView } from "./components/views/DashboardView";
+import type { AreaProgress, ContinueTarget } from "./components/views/DashboardView";
 import { GrammarView } from "./components/views/GrammarView";
 import { PhrasesView } from "./components/views/PhrasesView";
 import { ProfileView } from "./components/views/ProfileView";
@@ -14,7 +14,7 @@ import { ProgressView } from "./components/views/ProgressView";
 import { VerbsView } from "./components/views/VerbsView";
 import { VocabView } from "./components/views/VocabView";
 import { emptyStoredState, PASS_THRESHOLD, tenseLabels } from "./features/study/constants";
-import { grammar, phraseSections, verbs, vocab } from "./features/study/data";
+import { grammar, phraseSections, vocab } from "./features/study/data";
 import {
   buildGrammarQuizSession,
   buildPhraseQuizSession,
@@ -24,13 +24,14 @@ import {
   buildVerbTranslationQuizSession,
   buildVocabQuizSession,
 } from "./features/study/quizBuilders";
-import type { DeckStats, QuizAnswer, QuizItem, ReviewCard, StoredState, StudySession, Theme, View } from "./features/study/types";
+import type { DeckStats, QuizAnswer, QuizItem, QuizSession, ReviewCard, StoredState, StudySession, Theme, View } from "./features/study/types";
 import {
   daysUntilExam,
   dedupeCards,
   formatDeckLabel,
   getBestScore,
   getDeckFamily,
+  isPassed,
   percent,
   randomizeQuizSession,
   toDeckStats,
@@ -40,6 +41,7 @@ import { loadCurrentUser, loadProgress, saveCurrentUser, saveProgress } from "./
 export default function App() {
   const [view, setView] = useState<View>("dashboard");
   const [session, setSession] = useState<StudySession | null>(null);
+  const [sessionRun, setSessionRun] = useState(0);
   const [userName, setUserName] = useState<string | null>(loadCurrentUser);
   const [stored, setStored] = useState<StoredState>(() => (userName ? loadProgress(userName) : emptyStoredState));
   const [theme, setTheme] = useState<Theme>(stored.theme);
@@ -49,11 +51,15 @@ export default function App() {
   const [verbSearch, setVerbSearch] = useState("");
   const [vocabSearch, setVocabSearch] = useState("");
   const [tense, setTense] = useState<keyof typeof tenseLabels>("p");
-  const [openPhrase, setOpenPhrase] = useState<string | null>(phraseSections[0]?.title ?? null);
+  const [openPhrase, setOpenPhrase] = useState<string | null>(null);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [view]);
 
   useEffect(() => {
     if (!userName) return;
@@ -75,8 +81,6 @@ export default function App() {
   const favorites = useMemo(() => new Set(stored.favorites.map((card) => card.id)), [stored.favorites]);
   const categoryEntries = useMemo(() => Object.entries(vocab), []);
   const deckStatsEntries = useMemo(() => Object.entries(stored.deckStats), [stored.deckStats]);
-  const totalWords = useMemo(() => categoryEntries.reduce((sum, [, entries]) => sum + entries.length, 0), [categoryEntries]);
-  const totalVerbForms = verbs.length * 3;
   const totalCorrect = deckStatsEntries.reduce((sum, [, deck]) => sum + deck.correct, 0);
   const totalAttempted = deckStatsEntries.reduce((sum, [, deck]) => sum + deck.attempted, 0);
   const totalSessions = deckStatsEntries.reduce((sum, [, deck]) => sum + deck.sessions, 0);
@@ -103,7 +107,7 @@ export default function App() {
     [categoryEntries, stored.deckStats],
   );
   const passedVocabCategories = useMemo(
-    () => categoryEntries.filter(([category]) => (vocabCategoryBestScores[category] ?? 0) > 80).length,
+    () => categoryEntries.filter(([category]) => isPassed(vocabCategoryBestScores[category])).length,
     [categoryEntries, vocabCategoryBestScores],
   );
   const vocabCompletionPercent = categoryEntries.length ? Math.round((passedVocabCategories / categoryEntries.length) * 100) : 0;
@@ -135,7 +139,7 @@ export default function App() {
       }),
     [stored.deckStats],
   );
-  const passedGrammarTopics = grammarTopicBestScores.filter((score) => (score ?? 0) > 80).length;
+  const passedGrammarTopics = grammarTopicBestScores.filter((score) => isPassed(score)).length;
   const grammarCompletionPercent = grammar.length ? Math.round((passedGrammarTopics / grammar.length) * 100) : 0;
   const phraseSectionBestScores = useMemo(
     () =>
@@ -159,11 +163,11 @@ export default function App() {
     [stored.deckStats],
   );
   const passedPhraseSections = useMemo(
-    () => phraseSections.filter((section) => (phraseSectionBestScores[section.title] ?? 0) > 80).length,
+    () => phraseSections.filter((section) => isPassed(phraseSectionBestScores[section.title])).length,
     [phraseSectionBestScores],
   );
   const phrasesCompletionPercent = phraseSections.length ? Math.round((passedPhraseSections / phraseSections.length) * 100) : 0;
-  const passedVerbDecks = [verbMeaningBestScore, verbConjugationBestScore].filter((score) => (score ?? 0) > 80).length;
+  const passedVerbDecks = [verbMeaningBestScore, verbConjugationBestScore].filter((score) => isPassed(score)).length;
   const verbsCompletionPercent = Math.round((passedVerbDecks / 2) * 100);
   const overallPassedUnits = passedVocabCategories + passedGrammarTopics + passedPhraseSections + passedVerbDecks;
   const overallTotalUnits = categoryEntries.length + grammar.length + phraseSections.length + 2;
@@ -219,7 +223,73 @@ export default function App() {
   const fallbackAnswerPool = useMemo(() => categoryEntries.flatMap(([, entries]) => entries.map(([, en]) => en)), [categoryEntries]);
 
   const launchQuiz = (nextSession: StudySession | null) => {
-    if (nextSession) setSession(nextSession);
+    if (!nextSession) return;
+    setSession(nextSession);
+    setSessionRun((run) => run + 1);
+  };
+
+  const openView = (next: View) => startTransition(() => setView(next));
+
+  const areas: AreaProgress[] = completionByArea.map((area) => ({
+    ...area,
+    onOpen: () =>
+      openView(
+        area.label === "Vocabulary" ? "vocab" : area.label === "Grammar" ? "grammar" : area.label === "Phrases" ? "phrases" : "verbs",
+      ),
+  }));
+
+  // "What should I study now?": the weakest unpassed deck you've tried, else the next unpassed unit.
+  const continueTarget = useMemo<{ title: string; detail: string; build: () => QuizSession | null }>(() => {
+    const weakest = rankedDecks
+      .filter((deck) => deck.family !== "Review" && deck.family !== "Other" && !isPassed(deck.stats.bestScore))
+      .sort((left, right) => left.stats.lastScore - right.stats.lastScore)[0];
+    if (weakest) {
+      return {
+        title: weakest.label,
+        detail: `${weakest.family} · last score ${weakest.stats.lastScore}%, pass at ${PASS_THRESHOLD}%`,
+        build: () => buildSessionForDeck(weakest.deckId),
+      };
+    }
+
+    const nextCategory = categoryEntries.find(([category]) => !isPassed(vocabCategoryBestScores[category]));
+    if (nextCategory) {
+      const [category, entries] = nextCategory;
+      return {
+        title: `${category} · Greek to English`,
+        detail: `Vocabulary · ${entries.length} words, not passed yet`,
+        build: () => buildVocabQuizSession(category, "gr-en"),
+      };
+    }
+
+    const nextTopic = grammarTopicBestScores.findIndex((score) => !isPassed(score));
+    if (nextTopic >= 0) {
+      return {
+        title: formatDeckLabel(`grammar:${nextTopic}`),
+        detail: "Grammar · not passed yet",
+        build: () => buildGrammarQuizSession(nextTopic),
+      };
+    }
+
+    const nextSection = phraseSections.find((section) => !isPassed(phraseSectionBestScores[section.title]));
+    if (nextSection) {
+      return {
+        title: `${nextSection.title} · Greek to English`,
+        detail: `Phrases · ${nextSection.items.length} phrases, not passed yet`,
+        build: () => buildPhraseQuizSession("gr-en", nextSection.title),
+      };
+    }
+
+    return {
+      title: "Mixed grammar review",
+      detail: "Everything is passed. Keep it fresh with a mixed quiz.",
+      build: () => buildGrammarQuizSession(),
+    };
+  }, [rankedDecks, categoryEntries, vocabCategoryBestScores, grammarTopicBestScores, phraseSectionBestScores]);
+
+  const dashboardContinue: ContinueTarget = {
+    title: continueTarget.title,
+    detail: continueTarget.detail,
+    onStart: () => launchQuiz(continueTarget.build()),
   };
 
   const toggleFavorite = (card: ReviewCard) => {
@@ -299,24 +369,23 @@ export default function App() {
   if (session?.kind === "quiz") {
     return (
       <QuizRunner
+        key={sessionRun}
         session={session}
         favorites={favorites}
         onToggleFavorite={toggleFavorite}
         onClose={() => setSession(null)}
         onComplete={recordQuizOutcome}
-        onRestart={() => setSession(randomizeQuizSession(session))}
-        onToggleTheme={handleToggleTheme}
-        theme={theme}
+        onRestart={() => launchQuiz(randomizeQuizSession(session))}
       />
     );
   }
 
   if (session?.kind === "match") {
-    return <MatchGame onClose={() => setSession(null)} onToggleTheme={handleToggleTheme} theme={theme} />;
+    return <MatchGame onClose={() => setSession(null)} />;
   }
 
   if (session?.kind === "typing") {
-    return <TypingChallenge onClose={() => setSession(null)} onToggleTheme={handleToggleTheme} theme={theme} />;
+    return <TypingChallenge onClose={() => setSession(null)} />;
   }
 
   if (!userName) {
@@ -324,39 +393,30 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
+    <div className="app-shell has-bottom-nav">
       <AppHeader
-        title="Greek Exam Studio"
-        subtitle="A cleaner A2 study app with vocab, conjugation, grammar, phrasebook, and progress."
-        eyebrow={`${daysUntilExam()} days until the May 19, 2026 exam`}
-        onOpenProfile={() => startTransition(() => setView("profile"))}
+        daysToExam={daysUntilExam()}
+        onOpenProfile={() => openView("profile")}
         profileName={userName}
         profileActive={view === "profile"}
         onToggleTheme={handleToggleTheme}
         theme={theme}
       />
       <TabBar view={view} setView={setView} />
-      <main className="content">
+      <main className="container content">
         {view === "dashboard" && (
           <DashboardView
+            profileName={userName}
+            continueTarget={dashboardContinue}
             overallAccuracy={overallAccuracy}
             totalSessions={totalSessions}
             mistakesCount={stored.mistakes.length}
-            overallCompletionPercent={overallCompletionPercent}
-            overallPassedUnits={overallPassedUnits}
-            overallTotalUnits={overallTotalUnits}
-            totalWords={totalWords}
-            categoryCount={categoryEntries.length}
-            phraseSectionCount={phraseSections.length}
-            verbsCount={verbs.length}
-            totalVerbForms={totalVerbForms}
-            rankedDecks={rankedDecks}
+            areas={areas}
             favorites={stored.favorites}
             mistakes={stored.mistakes}
-            onStartMixedGrammar={() => launchQuiz(buildGrammarQuizSession())}
-            onOpenVerbs={() => startTransition(() => setView("verbs"))}
             onOpenFavoritesQuiz={openFavoritesQuiz}
             onOpenMistakesQuiz={openMistakesQuiz}
+            onOpenProgress={() => openView("progress")}
           />
         )}
 
@@ -421,7 +481,7 @@ export default function App() {
             phrasesCompletionPercent={phrasesCompletionPercent}
             phraseSectionBestScores={phraseSectionBestScores}
             phraseSectionPassFail={phraseSectionPassFail}
-            onTogglePhrase={(title) => setOpenPhrase((current) => (current === title ? null : title))}
+            onSelectPhrase={setOpenPhrase}
             onBuildPhraseQuiz={(direction, sectionTitle) => launchQuiz(buildPhraseQuizSession(direction, sectionTitle))}
           />
         )}
@@ -438,6 +498,7 @@ export default function App() {
             completionByArea={completionByArea}
             familyStats={familyStats}
             rankedDecks={rankedDecks}
+            onStartQuiz={dashboardContinue.onStart}
           />
         )}
 
@@ -450,14 +511,11 @@ export default function App() {
             needsWorkDeck={needsWorkDeck}
             totalSessions={totalSessions}
             overallAccuracy={overallAccuracy}
-            totalCorrect={totalCorrect}
             favorites={stored.favorites}
             mistakes={stored.mistakes}
             onToggleTheme={handleToggleTheme}
             onLogout={handleLogout}
-            onOpenProgress={() => startTransition(() => setView("progress"))}
-            onOpenFavoritesQuiz={openFavoritesQuiz}
-            onOpenMistakesQuiz={openMistakesQuiz}
+            onOpenProgress={() => openView("progress")}
             onResetProgress={() => {
               const confirmed = window.confirm(
                 "Reset all progress? This clears every deck score, pass/fail count, favorite, and saved mistake. This cannot be undone.",
@@ -469,4 +527,29 @@ export default function App() {
       </main>
     </div>
   );
+}
+
+/** Rebuild a quiz session from a stored deck id (used by the dashboard "Continue" card). */
+function buildSessionForDeck(deckId: string): QuizSession | null {
+  const parts = deckId.split(":");
+  const kind = parts[0];
+  if (kind === "vocab" || kind === "phrases") {
+    const direction = parts[parts.length - 1] === "en-gr" ? "en-gr" : "gr-en";
+    const name = parts.slice(1, -1).join(":");
+    if (kind === "vocab") return vocab[name] ? buildVocabQuizSession(name, direction) : null;
+    if (name === "all") return buildPhraseQuizSession(direction);
+    return phraseSections.some((section) => section.title === name) ? buildPhraseQuizSession(direction, name) : null;
+  }
+  if (kind === "verbs") {
+    if (parts[1] === "meaning") return buildVerbMeaningQuizSession();
+    if (parts[1] === "conjugation") return buildVerbConjugationQuizSession();
+    if (parts[1] === "translation-all") return buildVerbTranslationQuizSession();
+    return null;
+  }
+  if (kind === "grammar") {
+    if (parts[1] === "all") return buildGrammarQuizSession();
+    const topic = Number(parts[1]);
+    return Number.isInteger(topic) && grammar[topic] ? buildGrammarQuizSession(topic) : null;
+  }
+  return null;
 }
